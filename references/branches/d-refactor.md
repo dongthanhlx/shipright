@@ -1,13 +1,17 @@
 ## Branch D — Refactor / improve architecture
 
-Highest-risk operation. Most "refactors" become unplanned rewrites.
+> **L0→L4 tree: read L0 docs to understand intent, do NOT follow tree sequence.**
+> Refactor uses characterization tests + atomic steps — not L1/L2/L3.
+> Working directory: all files in directory shown in SKILL.md context.
 
-### Step 1 — Define the pain (reject vague goals)
+---
+
+## Step 1 — Define the pain (reject vague goals)
 
 ```
-Q1: "Điều gì đang gây pain cụ thể, đo được?
-     [A] Add feature X mất [N ngày] — nên mất [M giờ]
-     [B] Bug mất [N giờ] để tìm vì code không rõ
+Q1: "Điều gì đang gây pain CỤ THỂ, ĐO ĐƯỢC?
+     [A] Thêm feature X mất [N ngày] — nên mất [M giờ]
+     [B] Bug mất [N giờ] tìm vì code phức tạp
      [C] Test suite chạy [N phút] — quá chậm cho CI
      [D] Performance: [metric] = [value], target = [target]
      [E] Chuẩn bị cho: team lớn hơn / data volume / service split"
@@ -15,47 +19,70 @@ Q1: "Điều gì đang gây pain cụ thể, đo được?
 Q2: "Module / file cụ thể nào đang là vấn đề?"
 ```
 
-Nếu answer là "code trông không clean" hoặc "muốn restructure":
-→ Redirect: "Refactor không có pain cụ thể thường không ship được và không cải thiện gì đo được. Hãy dùng codebase vài ngày nữa và note lại pain points thật sự."
+If answer is "code trông không clean" or "muốn restructure":
+→ Redirect: "Refactor không có pain cụ thể thường không deliver value đo được.
+   Dùng codebase thêm vài ngày, note lại pain points thật sự."
 
-### Step 2 — Define DONE (mandatory before starting)
+---
 
-```
-DONE là gì? Chọn một, phải đo được hoặc binary:
-
-□ "Add feature [X] sẽ mất < [N giờ]" — đo được
-□ "npx madge --circular trả empty" — binary
-□ "Coverage paths bị touch > 80%" — binary
-□ "Cyclomatic complexity < 10 mỗi function" — binary
-□ "Refactor xong trong [N ngày] — time-boxed, không extend"
-
-Nếu không define được DONE → dừng, không refactor bây giờ.
-```
-
-### Step 3 — Characterization tests (non-negotiable)
-
-Xem định nghĩa đúng của characterization test ở Branch B.
+## Step 2 — Define DONE (mandatory before starting)
 
 ```
-Viết characterization tests cho code sẽ bị touch.
-Coverage target: 100% code paths sẽ thay đổi (không phải 60% overall).
-Chạy tests → GREEN.
-Từ đây không được để test đỏ tại bất kỳ thời điểm nào.
-```
+Pick one — must be measurable or binary:
+□ "Add feature [X] will take < [N hours]" — measurable
+□ "npx madge --circular returns empty" — binary
+□ "Coverage of touched paths > 80%" — binary
+□ "Refactor done in [N days] — time-boxed, no extension"
 
-### Step 4 — Refactor in atomic steps
-
-```
-Rules không thể phá vỡ:
-□ Một thay đổi nhỏ, atomic mỗi lần
-□ Chạy tests SAU MỖI thay đổi — không batch
-□ Test đỏ trong refactor = revert NGAY, tìm cách khác
-□ Commit sau mỗi step xanh: "refactor([module]): [mô tả thay đổi nhỏ]"
-□ Không implement feature mới trong refactor commit
-□ Không đổi public interface mà không update callers ngay
-
-Khi DONE condition đạt được → STOP.
-Không tiếp tục "vì còn chỗ này chưa clean".
+Cannot define DONE → do not refactor now.
 ```
 
 ---
+
+## Step 3 — Characterization tests FIRST
+
+```
+Write tests that capture CURRENT behavior (even if wrong):
+
+// CORRECT — snapshot captures exactly what it does NOW
+it('CHARACTERIZATION: current behavior', () => {
+  expect(result).toMatchSnapshot()  // fails if ANYTHING changes
+})
+
+// WRONG — this tests expected behavior, not current
+it('should return correct fields', () => {
+  expect(result.id).toBe(1)
+})
+
+Coverage target: 100% of code paths THAT WILL BE TOUCHED.
+Not 60% overall — just the paths changing.
+Run tests → GREEN. From here: tests must never go RED.
+```
+
+---
+
+## Step 4 — Atomic steps, always green
+
+```
+Rules (unbreakable):
+□ One small change at a time
+□ Run tests AFTER EACH change — never batch
+□ Test goes RED during refactor → REVERT that step immediately
+□ Commit after each green step: "refactor([module]): [small description]"
+□ No new features in refactor commits
+□ No interface changes without updating all callers in same commit
+
+When DONE condition is met → STOP.
+"This other part also looks messy" is not a reason to continue.
+```
+
+**[if addyosmani installed]** → activate `code-simplification` for Chesterton's Fence
+analysis and complexity reduction within the refactor scope.
+
+---
+
+## Step 5 — Update constitution after
+
+If refactor revealed a boundary violation that was in CLAUDE.md as acceptable:
+update tech debt log (trigger met, removed).
+If refactor changed module structure: update ARCHITECTURE.md.

@@ -1,115 +1,114 @@
 ## Branch B — Existing project, add feature
 
-**Rule: Never touch code before understanding what's there.**
+> **Working directory**: all files in directory shown in SKILL.md context.
+> If CLAUDE.md or ARCHITECTURE.md exist → read them BEFORE asking anything.
+> L0→L4 tree: L0 already exists. L1 done (project runs). Entry point is L2.
 
-### Step 1 — Intake (ask one at a time)
+---
+
+## Step 1 — Intake (one at a time)
 
 ```
-Q1: "Tên project và một câu mô tả nó làm gì?"
-
-Q2: "Feature cần thêm, từ góc độ user:
-     'User có thể [làm gì] để [đạt được gì]'"
-
-Q3: "Feature này cần module mới hay extend module đang có?"
-
+Q1: "Tên project và 1 câu mô tả nó làm gì?"
+Q2: "Feature cần thêm: 'User có thể [làm gì] để [đạt gì]'"
+Q3: "Feature này cần module mới hay extend module cũ?"
 Q4: "CLAUDE.md và ARCHITECTURE.md có không?"
-```
-
-### Step 2 — Read codebase (structured report required)
-
-```
-Đọc codebase, KHÔNG sửa gì. Báo cáo theo đúng format này:
-
-## Codebase report: [project-name]
-Entry points: [file → what it starts]
-Module map:   [module] → [1-sentence job] → [depends on]
-Data flow:    Request → [A] → [B] → [C] → Response
-Patterns:     [what patterns exist, where]
-Landmines:    [files/areas dangerous to touch — global state, tight coupling, etc.]
-Feature [X] touches: [which modules and why]
-Unknowns:     [what needs clarification before coding]
-```
-
-### Step 3 — Health check (tiered, not flat 4 questions)
-
-```
-Đánh giá module(s) sẽ bị touch. Phân loại theo tier:
-
-TIER 1 — Blockers (phải giải quyết trước khi thêm feature):
-□ Có global mutable state không? (module-level variables bị mutate)
-□ Circular dependencies? (chạy: npx madge --circular src/)
-□ Có empty catch blocks không? (errors bị swallow silently)
-□ Feature mới có race condition risk không? (shared resource + concurrent access)
-
-TIER 2 — Warnings (ghi nhận, proceed with caution):
-□ Test coverage của module bị touch (chạy coverage report)
-□ Service import db trực tiếp không?
-□ Handler có business logic không?
-□ Public interface đang unstable (thay đổi thường xuyên)?
-
-TIER 3 — Notes (log vào tech debt, không block):
-□ TODO/FIXME liên quan đến feature đang thêm?
-□ Naming inconsistency?
-
-Kết luận: [SAFE / TIER1-BLOCKER / TIER2-CAUTION] với lý do cụ thể.
-```
-
-### Step 4 — Decision based on health check
-
-**SAFE** → implement ngay:
-```
-Module mới hay extend module cũ?
-
-Extend module cũ → bắt đầu L2 cho feature:
-  1. Viết test cases (RED)
-  2. Implement inside-out: repository → service → handler
-  3. Boundary check trước commit
-
-Module mới → update ARCHITECTURE.md trước:
-  1. Add module vào ARCHITECTURE.md (responsibility, deps, forbidden deps)
-  2. Confirm không tạo circular dependency mới
-  3. Bắt đầu L2 cho module mới
-```
-
-**TIER1-BLOCKER** → assess effort first, then decide:
-```
-Estimate effort để fix blocker:
-  Files cần touch: [N]
-  Test coverage hiện tại: [%]
-  Estimate: [X giờ]
-
-Quyết định:
-  Blocker fix < 20% deadline còn lại → Fix trước, commit riêng: "fix: remove global state in [module]"
-  Blocker fix > 20% deadline → Workaround với TODO[fix-before-scale]: [description]
-  Blocker fix > 50% deadline → Escalate với team/manager trước khi làm gì
-```
-
-**TIER2-CAUTION** → proceed với safety net:
-```
-Viết characterization tests trước (xem bên dưới).
-Sau đó implement feature dưới green tests.
-Ghi Tier 2 issues vào tech debt log trong CLAUDE.md.
-```
-
-### Characterization tests — đúng cách
-
-```typescript
-// MỤC ĐÍCH: capture EXACTLY what code does NOW (kể cả behavior sai)
-// KHÔNG PHẢI: test expected behavior
-
-// Cách đúng — snapshot test
-it('CHARACTERIZATION: getUser current behavior', () => {
-  const result = userService.getUser(1)
-  expect(result).toMatchSnapshot() // fail nếu BẤT KỲ thứ gì thay đổi
-})
-
-// Cách sai — viết như unit test thường
-it('should return user with correct fields', () => {
-  expect(result.id).toBe(1) // test expected, không phải current
-})
-
-// Coverage cần: 100% code paths SẼ BỊ TOUCH trong feature/refactor
-// Không cần: 60% overall (tùy tiện)
+     → Nếu không có → tạo trước (Branch A Production mode), rồi quay lại đây
 ```
 
 ---
+
+## Step 2 — Read codebase (structured report)
+
+```
+Đọc codebase. KHÔNG sửa gì. Report theo format:
+
+## Codebase report: [name]
+Entry points:  [file → what it starts]
+Module map:    [module] → [1-sentence job] → [depends on]
+Data flow:     Request → [A] → [B] → [C] → Response
+Patterns:      [what patterns exist, where]
+Landmines:     [dangerous areas — global state, tight coupling]
+Feature touches: [which modules affected and why]
+Unknowns:      [what needs clarification]
+```
+
+---
+
+## Step 3 — Health check (tiered)
+
+```
+TIER 1 — Blockers (fix before feature):
+□ Global mutable state? (module-level vars mutated)
+□ Circular dependencies? (run: npx madge --circular src/)
+□ Empty catch blocks swallowing errors?
+□ Race condition risk with new feature?
+
+TIER 2 — Warnings (proceed with caution):
+□ Test coverage of modules being touched?
+□ Service importing db directly?
+□ Business logic in handler?
+
+Verdict: [SAFE / TIER1-BLOCKER / TIER2-CAUTION]
+```
+
+**TIER1-BLOCKER** → estimate effort:
+```
+Effort < 20% remaining deadline → fix first, separate commit
+Effort > 20% deadline → workaround + TODO[fix-before-scale]
+Effort > 50% deadline → escalate to team/manager
+```
+
+---
+
+## Step 4 — Implement
+
+**Extend existing module:**
+```
+Entry: L2 for this feature only
+
+[if addyosmani installed]:
+  Simple/clear feature → activate incremental-implementation + test-driven-development
+  Complex/risky feature → activate spec-driven-development first
+
+[if not installed]:
+  1. Write test cases for new behavior (RED — Outside-In TDD)
+  2. Implement inside-out: repository → service → handler
+  3. Run boundary checklist before commit
+
+Gate: tests GREEN + boundary check pass + no regression
+```
+
+**New module needed:**
+```
+1. Update ARCHITECTURE.md first:
+   - Add module: responsibility (1 sentence), public API, forbidden deps
+   - Verify: no circular dependency introduced
+   - Commit: "docs: add [module] to ARCHITECTURE.md"
+
+2. Then L2 → L3 for new module
+   [delegate to addyosmani if installed]
+```
+
+---
+
+## Boundary checklist (run after every feature)
+
+```bash
+grep -r "shared/db" src/modules/       # must be empty
+grep -r "\.service" src/modules/*/index # must be empty
+npx tsc --noEmit                        # must pass
+```
+
+Manual:
+- [ ] Repository returns typed object, not raw row
+- [ ] Handler has zero domain if/else
+- [ ] Mutation is idempotent (if applicable)
+
+---
+
+## taste-skill (if installed, UI features only)
+
+Activate `design-taste-frontend` only when:
+- Feature has user-facing UI components
+- DO NOT activate for: backend API, CLI, background jobs

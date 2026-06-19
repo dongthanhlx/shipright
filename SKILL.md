@@ -1,348 +1,251 @@
 ---
 name: shipright
-version: 0.3.0
+version: 0.4.0
 description: >
-  Guides any developer through building software projects with senior-level architecture
-  judgment — structured, testable, and designed to grow without technical debt.
-  Use this skill whenever someone wants to start a new project, asks how to structure
-  code, wants to avoid technical debt, or asks how to build something that can grow.
-  Triggers for: "build project X", "help me start", "project structure", "organize code",
-  "build like a senior", "scalable architecture", "MVP first", "how do I build X".
-  Equally important: this skill teaches WHEN NOT TO use patterns — that judgment is
-  what separates senior from junior thinking.
+  Ship your MVP fast. Grow it right. Shipright is the project constitution skill —
+  it sets up minimal irreversible architecture decisions that let your codebase
+  grow without rot, then orchestrates the right skills at the right moment.
+  Use when: starting a new project, adding a feature to existing code, fixing a bug,
+  refactoring, resuming after a break, or dealing with a production incident.
+  Triggers: "build project X", "help me start", "MVP first", "project structure",
+  "add feature", "fix bug", "refactor", "production down", "resume project".
+  Pairs with addyosmani/agent-skills for execution, taste-skill for UI quality.
+allowed-tools: Read, Write, Bash, Glob, Grep
 ---
 
-# Shipright Skill
+## Working context (injected at runtime)
 
-A repeatable process for building software that starts simple, stays clean, and grows
-without rewriting. Works for any stack. Works for new projects and existing codebases.
-
-The mental model: a **tree**. Trunk first, then branches, then leaves. Never skip levels.
-Each level has a gate — you only move forward when the current level is stable.
-
----
-
-## FIRST — Always run onboarding before anything else
-
-When this skill triggers, the very first thing to do is ask ONE question:
-
-```
-Dự án này đang ở trạng thái nào?
-
-  [A] Mới hoàn toàn — chưa có gì
-  [B] Đã có code — cần dev thêm feature
-  [C] Đã có code — cần fix bug
-  [D] Đã có code — muốn refactor / cải thiện kiến trúc
-  [E] Đã có code — cần orient lại / tiếp tục sau thời gian dừng
-  [F] Đang có vấn đề production — chậm / crash / data sai
-```
-
-**Wait for the answer.** Then follow the correct branch in `references/onboarding.md`.
-
-Do NOT proceed to architecture, code, or any other step before this question is answered.
-Do NOT ask multiple questions at once — one question, wait, then the next.
+Shipright version: !`grep "^version:" "${CLAUDE_SKILL_DIR}/SKILL.md" 2>/dev/null | head -1 | awk '{print $2}' || echo "unknown"`
+Current directory: !`pwd`
+Project files: !`ls -1 2>/dev/null | head -20`
+Git status: !`git status --short 2>/dev/null || echo "not a git repo"`
+CLAUDE.md: !`test -f CLAUDE.md && echo "YES — read before asking anything" || echo "NO"`
+ARCHITECTURE.md: !`test -f ARCHITECTURE.md && echo "YES — read before asking anything" || echo "NO"`
+addyosmani/agent-skills: !`test -d "${HOME}/.claude/skills/agent-skills" && grep "^version:" "${HOME}/.claude/skills/agent-skills/SKILL.md" 2>/dev/null | head -1 | awk '{print $2}' || echo "not installed"`
+taste-skill: !`test -d "${HOME}/.claude/skills/taste-skill" && echo "installed" || echo "not installed"`
 
 ---
 
-## Is this workflow even appropriate?
+# Shipright
 
-Before generating anything, validate:
+**Shipright is the conductor. External skills are the musicians.**
+Shipright knows: which piece to play, what order, which musician plays what.
+addyosmani/agent-skills knows: how to execute each part excellently.
+taste-skill knows: how to make UI not look like slop.
+These roles never overlap. Shipright does NOT duplicate their instructions.
+
+---
+
+## The one rule that never changes
+
+**3 boundaries. Absolute. Non-negotiable. In MVP and in production.**
+
+Based on Uncle Bob's Dependency Rule and Fowler's internal quality research:
+these are the only things that are cheap to do right from day one
+and expensive to fix later — even with AI coding fast.
 
 ```
-Project lives < 1 week OR throwaway prototype?   → skip everything, just hack
-Single dev, < 500 lines total?                   → flat modules, no DI needed
-Script / CLI with no domain logic?               → functions, no classes
-Fewer than 3 domain entities?                    → flat structure is fine
+1. Dependencies point inward only
+   Service never imports db directly. Module never imports another module's internals.
+   Cross-module calls go through index.ts / __init__.py only.
 
-Otherwise → use this workflow
+2. Each layer has one job
+   Handler: parse → call service → format. No domain logic.
+   Service: business rules only. No HTTP, no DB.
+   Repository: DB queries only. Returns typed domain objects, not raw rows.
+
+3. Modules do not share databases
+   If module A needs data from module B → call B's public interface.
+   Never query B's table directly. This is the seam for future service extraction.
+```
+
+Why these three and nothing else as non-negotiable:
+Fowler showed internal quality pays off in weeks, not months.
+Uncle Bob showed the dependency rule is what makes systems testable and swappable.
+With AI coding fast, these boundaries are even cheaper to maintain —
+but the cost of violating them is unchanged: data model migrations still hurt,
+tangled dependencies still make AI generate wrong code at scale.
+
+Everything else — test coverage level, error taxonomy completeness, caching,
+full ADR set, idempotency on every operation — is signal-driven. Do it when
+the trigger condition is met, not upfront.
+
+---
+
+## FIRST — One question, then branch
+
+Ask exactly this, wait for the answer, load ONE branch file:
+
+```
+Dự án đang ở trạng thái nào?
+
+  [A] Mới — chưa có gì
+  [B] Đã có code — thêm feature
+  [C] Đã có code — fix bug
+  [D] Đã có code — refactor
+  [E] Đang có code — cần orient lại / tiếp tục
+  [F] Production đang có vấn đề
+```
+
+| Answer | Load | Do NOT load others |
+|---|---|---|
+| A | `references/branches/a-new-project.md` | B–F |
+| B | `references/branches/b-add-feature.md` | A,C–F |
+| C | `references/branches/c-fix-bug.md` | A,B,D–F |
+| D | `references/branches/d-refactor.md` | A–C,E,F |
+| E | `references/branches/e-resume.md` | A–D,F |
+| F | `references/branches/f-incident.md` | A–E |
+
+---
+
+## Is this workflow appropriate?
+
+```
+Throwaway prototype, < 1 week lifespan?    → skip everything, just hack
+Script / CLI, < 200 lines, no domain?      → flat functions, no layers needed
+Solo, < 3 domain entities, read-only?      → simple modules, no DI needed
+Otherwise                                   → use shipright
 ```
 
 Senior thinking is knowing when NOT to apply a pattern.
-Cargo-culting Repository pattern into a 50-line CSV reader is not senior — it's noise.
 
 ---
 
-## Your role when this skill triggers
+## The 2-mode decision (ask in Branch A)
 
-You are a **senior engineer pairing with the developer**.
-You surface trade-offs, not just patterns. You push back when something is over-engineered.
-You ask "what problem are we solving?" before recommending any solution.
+```
+"Building to VALIDATE an idea, or SCALE a proven solution?"
 
-Be direct. If the developer wants to skip a level, explain specifically what debt that creates.
-If they want to over-engineer, name what they're trading away (speed, simplicity, cognitive load).
+VALIDATE (MVP mode):
+  Goal: working software in front of real users, fastest possible.
+  Constitution: minimal — 3 boundaries + core modules only + debt log.
+  Process: walking skeleton first, validate, then feature loop.
+  Timeline: days, not weeks.
+
+SCALE (Production mode):
+  Goal: architecture that supports team growth and load.
+  Constitution: full — all modules, error taxonomy, idempotency, ADRs.
+  Process: full L0 → L1 → L2 → L3.
+  Timeline: planned sprints.
+```
+
+The irreversible decisions that need to be right in BOTH modes:
+core domain model shape, module boundary map, dependency direction.
+These are cheap to do right now. Expensive to fix with 10k users and live data.
 
 ---
 
-## The 4-Level Tree
+## The 4-Level Tree (Branch A only — new projects)
 
 ```
-L0  Contract        → CLAUDE.md + ARCHITECTURE.md (before any code)
-L1  Skeleton        → project compiles, runs, no logic yet  
-L2  Interfaces      → layers defined, tests written (RED)
-L3  Implement       → one feature at a time, tests GREEN
-L4  Harden          → only when production signals demand it
+L0  Constitution  → CLAUDE.md + ARCHITECTURE.md
+L1  Skeleton      → compiles, runs, no logic
+L2  Interfaces    → layers defined, tests written (RED)
+L3  Implement     → one feature at a time, tests GREEN
+L4  Harden        → only when production signal demands it
 ```
 
-Gate rule: never move to the next level until the current gate passes.
-See `references/levels.md` for complete definitions.
+Which branch uses which levels:
+
+| Branch | L0 | L1 | L2 | L3 | L4 |
+|---|---|---|---|---|---|
+| A — New project | ✓ Create | ✓ Create | ✓ Create | ✓ Loop | Signal |
+| B — Add feature | ✓ Read/update | — | ✓ Feature only | ✓ | Signal |
+| C — Fix bug | — | — | — | — | — |
+| D — Refactor | ✓ Read | — | — | — | — |
+| E — Resume | ✓ Read | Detect level | Resume at level | Continue | Signal |
+| F — Incident | — | — | — | — | — |
+
+Branch C and F: tree does NOT apply. Dedicated workflows in branch files.
+Branch D: read L0 docs for intent, follow refactor workflow (characterization tests first).
 
 ---
 
-## Step 1 — Understand the project (5 questions)
+## Ecosystem — what shipright delegates
 
-Extract these before writing any file:
+Shipright orchestrates. These skills execute their parts better.
+Install independently. Shipright works without them but pairs better with them.
 
-1. **Problem in one sentence**: [Input] → [Process] → [Output].
-   Cannot write it in one sentence? Ask until you can.
+### addyosmani/agent-skills (43k★ — production-grade SDLC)
+Install: `npx skills add https://github.com/addyosmani/agent-skills`
 
-2. **Bounded contexts**: What are the major nouns in the domain?
-   Name them as nouns: `Order`, `Payment`, `Crawler` — not `ProcessOrder`, `HandlePayment`.
+When shipright says "spec this feature" → activate `spec-driven-development`
+When shipright says "implement" → activate `incremental-implementation` + `test-driven-development`
+When shipright says "bug fix" → activate `debugging-and-error-recovery`
+When shipright says "review before merge" → activate `code-review-and-quality`
+When shipright says "security check" → activate `security-and-hardening`
+When shipright says "ship" → activate `shipping-and-launch`
 
-3. **Core domain object**: What is the central type flowing through the system?
+Shipright still owns: constitution generation, 3 boundary rules, MVP vs production routing,
+tech debt ledger, project state detection, irreversible decisions.
+addyosmani still owns: how to execute each of the above excellently.
 
-4. **Trigger**: How does the system run? (HTTP request / cron / event / CLI / background job)
+### taste-skill (30k★ — anti-slop frontend)
+Install: `npx skills add https://github.com/Leonxlnx/taste-skill`
 
-5. **Mutation surface**: Which operations mutate state?
-   → These need idempotency design at L0. Ask: "if this runs twice, what breaks?"
+Activate only when: L3 is building a UI module.
+Do NOT activate for: backend-only modules, API services, CLI tools.
 
----
-
-## Step 2 — L0: Generate the contract
-
-Read `references/l0-templates.md` for exact structure. Generate both files in one pass.
-
-### CLAUDE.md must cover:
-- Project in one sentence
-- The 3 boundary rules (specific to this project, with banned import examples)
-- Coding workflow (always in order: types → test → implement inside-out)
-- Error taxonomy (domain errors vs infrastructure errors — see below)
-- Idempotency decisions for each mutation operation
-- Pre-commit checklist (grep-able commands)
-- Tech debt log with metric-based triggers
-- "When to ask before doing" (interface changes, new deps, schema migrations)
-
-### ARCHITECTURE.md must cover:
-- ASCII system diagram showing data flow
-- Module list: responsibility (1 sentence), public API, explicit forbidden deps
-- Core domain model with field comments explaining *why* each field exists
-- Database schema with indexes
-- Dependency rules (allowed AND forbidden)
-- "How to add a new [X]" (proves extensibility — zero changes to existing code)
-- ADR section (only for non-obvious decisions — see below)
-
-### Error taxonomy — define at L0, not L3
-
-Every project needs this decided before code:
-
-```
-DomainError (business rule violations → client's fault)
-  ├── ValidationError    → HTTP 400
-  ├── NotFoundError      → HTTP 404  
-  ├── ConflictError      → HTTP 409 (duplicate, already exists)
-  └── ForbiddenError     → HTTP 403
-
-InfrastructureError (technical failures → our problem)
-  ├── DatabaseError      → HTTP 503 + retry + alert
-  └── ExternalAPIError   → HTTP 502 + circuit breaker
-
-Rule: Service throws DomainError or InfrastructureError.
-      Handler maps error type → HTTP status. Never the other way around.
-      Service has ZERO knowledge of HTTP.
-```
-
-### What earns an ADR
-
-ADR is for **non-obvious decisions with rejected alternatives**.
-No rejected alternatives = not hard enough to need an ADR.
-
-❌ "We use PostgreSQL because we need a relational database" — obvious, skip it
-❌ "We use TypeScript for type safety" — obvious, skip it
-✅ "We accept eventual consistency in the notification module because..."
-✅ "We chose raw SQL over ORM because... (rejected: Prisma because...)"
-✅ "We store quota in PostgreSQL not Redis because... trigger to revisit: ..."
-
-Each ADR must have: Context / Options considered (with trade-offs) / Decision / Consequences / Trigger to revisit.
-
-### Gate — L0 done when:
-- [ ] Both files are project-specific (zero generic boilerplate)
-- [ ] Every module has a single-sentence responsibility
-- [ ] Error taxonomy is defined
-- [ ] Every mutation operation has an idempotency answer
-- [ ] Every tech debt item has a metric-based trigger (not "fix later")
+When active: `design-taste-frontend` for layout/typography/motion quality.
 
 ---
 
-## Step 3 — L1: Skeleton
+## Working directory rule
 
-Give developer the L1 skeleton prompt from `references/prompts.md` (section: L1 Prompts).
-Adapt stack names using `references/stacks/[stack].md`.
-
-### Gate — L1 done when:
-- [ ] Build passes, zero type errors
-- [ ] App starts without crashing
-- [ ] `grep -r "direct-db-import-pattern" src/modules/` returns empty
-- [ ] Every module's public boundary file exports only what others need
-- [ ] No circular dependencies (run: `npx madge --circular src/`)
+ALL file operations happen in the current directory shown in the context above.
+If CLAUDE.md or ARCHITECTURE.md exist → read them BEFORE asking any questions.
+If developer mentions a path → confirm: "You mean `[path]` relative to `[pwd]`?"
 
 ---
 
-## Step 4 — L2: Interfaces + Test Specs (Outside-In TDD)
+## When requirements change architecture
 
-**Critical**: tests drive interface design — not the other way around.
-Write the test first. Let the interface *emerge* from what the test needs to call.
+Read `references/requirement-drift.md` when:
+- New requirement doesn't fit current module structure
+- Developer wants to add a completely new bounded context
+- Core domain type needs to change
 
-For each module, one at a time, use the L2 prompt from `references/prompts.md` (section: L2 Prompts).
-
-Key principle: write test first → interface emerges from what test needs to call.
-RED tests at end of L2 = correct. GREEN = something is wrong.
-
-**The RED-is-correct principle**: if tests pass at L2, something is wrong.
-You either implemented logic prematurely or wrote tests that don't test anything.
-
-### Gate — L2 done when:
-- [ ] Tests exist and run RED (not ERROR — RED means logic not implemented yet)
-- [ ] Interface was discovered from tests, not pre-defined
-- [ ] Every mutation test includes an idempotent retry test case
-- [ ] Build still passes
-- [ ] Dependencies injected via constructor (no module-level singletons)
+3 scenarios: new implementation of existing interface (add, zero changes elsewhere),
+wrong abstraction revealed (refactor to new pattern under green tests),
+foundational type change (Expand-Contract: optional → migrate → required, 3 commits).
 
 ---
 
-## Step 5 — L3: Implement features (one at a time)
+## Common mistakes — redirect these
 
-L3 is a loop. One iteration = one feature. Never implement two features before testing.
-
-**Inside-out order**: normalizer → repository → service → handler. Detail in `references/levels.md`.
-
-Use the L3 feature prompt + boundary checklist from `references/prompts.md` (section: L3 Prompts).
-
-**When a module grows too large** (service file > 300 lines OR > 5 distinct operations):
-Stop. Reorganize by feature inside the module before adding more:
-```
-modules/orders/           ← boundary stays the same
-  index.ts                ← public API unchanged
-  fulfillment/            ← extracted sub-domain
-    fulfillment.service.ts
-    fulfillment.repository.ts
-  pricing/                ← domain service (pure logic, no DB)
-    pricing.service.ts
-```
-This is Package by Feature inside a bounded context. Not microservices — just better organization.
-
-### Gate — commit when:
-- [ ] This feature's tests: GREEN
-- [ ] All previous tests: still GREEN (no regression)
-- [ ] Boundary checklist: zero violations
-- [ ] Idempotency test: passes
-- [ ] Commit message: `feat([module]): [what it does in plain language]`
-
----
-
-## Step 6 — L4: Production hardening (signal-driven only)
-
-L4 is NOT "make it better". Only when production gives a measurable signal.
-
-**Required signal format before starting ANY L4 work**:
-```
-Track: [Performance | Reliability | Observability]
-Signal: [metric] = [measured value]
-Target: [what it should be]  
-Context: [when — peak load? specific query? after deploy?]
-```
-
-Three tracks: **Performance** (latency, DB CPU, quota, memory), **Reliability** (flaky APIs, overlapping jobs, error rate, data consistency), **Observability** (tracing, alerting, correlation IDs).
-
-Full signal → action table in `references/levels.md` (L4 section).
-
-**L4 constraint**: fix stays inside one layer. If the fix requires changing a service's
-public interface → it's a design problem, not an optimization. Stop and do architecture review.
-
----
-
-## When to NOT use the full workflow
-
-```
-Script / one-off tool / throwaway prototype     → single file, functions only
-Team of 1, project < 2 weeks, < 500 lines      → flat modules, skip DI
-Domain entities < 3, no mutation               → simple functions, no repository
-Already have working code, adding a feature    → start at L2 for the new module only
-```
-
----
-
-
----
-
-## When requirement changes force architecture changes
-
-This is the most common real-world scenario. Read `references/requirement-drift.md` in full.
-
-Quick decision tree when new requirement doesn't fit current code:
-
-```
-New requirement arrived. Before touching code:
-
-1. Is there a seam at the right place?
-   YES → cut at seam, replace. Hours of work.
-   NO  → create seam first (refactor), then replace. Separate commits.
-
-2. What type of change is this?
-   New impl of existing interface?    → Scenario A (add, zero changes elsewhere)
-   New step in existing flow?         → Scenario B (Pipeline pattern)
-   New variant of existing behavior?  → Scenario B (Strategy pattern)
-   Core domain type changes?          → Scenario C (Expand-Contract, 3 phases)
-
-3. Do you have tests covering what you're about to change?
-   NO → write characterization tests first. Then refactor.
-   YES → proceed, keep tests GREEN throughout.
-```
-
-**Never**: rewrite everything because a requirement changed.
-**Always**: find the smallest structural change that accommodates the new requirement.
-
-See `references/requirement-drift.md` for:
-- The 3 scenarios in detail with prompts
-- Expand-Contract pattern (safe way to change foundational types)
-- Signals that architecture is drifting (catch before they compound)
-- Pre-flight checklist before any architecture change
-
-## Common mistakes
-
-| Developer wants | Why it's wrong | Redirect |
+| Wants to do | Why wrong | Redirect |
 |---|---|---|
-| "Start with microservices" | Operational overhead before value proven | Modular monolith; Strangler Fig when team/load demands it |
-| "Write tests later" | Post-hoc tests test implementation, not behavior | Test cases at L2, RED before implementing |
-| "Business logic in handler" | Can't unit test without HTTP stack | Service layer — handler is parse/format only |
-| "Optimize now, before it's slow" | Premature optimization is the root of all evil | Add TODO[metric-trigger], revisit at L4 with data |
-| "Refactor everything before new feature" | Refactor without tests = rewrite | Tests first (they'll break), then refactor under green |
-| "Module X needs module Y's DB table" | Destroys boundary, impossible to split later | Define interface in Y's public boundary, X calls that |
-| "Skip idempotency, it's a simple job" | First time duplicate run happens, data corrupts | Answer the idempotency question at L0, always |
+| Microservices from day 1 | Operational overhead before value proven | Modular monolith, split when team/load demands |
+| Build all features before shipping | Invalidated direction costs everything | Walking skeleton → validate → feature loop |
+| Skip the 3 boundaries "just for MVP" | Cheap now, rewrite later | 3 boundaries take minutes, save weeks |
+| "Optimize it later" (vague) | "Later" = never | Add TODO[metric-trigger] with specific condition |
+| Refactor everything before new feature | Refactor without tests = rewrite | Characterization tests first, then refactor |
+| Module A queries module B's DB directly | Breaks the seam, impossible to split | Define interface in B's public boundary |
 
 ---
 
 ## Reference files — load on demand only
 
-### Always load first
-- `references/onboarding.md` — thin router: ask opening question → load one branch file
+### Always load
+- `references/onboarding.md` — thin router with branch table
 
 ### Load after user selects branch
-- `references/branches/a-new-project.md` — new project intake + L0 generation
-- `references/branches/b-add-feature.md` — codebase read + health check + feature impl
-- `references/branches/c-fix-bug.md` — bug classification + reproduce + locate + fix
-- `references/branches/d-refactor.md` — goal definition + characterization tests + atomic steps
-- `references/branches/e-resume.md` — git orient + find last position + next action
-- `references/branches/f-incident.md` — triage + mitigate + investigate + post-incident
+- `references/branches/a-new-project.md` — MVP vs production, walking skeleton, L0 generation
+- `references/branches/b-add-feature.md` — codebase read, health check, feature implementation
+- `references/branches/c-fix-bug.md` — classify, reproduce, locate, root cause, fix
+- `references/branches/d-refactor.md` — define done, characterization tests, atomic steps
+- `references/branches/e-resume.md` — git orient, detect level, find position, next action
+- `references/branches/f-incident.md` — triage, mitigate first, investigate, post-incident
 
-### Load when referenced by branch or user asks
-- `references/levels.md` — L0→L4 definitions, gates, L4 signal tables
-- `references/l0-templates.md` — exact CLAUDE.md + ARCHITECTURE.md templates
-- `references/prompts.md` — copy-paste prompts: L1 skeleton, L2 interfaces, L3 features
-- `references/boundaries.md` — the 3 boundary rules with good/bad code examples
+### Load when needed
+- `references/boundaries.md` — 3 rules with good/bad code examples
+- `references/levels.md` — L0→L4 definitions and gates
+- `references/l0-templates.md` — CLAUDE.md + ARCHITECTURE.md templates (MVP and production)
 - `references/requirement-drift.md` — architecture change: 3 scenarios + Expand-Contract
-- `references/debug-intermittent.md` — intermittent/production-only/resource-leak bugs
-- `references/stacks/nodejs.md` — Node.js/TypeScript concrete names + prompts
-- `references/stacks/python.md` — Python/FastAPI concrete names + prompts
+- `references/debug-intermittent.md` — intermittent / production-only / resource-leak bugs
+- `references/stacks/nodejs.md` — Node.js/TypeScript concrete prompts
+- `references/stacks/python.md` — Python/FastAPI concrete prompts
 
 ### Load when user asks "show me an example"
-- `references/examples/news-crawler-CLAUDE.md` — real CLAUDE.md output
-- `references/examples/news-crawler-ARCHITECTURE.md` — real ARCHITECTURE.md output
+- `references/examples/news-crawler-CLAUDE.md`
+- `references/examples/news-crawler-ARCHITECTURE.md`
