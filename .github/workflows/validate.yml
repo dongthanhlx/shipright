@@ -1,0 +1,39 @@
+name: Validate skill
+
+on:
+  pull_request:
+    paths: ['**/*.md', 'SKILL.md']
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check SKILL.md has required fields
+        run: |
+          grep -q "^name: shipright" SKILL.md || (echo "Missing name field" && exit 1)
+          grep -q "^version:" SKILL.md || (echo "Missing version field" && exit 1)
+          grep -q "^description:" SKILL.md || (echo "Missing description field" && exit 1)
+          echo "✓ SKILL.md frontmatter valid"
+
+      - name: Check all branch files exist
+        run: |
+          for branch in a-new-project b-add-feature c-fix-bug d-refactor e-resume f-incident; do
+            test -f "references/branches/${branch}.md" || (echo "Missing: ${branch}.md" && exit 1)
+          done
+          echo "✓ All branch files present"
+
+      - name: Check examples exist
+        run: |
+          test -f "references/examples/news-crawler-CLAUDE.md" || (echo "Missing example" && exit 1)
+          test -f "references/examples/news-crawler-ARCHITECTURE.md" || (echo "Missing example" && exit 1)
+          echo "✓ Example files present"
+
+      - name: Check no broken internal links
+        run: |
+          # Find all references/[file].md mentions in SKILL.md and verify files exist
+          grep -oE 'references/[a-z/-]+\.md' SKILL.md | while read ref; do
+            test -f "$ref" || echo "WARNING: referenced file not found: $ref"
+          done
+          echo "✓ Link check done"

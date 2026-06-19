@@ -1,0 +1,171 @@
+# Level Definitions
+
+## L0 — Contract (before any code)
+
+**What it is**: Two markdown files that define the project's constitution.
+Nothing is built. No code exists. Only decisions are documented.
+
+**Why it matters**: Claude Code reads CLAUDE.md before every action.
+The clearer these files are, the more consistently Claude Code will follow
+the architecture — across sessions, across features, across developers.
+
+**Time estimate**: 30–60 minutes. Fast if the problem is clear. Slow if it isn't
+(which means you need more time here, not less).
+
+**Output**:
+```
+CLAUDE.md          # rules + workflow + tech debt policy
+ARCHITECTURE.md    # modules + boundaries + domain model + ADR
+```
+
+**What "done" looks like**:
+- You can explain every module's job in one sentence
+- You can name 3 things that are explicitly forbidden
+- Every tech debt shortcut has a trigger condition that is a real metric
+
+---
+
+## L1 — Skeleton (project compiles, runs, does nothing)
+
+**What it is**: The entire folder structure created with stub files.
+Every module exists. Every service class exists. Every method exists.
+But every method throws `NotImplementedError`.
+
+**Why it matters**: Forces you to confront import errors, circular dependencies,
+and structural problems before any logic is written. Cheap to fix now.
+Expensive to fix after 3 features are implemented.
+
+**Time estimate**: 1–2 hours with Claude Code.
+
+**Output**:
+```
+src/
+  modules/[each-module]/
+    index.ts          ← public API only
+    types.ts          ← interfaces and DTOs
+    [name].service.ts ← class with stub methods
+  shared/
+    db.ts, logger.ts, errors.ts, http-client.ts
+  config/
+    env.ts            ← zod schema, throws on startup if missing
+package.json, tsconfig.json, jest.config.ts
+docker-compose.yml
+```
+
+**What "done" looks like**:
+- `npm run build` exits 0
+- `npm start` logs "started" and doesn't crash
+- `grep -r "from.*shared/db" src/modules/` returns nothing
+
+---
+
+## L2 — Interfaces + Test Specs (tests exist, all RED)
+
+**What it is**: For each module, you define how the layers talk to each other
+AND you write what each feature should do (as test cases).
+No business logic or SQL yet — only shapes and expectations.
+
+**Why it matters**: Test cases written now describe behavior, not implementation.
+They become the spec that guides L3. They also catch interface design problems
+before you're committed to an implementation.
+
+**The "RED is correct" principle**: Running `npm test` at end of L2 should show
+all tests failing. This means the interfaces are defined but not implemented.
+If tests pass at L2, something is wrong — you've implemented without testing first.
+
+**Time estimate**: 2–4 hours per module, depending on complexity.
+
+**Output** (per module):
+```
+[name].repository.ts       ← I[Name]Repository interface + class stub
+[name].handler.ts          ← routes + zod validation
+[name].service.test.ts     ← test cases (mock repository)
+```
+
+**Test case template**:
+```typescript
+describe('FeatureService.methodName', () => {
+  it('happy path: does the thing', async () => { ... })
+  it('edge case: empty input returns empty array', async () => { ... })
+  it('error case: not found throws NotFoundError', async () => { ... })
+  it('error case: dependency fails propagates error', async () => { ... })
+})
+```
+
+**What "done" looks like**:
+- Every service method has at least 3 test cases
+- `npm test` runs and shows RED (failures, not errors)
+- `npm run build` still passes
+- Repository is injected via constructor, not imported directly
+
+---
+
+## L3 — Implement Features (tests go GREEN one by one)
+
+**What it is**: The loop where actual work happens.
+One feature at a time. Implement → test GREEN → boundary check → commit → repeat.
+
+**Why one feature at a time**: If you implement 5 features then run tests,
+you don't know which feature broke what. One feature per commit makes
+every failure immediately diagnosable.
+
+**Inside-out order** (always follow this):
+1. Normalizer (if source-specific transform) — pure function, easiest to test
+2. Repository — SQL queries
+3. Service — business logic using repository
+4. Handler — HTTP layer (often trivial once service works)
+
+**Time estimate**: 30–90 minutes per feature.
+
+**The commit discipline**:
+```
+feat(orders): add createOrder with stock validation
+feat(orders): add cancelOrder with refund trigger
+fix(orders): handle concurrent order race condition
+```
+
+Never: `feat: add stuff` or `wip` or `various fixes`
+
+**What "done" (for one feature) looks like**:
+- Feature test cases: GREEN
+- All previous test cases: still GREEN
+- Boundary checklist: zero violations
+- Commit: created with descriptive message
+
+---
+
+## L4 — Optimize (only with production signal)
+
+**What it is**: Targeted fixes for measured problems.
+Not "make it cleaner" or "this could be faster".
+Only: "this metric is outside this target, here is the data."
+
+**The signal format** (require this before starting any L4 work):
+```
+Signal: [what metric] = [measured value]
+Target: [what it should be]
+Context: [when does this happen — peak traffic? specific query? specific user?]
+```
+
+**Why the signal is required**: Without a signal, "optimization" is often
+premature and introduces complexity for a problem that doesn't exist at scale.
+The architecture from L0-L3 is designed so that L4 changes stay inside one layer.
+If a fix requires changing a service interface, it's not an L4 problem — it's
+a design review.
+
+**L4 branches by signal type**:
+
+| Signal | L4 action |
+|---|---|
+| Latency p95 > target | Profile → find slow query/function → cache or index |
+| DB CPU > 60% | Read replica → connection pooling → query plan analysis |
+| API quota exhausted early | Increase cache TTL → batch requests → request deduplication |
+| Memory growth over time | Find leak → fix or add cleanup job |
+| Module too large for one team | Strangler Fig → extract service with feature flag |
+| Storage > threshold | Partition by date → archive policy → cleanup job |
+
+**What "done" looks like**:
+- Metric is now within target (measured, not assumed)
+- Benchmark test exists proving before/after
+- No public interface was changed
+- No new dependencies were added without justification in ARCHITECTURE.md
