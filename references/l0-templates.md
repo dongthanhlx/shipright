@@ -34,6 +34,32 @@ The 3 boundary rules appear in BOTH — they are never optional.
 ## Stack
 [Runtime, database, test runner, key libs]
 
+## External API integrations  [fill if applicable]
+| Provider | Purpose | Sandbox URL | Quota |
+|---|---|---|---|
+| [name] | [what for] | [sandbox endpoint] | [limit] |
+
+Fixtures location: `tests/fixtures/`
+Bruno collection: `api-exploration/`
+Read: `references/third-party-apis.md` for full strategy.
+
+## Observability conventions
+Correlation ID: every HTTP request and cron job runs inside RequestContext.run()
+requestId flows through all log lines automatically.
+
+Log levels:
+- ERROR: infrastructure failures → needs human attention
+- WARN:  degraded behavior, fallback used, quota low → monitor
+- INFO:  operation lifecycle, key state changes
+- DEBUG: development only, never production
+
+Third-party API logs:
+- Adapters log: callId, provider, operation, duration, itemsReturned
+- Adapters NEVER log: API keys, full response body, user PII
+- Normalizers log WARN on schema validation failure (API changed signal)
+
+Read: `references/observability.md` for full patterns.
+
 ## Environment variables
 [VAR_NAME] # description
 

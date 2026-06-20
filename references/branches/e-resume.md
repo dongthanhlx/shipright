@@ -4,18 +4,18 @@
 
 ---
 
-## Step 1 — Orient (5 minutes, no code yet)
+## Step 1 — Orient first (5 minutes, no code yet)
 
 ```bash
-git log --oneline -20    # what happened last?
-git status               # uncommitted changes?
-git stash list           # forgotten stash?
-git branch -a            # which branch, any WIP branches?
+git log --oneline -20    # what happened recently?
+git status               # any uncommitted changes?
+git stash list           # any forgotten stash?
+git branch -a            # which branch? any WIP branches?
 ```
 
 ---
 
-## Step 2 — Read docs if exist
+## Step 2 — Read existing docs
 
 Read CLAUDE.md and ARCHITECTURE.md (already detected in context above).
 If neither exists → use Branch A (Production mode) to reconstruct from codebase first.
@@ -26,7 +26,7 @@ If neither exists → use Branch A (Production mode) to reconstruct from codebas
 
 ```
 Look for "where did I stop?":
-- TODO/FIXME nearest to last commit area
+- TODO/FIXME nearest to recent changes
 - Last commit message: what was being built?
 - Open PRs or issues if any
 - RED tests in uncommitted changes (WIP indicator)
@@ -34,26 +34,26 @@ Look for "where did I stop?":
 
 ---
 
-## Step 4 — Detect which level project is at
+## Step 4 — Detect which level the project is at
 
 ```
-[ ] No L0 (no CLAUDE.md / ARCHITECTURE.md)
+[ ] No L0 (no CLAUDE.md or ARCHITECTURE.md)
     → Use Branch A to create before anything else
 
 [ ] L0 exists, L1 not done (project doesn't compile or run)
-    → Return to L1: fix build, no new features
+    → Return to L1: fix build errors, no new features
 
-[ ] L1 done, L2 incomplete (interfaces missing, tests not written yet)
+[ ] L1 done, L2 incomplete (interfaces missing, tests not written)
     → Return to L2: define interfaces, write test cases
 
-[ ] L2 done, L3 in progress (tests RED correctly, feature being built)
+[ ] L2 done, L3 in progress (tests RED correctly — feature being built)
     → Continue L3: find which test is RED, implement to make it GREEN
 
 [ ] Normally in L3 loop (tests GREEN, need next feature)
     → Use Branch B for next feature
 
 [ ] Production signal needs L4
-    → Read SKILL.md Step 6 (L4 hardening section)
+    → Read levels.md L4 section
 ```
 
 ---
@@ -65,21 +65,22 @@ npm test / pytest / go test
 ```
 
 GREEN → continue from detected level
-RED → fix tests before doing anything else
-(Who broke them? WIP from before? Or someone else?)
+RED → fix failing tests before doing anything else
+(Were they broken before? Or WIP that was left incomplete?)
 
 ---
 
 ## Step 6 — State next action clearly
 
 ```
-Write: "Project is at [Level]. Next action: [verb + object + acceptance criteria]"
-Do not start coding until this sentence is clear.
+Write out: "Project is at [Level]. Next action: [verb + object + acceptance criteria]"
+Do not start coding until this sentence is clear and specific.
 
 Good: "Project at L3. Next: implement OrderService.cancelOrder()
        — test cases exist in service.test.ts, currently RED"
-Good: "Project at L0 missing. Next: create CLAUDE.md + ARCHITECTURE.md
+Good: "Project missing L0. Next: generate CLAUDE.md + ARCHITECTURE.md
        using Branch A Production mode"
-Bad:  "Continue the orders module"
-Bad:  "Fix remaining stuff"
+
+Bad: "Continue the orders module"
+Bad: "Fix remaining stuff"
 ```

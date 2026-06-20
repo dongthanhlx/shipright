@@ -1,15 +1,17 @@
 ---
 name: shipright
-version: 0.4.0
+version: 0.5.4
 description: >
-  Ship your MVP fast. Grow it right. Shipright is the project constitution skill —
-  it sets up minimal irreversible architecture decisions that let your codebase
-  grow without rot, then orchestrates the right skills at the right moment.
-  Use when: starting a new project, adding a feature to existing code, fixing a bug,
-  refactoring, resuming after a break, or dealing with a production incident.
-  Triggers: "build project X", "help me start", "MVP first", "project structure",
-  "add feature", "fix bug", "refactor", "production down", "resume project".
-  Pairs with addyosmani/agent-skills for execution, taste-skill for UI quality.
+  Ship your MVP fast. Grow it right.
+  Use when: starting ANY new project or codebase, adding a non-trivial feature
+  (touches 2+ files), debugging a bug with unclear root cause, refactoring a module,
+  returning to a project after a break, or dealing with a production incident.
+  Triggers on phrases like: "build", "start a new project", "add feature to my app",
+  "there's a bug", "fix this issue", "refactor", "production is down", "I'm back on this",
+  "help me structure", "I want to create", "integrate API", "add logging/tracing".
+  Do NOT trigger for: single-line fixes, knowledge questions, mid-implementation steps,
+  writing README, generating commit messages.
+  Manual invoke: /shipright (most reliable — always works).
 allowed-tools: Read, Write, Bash, Glob, Grep
 ---
 
@@ -57,9 +59,15 @@ and expensive to fix later — even with AI coding fast.
 3. Modules do not share databases
    If module A needs data from module B → call B's public interface.
    Never query B's table directly. This is the seam for future service extraction.
+
+4. No raw external response passes the Adapter layer  [applies when using third-party APIs]
+   Every external API has exactly one Adapter (Normalizer).
+   Raw response never enters service or domain logic directly.
+   When provider changes schema → fix Adapter only, service untouched.
+   See `references/third-party-apis.md` for full pattern.
 ```
 
-Why these three and nothing else as non-negotiable:
+Why these and nothing else as non-negotiable:
 Fowler showed internal quality pays off in weeks, not months.
 Uncle Bob showed the dependency rule is what makes systems testable and swappable.
 With AI coding fast, these boundaries are even cheaper to maintain —
@@ -77,14 +85,14 @@ the trigger condition is met, not upfront.
 Ask exactly this, wait for the answer, load ONE branch file:
 
 ```
-Dự án đang ở trạng thái nào?
+What's the current state of your project?
 
-  [A] Mới — chưa có gì
-  [B] Đã có code — thêm feature
-  [C] Đã có code — fix bug
-  [D] Đã có code — refactor
-  [E] Đang có code — cần orient lại / tiếp tục
-  [F] Production đang có vấn đề
+  [A] Brand new — nothing exists yet
+  [B] Existing code — add a feature
+  [C] Existing code — fix a bug
+  [D] Existing code — refactor
+  [E] Existing code — re-orient / continue after a break
+  [F] Production issue
 ```
 
 | Answer | Load | Do NOT load others |
@@ -161,40 +169,81 @@ Branch D: read L0 docs for intent, follow refactor workflow (characterization te
 
 ---
 
-## Ecosystem — what shipright delegates
+## Ecosystem — install by stage, not all at once
 
-Shipright orchestrates. These skills execute their parts better.
-Install independently. Shipright works without them but pairs better with them.
+Shipright orchestrates. External skills execute specific parts.
+Do NOT install all 24 addyosmani skills upfront — context budget is finite.
+Install only what your current pain requires. Addy Osmani himself: "pick 4–5 closest to your pain."
 
-### addyosmani/agent-skills (43k★ — production-grade SDLC)
-Install: `npx skills add https://github.com/addyosmani/agent-skills`
+### Stage-based install guide
 
-When shipright says "spec this feature" → activate `spec-driven-development`
-When shipright says "implement" → activate `incremental-implementation` + `test-driven-development`
-When shipright says "bug fix" → activate `debugging-and-error-recovery`
-When shipright says "review before merge" → activate `code-review-and-quality`
-When shipright says "security check" → activate `security-and-hardening`
-When shipright says "ship" → activate `shipping-and-launch`
+**MVP stage** (validate idea, team 1–3):
+```
+Install: debugging-and-error-recovery   ← bugs happen from day one
+Skip everything else                    ← overhead > value at this stage
+```
 
-Shipright still owns: constitution generation, 3 boundary rules, MVP vs production routing,
-tech debt ledger, project state detection, irreversible decisions.
-addyosmani still owns: how to execute each of the above excellently.
+> **Complexity control:** Even when skills ARE installed, Branch B classifies
+> each feature as Tier S/M/L/XL and activates only the right skills.
+> Simple features (1 file) never trigger incremental-implementation or spec-driven.
+> addyosmani documented "When NOT to use" for every skill — shipright enforces it.
+
+**Traction stage** (feature loop active, team 3–8):
+```
+Add: incremental-implementation         ← features now span multiple files
+Add: test-driven-development            ← prevent regression as features grow
+Add: code-review-and-quality            ← team consistency matters now
+```
+
+**Growth stage** (proven product, pre-enterprise):
+```
+Add: spec-driven-development            ← complex features need specs
+Add: security-and-hardening            ← real users with real data
+Add: observability-and-instrumentation ← need visibility before incidents
+```
+
+### Skills to skip (shipright already covers or taste-skill does better)
+
+- `interview-me` → shipright Branch A onboarding does this
+- `idea-refine` → shipright Q2/Q3 in Branch A does this
+- `frontend-ui-engineering` → use taste-skill instead (more focused)
+- `using-agent-skills` → only needed if you have 10+ skills installed
+- `performance-optimization` → L4 signal-driven, never install proactively
+
+### addyosmani/agent-skills
+Install: `git clone https://github.com/addyosmani/agent-skills ~/.claude/skills/agent-skills`
+Then load only the skills you need — see stage guide above.
 
 ### taste-skill (30k★ — anti-slop frontend)
-Install: `npx skills add https://github.com/Leonxlnx/taste-skill`
-
-Activate only when: L3 is building a UI module.
-Do NOT activate for: backend-only modules, API services, CLI tools.
-
-When active: `design-taste-frontend` for layout/typography/motion quality.
+Install: `git clone https://github.com/Leonxlnx/taste-skill ~/.claude/skills/taste-skill`
+Activate only when building UI modules. Skip for backend/API/CLI.
 
 ---
+
+## Language rule
+
+**Respond in the user's language throughout the session.**
+These skill files are written in English for GitHub discoverability,
+but if the user writes in Vietnamese, French, or any other language,
+conduct the entire conversation in that language.
+CLAUDE.md and ARCHITECTURE.md content stays in English (project convention).
 
 ## Working directory rule
 
 ALL file operations happen in the current directory shown in the context above.
 If CLAUDE.md or ARCHITECTURE.md exist → read them BEFORE asking any questions.
 If developer mentions a path → confirm: "You mean `[path]` relative to `[pwd]`?"
+
+---
+
+## When project grows and architecture needs to evolve
+
+When project is growing and team is expanding, read `references/scaling-guide.md`:
+- Stage 1 (team < 20): enforce boundaries harder, module ownership, architecture tests
+- Stage 2 (team 10–30): modular monolith patterns, async events, module-level CI
+- Stage 3 (team 20–50): selective extraction via Strangler Fig — only when 3 signals appear
+
+Signal to check: if any graduate checklist item fires → read scaling-guide.md immediately.
 
 ---
 
@@ -243,6 +292,8 @@ foundational type change (Expand-Contract: optional → migrate → required, 3 
 - `references/l0-templates.md` — CLAUDE.md + ARCHITECTURE.md templates (MVP and production)
 - `references/requirement-drift.md` — architecture change: 3 scenarios + Expand-Contract
 - `references/debug-intermittent.md` — intermittent / production-only / resource-leak bugs
+- `references/third-party-apis.md` — 3-layer testing strategy, Adapter pattern, fixture workflow, resilience
+- `references/ui-design.md` — taste-skill ecosystem: page type → correct skill → dials → anti-slop rules
 - `references/stacks/nodejs.md` — Node.js/TypeScript concrete prompts
 - `references/stacks/python.md` — Python/FastAPI concrete prompts
 

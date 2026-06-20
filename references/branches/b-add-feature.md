@@ -9,28 +9,28 @@
 ## Step 1 — Intake (one at a time)
 
 ```
-Q1: "Tên project và 1 câu mô tả nó làm gì?"
-Q2: "Feature cần thêm: 'User có thể [làm gì] để [đạt gì]'"
-Q3: "Feature này cần module mới hay extend module cũ?"
-Q4: "CLAUDE.md và ARCHITECTURE.md có không?"
-     → Nếu không có → tạo trước (Branch A Production mode), rồi quay lại đây
+Q1: "Project name and one sentence describing what it does?"
+Q2: "Feature needed: 'User can [do what] to [achieve what]'"
+Q3: "Does this feature need a new module, or extend an existing one?"
+Q4: "Do CLAUDE.md and ARCHITECTURE.md exist?"
+     → If not → create them first (Branch A Production mode), then return here
 ```
 
 ---
 
-## Step 2 — Read codebase (structured report)
+## Step 2 — Read codebase (structured report required)
 
 ```
-Đọc codebase. KHÔNG sửa gì. Report theo format:
+Read the codebase. Do NOT modify anything. Report in this format:
 
 ## Codebase report: [name]
-Entry points:  [file → what it starts]
-Module map:    [module] → [1-sentence job] → [depends on]
-Data flow:     Request → [A] → [B] → [C] → Response
-Patterns:      [what patterns exist, where]
-Landmines:     [dangerous areas — global state, tight coupling]
+Entry points:    [file → what it starts]
+Module map:      [module] → [1-sentence job] → [depends on]
+Data flow:       Request → [A] → [B] → [C] → Response
+Patterns:        [what patterns exist, where]
+Landmines:       [dangerous areas — global state, tight coupling]
 Feature touches: [which modules affected and why]
-Unknowns:      [what needs clarification]
+Unknowns:        [what needs clarification before coding]
 ```
 
 ---
@@ -38,45 +38,89 @@ Unknowns:      [what needs clarification]
 ## Step 3 — Health check (tiered)
 
 ```
-TIER 1 — Blockers (fix before feature):
-□ Global mutable state? (module-level vars mutated)
+TIER 1 — Blockers (fix before adding feature):
+□ Global mutable state? (module-level variables being mutated)
 □ Circular dependencies? (run: npx madge --circular src/)
-□ Empty catch blocks swallowing errors?
-□ Race condition risk with new feature?
+□ Empty catch blocks swallowing errors silently?
+□ Race condition risk with the new feature?
 
-TIER 2 — Warnings (proceed with caution):
+TIER 2 — Warnings (proceed with caution, document):
 □ Test coverage of modules being touched?
 □ Service importing db directly?
 □ Business logic in handler?
 
-Verdict: [SAFE / TIER1-BLOCKER / TIER2-CAUTION]
+Verdict: [SAFE / TIER1-BLOCKER / TIER2-CAUTION] with specific reason.
 ```
 
-**TIER1-BLOCKER** → estimate effort:
+**TIER1-BLOCKER** → estimate effort first:
 ```
-Effort < 20% remaining deadline → fix first, separate commit
-Effort > 20% deadline → workaround + TODO[fix-before-scale]
-Effort > 50% deadline → escalate to team/manager
+Effort < 20% of remaining deadline → fix first, separate commit
+Effort > 20% deadline             → workaround + TODO[fix-before-scale]
+Effort > 50% deadline             → escalate before doing anything
 ```
 
 ---
 
-## Step 4 — Implement
+## Step 4 — Classify complexity (mandatory before touching code)
+
+```
+Files this feature will touch:
+  1 file, obvious change       → Tier S (trivial)
+  2–5 files, clear scope       → Tier M (simple)
+  5–10 files OR unclear reqs   → Tier L (complex)
+  10+ files OR multiple devs   → Tier XL (system-level)
+```
+
+**Tier S — Trivial** (1 file, < 30 min):
+```
+No agent-skills needed.
+Shipright handles: write code → boundary check → commit.
+Exception: if it's a bug → always activate debugging-and-error-recovery.
+```
+
+**Tier M — Simple** (2–5 files, scope is clear):
+```
+[if test-driven-development installed]:
+  → activate for this change
+[if code-review-and-quality installed]:
+  → activate before merging
+
+[if neither installed]:
+  Shipright built-in: write test (RED) → implement → GREEN → boundary check
+```
+
+**Tier L — Complex** (5–10 files, requirements need clarification):
+```
+[if spec-driven-development installed]:
+  → activate FIRST, get spec approved
+  → then: /build auto
+  → activate code-review-and-quality before merge
+
+[if not installed]:
+  1. Write acceptance criteria explicitly
+  2. Break into sub-tasks, implement one at a time
+  3. Test after each sub-task, not at the end
+```
+
+**Tier XL — System-level** (10+ files, days of work):
+```
+→ Update ARCHITECTURE.md FIRST (shipright constitution step)
+→ [if addyosmani installed]: spec → planning → /build auto → security → review
+→ Feature flag all incomplete work before merging
+```
+
+**Gate for all tiers:** tests GREEN + boundary check pass + no regression
+
+---
+
+## Step 5 — Implement
 
 **Extend existing module:**
 ```
-Entry: L2 for this feature only
-
-[if addyosmani installed]:
-  Simple/clear feature → activate incremental-implementation + test-driven-development
-  Complex/risky feature → activate spec-driven-development first
-
-[if not installed]:
-  1. Write test cases for new behavior (RED — Outside-In TDD)
-  2. Implement inside-out: repository → service → handler
-  3. Run boundary checklist before commit
-
-Gate: tests GREEN + boundary check pass + no regression
+[Tier M+] Write test cases for new behavior (RED — Outside-In TDD)
+Interface emerges from what the test needs to call.
+Implement inside-out: repository → service → handler
+Boundary check before every commit.
 ```
 
 **New module needed:**
@@ -87,7 +131,7 @@ Gate: tests GREEN + boundary check pass + no regression
    - Commit: "docs: add [module] to ARCHITECTURE.md"
 
 2. Then L2 → L3 for new module
-   [delegate to addyosmani if installed]
+   [delegate to addyosmani if installed for Tier L/XL]
 ```
 
 ---
@@ -95,9 +139,9 @@ Gate: tests GREEN + boundary check pass + no regression
 ## Boundary checklist (run after every feature)
 
 ```bash
-grep -r "shared/db" src/modules/       # must be empty
-grep -r "\.service" src/modules/*/index # must be empty
-npx tsc --noEmit                        # must pass
+grep -r "shared/db" src/modules/          # must be empty
+grep -r "\.service" src/modules/*/index   # must be empty
+npx tsc --noEmit                          # must pass
 ```
 
 Manual:
@@ -107,8 +151,20 @@ Manual:
 
 ---
 
+## Special case: adding observability to existing project
+
+If the feature being "added" is observability (logging, tracing, correlation ID):
+→ Do NOT use the normal feature flow above
+→ Load `references/observability.md` — section "Retrofitting observability"
+→ Follow the 6-step surgical approach (audit → infrastructure → entry points → modules)
+→ Never do all files in one PR
+
+Signal that triggers this: "we can't debug production issues" or "we need logging"
+or "add tracer/correlation ID to existing project"
+
+---
+
 ## taste-skill (if installed, UI features only)
 
-Activate `design-taste-frontend` only when:
-- Feature has user-facing UI components
-- DO NOT activate for: backend API, CLI, background jobs
+Read `references/ui-design.md` first — pick the right variant for the page type.
+Skip entirely for: backend API, CLI, background jobs, data tables.
