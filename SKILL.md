@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 0.5.4
+version: 0.5.5
 description: >
   Ship your MVP fast. Grow it right.
   Use when: starting ANY new project or codebase, adding a non-trivial feature
@@ -40,7 +40,7 @@ These roles never overlap. Shipright does NOT duplicate their instructions.
 
 ## The one rule that never changes
 
-**3 boundaries. Absolute. Non-negotiable. In MVP and in production.**
+**4 boundaries. Absolute. Non-negotiable. In MVP and in production.**
 
 Based on Uncle Bob's Dependency Rule and Fowler's internal quality research:
 these are the only things that are cheap to do right from day one
@@ -216,7 +216,8 @@ Then load only the skills you need — see stage guide above.
 
 ### taste-skill (30k★ — anti-slop frontend)
 Install: `git clone https://github.com/Leonxlnx/taste-skill ~/.claude/skills/taste-skill`
-Activate only when building UI modules. Skip for backend/API/CLI.
+Read `references/ui-design.md` for page type → correct skill mapping.
+Skip entirely for: backend API, CLI, background jobs, dashboards.
 
 ---
 
@@ -287,13 +288,15 @@ foundational type change (Expand-Contract: optional → migrate → required, 3 
 - `references/branches/f-incident.md` — triage, mitigate first, investigate, post-incident
 
 ### Load when needed
-- `references/boundaries.md` — 3 rules with good/bad code examples
-- `references/levels.md` — L0→L4 definitions and gates
+- `references/boundaries.md` — 4 boundary rules with good/bad code examples
+- `references/levels.md` — L0→L4 definitions, gates, Conway's Law signals, graduate checklist
 - `references/l0-templates.md` — CLAUDE.md + ARCHITECTURE.md templates (MVP and production)
 - `references/requirement-drift.md` — architecture change: 3 scenarios + Expand-Contract
 - `references/debug-intermittent.md` — intermittent / production-only / resource-leak bugs
-- `references/third-party-apis.md` — 3-layer testing strategy, Adapter pattern, fixture workflow, resilience
-- `references/ui-design.md` — taste-skill ecosystem: page type → correct skill → dials → anti-slop rules
+- `references/third-party-apis.md` — 3-layer testing, Adapter pattern, fixture workflow, resilience
+- `references/observability.md` — Correlation ID, structured logging, API tracing, retrofit guide
+- `references/scaling-guide.md` — 3-stage scaling playbook + Strangler Fig extraction templates
+- `references/ui-design.md` — taste-skill page type → correct skill → dials → anti-slop rules
 - `references/stacks/nodejs.md` — Node.js/TypeScript concrete prompts
 - `references/stacks/python.md` — Python/FastAPI concrete prompts
 

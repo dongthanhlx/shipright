@@ -36,7 +36,11 @@ Q5 (Production mode): "About data: volume? read or write heavy? multi-tenant?"
 Q5b (all modes): "Does the project integrate any third-party APIs?
      (e.g. RapidAPI, Stripe, Twilio, YouTube, OpenAI, SearchAPI...)
      → If yes: Adapter layer required in ARCHITECTURE.md from L0
-     → Load: references/third-party-apis.md"
+     → Load: references/third-party-apis.md
+
+Q5c (all modes): "Does the project need observability (logging, tracing)?
+     → For new projects: add Correlation ID from day one (references/observability.md)
+     → For existing projects without logging: load retrofit section in observability.md"
 
 Q6: "Tech stack? (Node.js/TS, Python, Go, undecided?)"
 
@@ -71,7 +75,7 @@ Agreed? If so, I'll generate CLAUDE.md and ARCHITECTURE.md.
 
 **CLAUDE.md MVP** — minimal, enough to avoid irreversible debt:
 - Project in one sentence
-- **3 boundary rules** (never skip, even in MVP)
+- **4 boundary rules** (never skip, even in MVP)
 - Tech stack
 - Core modules needed for walking skeleton only
 - Tech debt log: record shortcuts + TODO[trigger] immediately
@@ -134,7 +138,7 @@ L0 (done) → L1 Skeleton → L2 Interfaces + tests (RED) → L3 Implement loop
 ## Gate — L0 done when:
 
 - [ ] Both files are project-specific (not generic template)
-- [ ] 3 boundary rules written with specific banned import examples
+- [ ] 4 boundary rules written with specific banned import examples for this project
 - [ ] Core domain type defined (shape is irreversible — must be right)
 - [ ] Tech debt log has obvious MVP shortcuts with trigger conditions
 - [ ] MVP: walking skeleton identified as 1 user journey

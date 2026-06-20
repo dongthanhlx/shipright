@@ -122,9 +122,11 @@ shipright/
     examples/
       news-crawler-CLAUDE.md            # real CLAUDE.md output
       news-crawler-ARCHITECTURE.md      # real ARCHITECTURE.md output
-    levels.md                           # L0→L4 + Conway's Law signals + graduate checklist
-    l0-templates.md                     # CLAUDE.md + ARCHITECTURE.md templates
+    levels.md                           # L0→L4, gates, Conway's Law, graduate checklist
+    l0-templates.md                     # CLAUDE.md + ARCHITECTURE.md templates (4 boundaries)
     boundaries.md                       # 4 boundary rules with code examples
+    observability.md                    # Correlation ID, logging, API tracing, retrofit
+    scaling-guide.md                    # 3-stage scaling playbook + Strangler Fig
     requirement-drift.md                # Expand-Contract + 3 architecture change scenarios
     third-party-apis.md                 # 3-layer testing, Adapter pattern, resilience
     ui-design.md                        # taste-skill ecosystem: page type → correct skill

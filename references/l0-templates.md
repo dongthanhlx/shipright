@@ -31,6 +31,11 @@ The 3 boundary rules appear in BOTH — they are never optional.
    If module A needs data from B → call B's public interface.
    `import { db } from '../../shared/db'` is BANNED in service files.
 
+4. No raw external response passes the Adapter layer  [if project uses external APIs]
+   Every third-party API has one Adapter (Normalizer).
+   Raw API response NEVER enters service or domain logic.
+   Service never knows which provider was called.
+
 ## Stack
 [Runtime, database, test runner, key libs]
 
