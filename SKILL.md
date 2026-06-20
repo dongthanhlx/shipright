@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 0.4.0
+version: 0.4.2
 description: >
   Ship your MVP fast. Grow it right. Shipright is the project constitution skill —
   it sets up minimal irreversible architecture decisions that let your codebase
@@ -57,9 +57,15 @@ and expensive to fix later — even with AI coding fast.
 3. Modules do not share databases
    If module A needs data from module B → call B's public interface.
    Never query B's table directly. This is the seam for future service extraction.
+
+4. No raw external response passes the Adapter layer  [applies when using third-party APIs]
+   Every external API has exactly one Adapter (Normalizer).
+   Raw response never enters service or domain logic directly.
+   When provider changes schema → fix Adapter only, service untouched.
+   See `references/third-party-apis.md` for full pattern.
 ```
 
-Why these three and nothing else as non-negotiable:
+Why these and nothing else as non-negotiable:
 Fowler showed internal quality pays off in weeks, not months.
 Uncle Bob showed the dependency rule is what makes systems testable and swappable.
 With AI coding fast, these boundaries are even cheaper to maintain —
@@ -161,32 +167,49 @@ Branch D: read L0 docs for intent, follow refactor workflow (characterization te
 
 ---
 
-## Ecosystem — what shipright delegates
+## Ecosystem — install by stage, not all at once
 
-Shipright orchestrates. These skills execute their parts better.
-Install independently. Shipright works without them but pairs better with them.
+Shipright orchestrates. External skills execute specific parts.
+Do NOT install all 24 addyosmani skills upfront — context budget is finite.
+Install only what your current pain requires. Addy Osmani himself: "pick 4–5 closest to your pain."
 
-### addyosmani/agent-skills (43k★ — production-grade SDLC)
-Install: `npx skills add https://github.com/addyosmani/agent-skills`
+### Stage-based install guide
 
-When shipright says "spec this feature" → activate `spec-driven-development`
-When shipright says "implement" → activate `incremental-implementation` + `test-driven-development`
-When shipright says "bug fix" → activate `debugging-and-error-recovery`
-When shipright says "review before merge" → activate `code-review-and-quality`
-When shipright says "security check" → activate `security-and-hardening`
-When shipright says "ship" → activate `shipping-and-launch`
+**MVP stage** (validate idea, team 1–3):
+```
+Install: debugging-and-error-recovery   ← bugs happen from day one
+Skip everything else                    ← overhead > value at this stage
+```
 
-Shipright still owns: constitution generation, 3 boundary rules, MVP vs production routing,
-tech debt ledger, project state detection, irreversible decisions.
-addyosmani still owns: how to execute each of the above excellently.
+**Traction stage** (feature loop active, team 3–8):
+```
+Add: incremental-implementation         ← features now span multiple files
+Add: test-driven-development            ← prevent regression as features grow
+Add: code-review-and-quality            ← team consistency matters now
+```
+
+**Growth stage** (proven product, pre-enterprise):
+```
+Add: spec-driven-development            ← complex features need specs
+Add: security-and-hardening            ← real users with real data
+Add: observability-and-instrumentation ← need visibility before incidents
+```
+
+### Skills to skip (shipright already covers or taste-skill does better)
+
+- `interview-me` → shipright Branch A onboarding does this
+- `idea-refine` → shipright Q2/Q3 in Branch A does this
+- `frontend-ui-engineering` → use taste-skill instead (more focused)
+- `using-agent-skills` → only needed if you have 10+ skills installed
+- `performance-optimization` → L4 signal-driven, never install proactively
+
+### addyosmani/agent-skills
+Install: `git clone https://github.com/addyosmani/agent-skills ~/.claude/skills/agent-skills`
+Then load only the skills you need — see stage guide above.
 
 ### taste-skill (30k★ — anti-slop frontend)
-Install: `npx skills add https://github.com/Leonxlnx/taste-skill`
-
-Activate only when: L3 is building a UI module.
-Do NOT activate for: backend-only modules, API services, CLI tools.
-
-When active: `design-taste-frontend` for layout/typography/motion quality.
+Install: `git clone https://github.com/Leonxlnx/taste-skill ~/.claude/skills/taste-skill`
+Activate only when building UI modules. Skip for backend/API/CLI.
 
 ---
 
@@ -243,6 +266,7 @@ foundational type change (Expand-Contract: optional → migrate → required, 3 
 - `references/l0-templates.md` — CLAUDE.md + ARCHITECTURE.md templates (MVP and production)
 - `references/requirement-drift.md` — architecture change: 3 scenarios + Expand-Contract
 - `references/debug-intermittent.md` — intermittent / production-only / resource-leak bugs
+- `references/third-party-apis.md` — 3-layer testing strategy, Adapter pattern, fixture workflow, resilience
 - `references/stacks/nodejs.md` — Node.js/TypeScript concrete prompts
 - `references/stacks/python.md` — Python/FastAPI concrete prompts
 

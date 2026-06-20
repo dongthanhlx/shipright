@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.4.2] — 2025-06
+### Added
+- Boundary rule 4: "No raw external response passes the Adapter layer"
+  Added to SKILL.md, l0-templates.md, and CLAUDE.md template
+- `references/third-party-apis.md` — complete third-party API strategy:
+  3-layer testing (exploration → unit with fixtures → contract),
+  Adapter/Normalizer pattern, resilience patterns, tool stack by stage
+- `references/levels.md`: Conway's Law team growth signals + graduate checklist
+- `references/branches/d-refactor.md`: CLAUDE.md evolution guide
+  (.claude/rules/ split, path scoping, compound engineering pattern)
+- Stage-based addyosmani/agent-skills install guide (not all 24 at once)
+- Q5b in Branch A: detect third-party APIs upfront, trigger strategy
+
+### Changed
+- SKILL.md ecosystem section: install by stage (MVP/Traction/Growth), not monolithic
+- Identified 3 addyosmani skills to skip when using shipright (interview-me, idea-refine, frontend-ui-engineering)
+
 ## [0.4.1] — 2025-06
 ### Added
 - `hooks/check-update.sh` — SessionStart hook, compares local version with GitHub tags
@@ -52,6 +69,23 @@
 ### Changed
 - Renamed from `senior-dev-workflow` to `shipright`
 - Slash command: `/shipright`
+
+## [0.4.2] — 2025-06
+### Added
+- Boundary rule 4: "No raw external response passes the Adapter layer"
+  Added to SKILL.md, l0-templates.md, and CLAUDE.md template
+- `references/third-party-apis.md` — complete third-party API strategy:
+  3-layer testing (exploration → unit with fixtures → contract),
+  Adapter/Normalizer pattern, resilience patterns, tool stack by stage
+- `references/levels.md`: Conway's Law team growth signals + graduate checklist
+- `references/branches/d-refactor.md`: CLAUDE.md evolution guide
+  (.claude/rules/ split, path scoping, compound engineering pattern)
+- Stage-based addyosmani/agent-skills install guide (not all 24 at once)
+- Q5b in Branch A: detect third-party APIs upfront, trigger strategy
+
+### Changed
+- SKILL.md ecosystem section: install by stage (MVP/Traction/Growth), not monolithic
+- Identified 3 addyosmani skills to skip when using shipright (interview-me, idea-refine, frontend-ui-engineering)
 
 ## [0.4.1] — 2025-06
 ### Added

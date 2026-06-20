@@ -34,6 +34,15 @@ The 3 boundary rules appear in BOTH — they are never optional.
 ## Stack
 [Runtime, database, test runner, key libs]
 
+## External API integrations  [fill if applicable]
+| Provider | Purpose | Sandbox URL | Quota |
+|---|---|---|---|
+| [name] | [what for] | [sandbox endpoint] | [limit] |
+
+Fixtures location: `tests/fixtures/`
+Bruno collection: `api-exploration/`
+Read: `references/third-party-apis.md` for full strategy.
+
 ## Environment variables
 [VAR_NAME] # description
 

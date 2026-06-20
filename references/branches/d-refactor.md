@@ -86,3 +86,75 @@ analysis and complexity reduction within the refactor scope.
 If refactor revealed a boundary violation that was in CLAUDE.md as acceptable:
 update tech debt log (trigger met, removed).
 If refactor changed module structure: update ARCHITECTURE.md.
+
+---
+
+## CLAUDE.md evolution — khi project grow
+
+> Đọc section này khi: CLAUDE.md > 150 lines, hoặc nhiều devs conflict trên cùng rules,
+> hoặc Claude bắt đầu ignore rules (thường xảy ra khi file quá dài).
+
+### Tại sao cần split
+
+Claude chỉ follow ~150 instructions reliably. 1 CLAUDE.md duy nhất không scale.
+Solution: `.claude/rules/` với path-scoped files — mỗi file chỉ load khi Claude
+làm việc trong directory match.
+
+### Cấu trúc mới khi CLAUDE.md > 150 lines
+
+```
+.claude/
+  rules/
+    boundaries.md          # 3 boundary rules — luôn load
+    testing.md             # test conventions — luôn load
+    api-conventions.md     # chỉ load khi làm việc trong src/api/
+    payments.md            # chỉ load khi trong src/modules/payments/
+    frontend.md            # chỉ load khi trong src/ui/
+CLAUDE.md                  # giữ < 80 lines: project overview + @import references
+```
+
+### Path scoping syntax
+
+```yaml
+# .claude/rules/payments.md
+---
+globs: ["src/modules/payments/**", "src/modules/billing/**"]
+---
+# Rules chỉ apply khi Claude ở trong payments hoặc billing module
+- Không gọi external payment API trực tiếp — dùng PaymentGateway interface
+- Mọi amount phải là integer cents, không bao giờ float
+- Log đầy đủ input/output của mọi payment operation
+```
+
+### CLAUDE.md sau khi split (lean version)
+
+```markdown
+# CLAUDE.md — [project-name]
+
+[Project in one sentence]
+
+## Always-on rules
+- [3 boundary rules — paste trực tiếp, không @import]
+- [Tech stack]
+- [Tech debt log]
+
+## Module-specific rules
+Xem .claude/rules/ — tự động load theo directory context.
+
+## When to ask before doing
+[...]
+```
+
+### Compound engineering — CLAUDE.md gets smarter over time
+
+Mỗi khi Claude mắc lỗi lặp lại → add rule vào đúng file trong .claude/rules/:
+```
+Claude generated float for money amount → add to payments.md:
+"Amounts are always integer cents. NEVER use float for money."
+
+Claude forgot to check quota before crawling → add to crawlers.md:
+"Always call isQuotaAvailable() before fetch(). Never skip this check."
+```
+
+Không add rule vào CLAUDE.md gốc nếu nó chỉ relevant cho 1 module.
+CLAUDE.md chỉ chứa project-wide truths.

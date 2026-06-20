@@ -169,3 +169,90 @@ a design review.
 - Benchmark test exists proving before/after
 - No public interface was changed
 - No new dependencies were added without justification in ARCHITECTURE.md
+
+---
+
+## Team growth signals — when architecture must align with team
+
+> Shipright focuses on technical architecture. But Conway's Law is real:
+> "Your architecture will reflect your team structure."
+> When team grows, these signals mean architecture decisions need team alignment.
+
+### Signal: team > 5 people
+
+```
+Action: define module ownership explicitly
+- Each module has 1 primary owner (team or person)
+- Owner approves PRs that change public interface (index.ts)
+- No module owned by "everyone" — that's owned by "no one"
+
+Add to ARCHITECTURE.md:
+## Module ownership
+| Module    | Owner      | Reviewer for interface changes |
+|-----------|------------|-------------------------------|
+| crawler   | @dev-a     | @dev-a + @tech-lead           |
+| feed      | @dev-b     | @dev-b + @tech-lead           |
+```
+
+### Signal: team > 8 people, multiple features in flight simultaneously
+
+```
+Risk: two devs change same module = merge conflict + coordination overhead
+Action: evaluate if module should be extracted
+Criteria (need ALL THREE to justify extraction):
+  1. Module has dedicated owner team (>= 2 people)
+  2. Module has different deploy cadence than rest of system
+  3. Module has clearly different scaling requirements
+
+If not all three → keep in monolith, improve boundary rules instead
+```
+
+### Signal: "we need microservices" conversation
+
+```
+Ask first:
+  - Is Conway's Law the real driver? (teams can't coordinate)
+  - Or is it scale? (one module needs 10x more resources)
+  - Or is it tech diversity? (one module needs different language/runtime)
+
+Most teams that "need microservices" actually need:
+  - Better module boundaries (shipright's 3 rules)
+  - Better team ownership (signal above)
+  - Better deployment automation
+
+Microservices solve organizational scale, not technical scale alone.
+A well-structured modular monolith can serve millions of users (Shopify does).
+```
+
+---
+
+## When shipright is no longer enough — graduate checklist
+
+These signals mean you need tools/practices beyond shipright:
+
+```
+[ ] CLAUDE.md > 150 lines and you haven't split to .claude/rules/ yet
+    → Do the split now (see Branch D — CLAUDE.md evolution)
+
+[ ] Team > 10 people working on same repo
+    → Need: team topology design, module ownership matrix, PR workflow policy
+
+[ ] Codebase > 100 files, Claude keeps getting lost
+    → Need: codebase navigation skill (ripgrep/ast-grep patterns)
+    → Add to CLAUDE.md: "Before making changes, run: rg -l '[keyword]' src/"
+
+[ ] Compliance required: SOC2, PCI-DSS, HIPAA, GDPR
+    → Need: specialized compliance skills + human legal/security review
+    → Shipright's security guidance is insufficient for compliance
+
+[ ] Multiple repos or monorepo > 500k LOC
+    → Need: Anthropic's enterprise Claude Code guidance
+    → Shipright assumes single repo, single deployment unit
+
+[ ] SRE practice needed: SLO, error budget, on-call rotation
+    → Need: dedicated SRE tooling + process design
+    → Shipright's incident guidance (Branch F) is not SRE practice
+```
+
+Shipright does not pretend to cover these. When you hit these signals,
+you've grown beyond what a skill can guide — you need organizational change.
