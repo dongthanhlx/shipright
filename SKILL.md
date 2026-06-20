@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 0.4.2
+version: 0.5.0
 description: >
   Ship your MVP fast. Grow it right. Shipright is the project constitution skill —
   it sets up minimal irreversible architecture decisions that let your codebase
@@ -83,14 +83,14 @@ the trigger condition is met, not upfront.
 Ask exactly this, wait for the answer, load ONE branch file:
 
 ```
-Dự án đang ở trạng thái nào?
+What's the current state of your project?
 
-  [A] Mới — chưa có gì
-  [B] Đã có code — thêm feature
-  [C] Đã có code — fix bug
-  [D] Đã có code — refactor
-  [E] Đang có code — cần orient lại / tiếp tục
-  [F] Production đang có vấn đề
+  [A] Brand new — nothing exists yet
+  [B] Existing code — add a feature
+  [C] Existing code — fix a bug
+  [D] Existing code — refactor
+  [E] Existing code — re-orient / continue after a break
+  [F] Production issue
 ```
 
 | Answer | Load | Do NOT load others |
@@ -181,6 +181,11 @@ Install: debugging-and-error-recovery   ← bugs happen from day one
 Skip everything else                    ← overhead > value at this stage
 ```
 
+> **Complexity control:** Even when skills ARE installed, Branch B classifies
+> each feature as Tier S/M/L/XL and activates only the right skills.
+> Simple features (1 file) never trigger incremental-implementation or spec-driven.
+> addyosmani documented "When NOT to use" for every skill — shipright enforces it.
+
 **Traction stage** (feature loop active, team 3–8):
 ```
 Add: incremental-implementation         ← features now span multiple files
@@ -212,6 +217,14 @@ Install: `git clone https://github.com/Leonxlnx/taste-skill ~/.claude/skills/tas
 Activate only when building UI modules. Skip for backend/API/CLI.
 
 ---
+
+## Language rule
+
+**Respond in the user's language throughout the session.**
+These skill files are written in English for GitHub discoverability,
+but if the user writes in Vietnamese, French, or any other language,
+conduct the entire conversation in that language.
+CLAUDE.md and ARCHITECTURE.md content stays in English (project convention).
 
 ## Working directory rule
 
@@ -267,6 +280,7 @@ foundational type change (Expand-Contract: optional → migrate → required, 3 
 - `references/requirement-drift.md` — architecture change: 3 scenarios + Expand-Contract
 - `references/debug-intermittent.md` — intermittent / production-only / resource-leak bugs
 - `references/third-party-apis.md` — 3-layer testing strategy, Adapter pattern, fixture workflow, resilience
+- `references/ui-design.md` — taste-skill ecosystem: page type → correct skill → dials → anti-slop rules
 - `references/stacks/nodejs.md` — Node.js/TypeScript concrete prompts
 - `references/stacks/python.md` — Python/FastAPI concrete prompts
 

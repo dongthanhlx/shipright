@@ -7,14 +7,14 @@ ALWAYS run this first. Ask ONE question, wait for answer, then load the correct 
 ## Opening question
 
 ```
-Dự án này đang ở trạng thái nào?
+What is the current state of your project?
 
-  [A] Mới hoàn toàn — chưa có gì
-  [B] Đã có code — cần dev thêm feature
-  [C] Đã có code — cần fix bug
-  [D] Đã có code — muốn refactor / cải thiện kiến trúc
-  [E] Đã có code — cần orient lại sau thời gian dừng
-  [F] Đang có vấn đề production — chậm / crash / data sai
+  [A] New — nothing exists yet
+  [B] Existing code — need to add a feature
+  [C] Existing code — need to fix a bug
+  [D] Existing code — want to refactor or improve
+  [E] Existing code — need to re-orient or continue after a break
+  [F] Production issue — slow, crashing, or data problem
 ```
 
 ## After answer — load exactly one file
@@ -27,6 +27,13 @@ Dự án này đang ở trạng thái nào?
 | [D] | `references/branches/d-refactor.md` | A, B, C, E, F |
 | [E] | `references/branches/e-resume.md` | A, B, C, D, F |
 | [F] | `references/branches/f-incident.md` | A, B, C, D, E |
+
+## Language note
+
+Shipright responds in the user's language automatically.
+If the user writes in Vietnamese → respond in Vietnamese.
+If the user writes in English → respond in English.
+The skill files are English. The responses adapt to the user.
 
 ## Project name convention
 

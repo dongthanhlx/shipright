@@ -1,5 +1,80 @@
 # Changelog
 
+## [0.5.0] — 2025-06 — PUBLISH READY
+### Breaking changes
+- All user-facing content converted to English (Option B decision)
+- Onboarding question: Vietnamese → English
+- All branch intake questions: English throughout
+
+### Added
+- Language rule in SKILL.md: "Respond in the user's language throughout"
+  Skills are English for GitHub discoverability; Claude responds in user's language
+- CONTRIBUTING.md — how to add new stacks, report bugs, guiding principles
+- README completely rewritten: correct tagline, full ecosystem table, token usage
+
+### Removed
+- references/domain-thinking.md (orphaned, 0 references)
+- references/error-handling.md (orphaned, 0 references)
+
+### Changed
+- README tagline: "Build any software project like a senior engineer" → "Ship your MVP fast. Grow it right."
+- README description: honest about scope (not "zero to production-ready" oversell)
+- SKILL.md taste-skill section: slimmed from 30 lines to 6, pointer to ui-design.md
+- prompts.md: rewritten to align with complexity tiers, ecosystem delegation, Adapter pattern
+- Q5b added to Branch A: detect third-party APIs in intake flow
+
+## [0.5.0] — 2025-06 — English-first release
+### Breaking change
+- All user-facing content converted to English (was mixed Vietnamese/English)
+- Shipright still responds in the user's language — skill language ≠ response language
+- Opening question, all branch files, onboarding router: now English
+
+### Added
+- Language note in onboarding.md: "responds in user's language automatically"
+- CONTRIBUTING.md: how to add new stacks, report issues, what's out of scope
+
+### Removed
+- references/domain-thinking.md (orphaned, 0 references)
+- references/error-handling.md (orphaned, 0 references)
+
+### Changed
+- README: tagline → "Ship your MVP fast. Grow it right."
+- README: description → honest scope (not "from empty folder to production-ready")
+- SKILL.md: taste-skill section slimmed (duplicated ui-design.md)
+- README: added "Works in your language" note
+
+## [0.4.4] — 2025-06
+### Added
+- Feature complexity classification in Branch B (Tier S/M/L/XL)
+  Tier S (1 file): no agent-skills needed
+  Tier M (2–5 files): test-driven + code-review
+  Tier L (5–10 files): spec-driven → /build auto → review
+  Tier XL (10+ files): full lifecycle
+
+### Fixed
+- Shipright was controlling WHEN TO INSTALL agent-skills (stage-based) but not
+  WHEN TO ACTIVATE each skill (complexity-based). Now both are controlled.
+- addyosmani already documented "When NOT to use" per skill —
+  shipright now exposes this decision tree at the right moment in Branch B.
+
+## [0.4.3] — 2025-06
+### Added
+- `references/ui-design.md` — complete taste-skill ecosystem mapping:
+  10+ specialized skills, page type → correct skill → dials → anti-slop rules
+  Includes pages OUTSIDE taste-skill scope (dashboard → vercel-labs, forms → addyosmani)
+- vercel-labs/agent-skills added to ecosystem for dashboard/admin/data UI
+
+### Changed
+- SKILL.md: taste-skill section replaced with precise mapping table
+  Was: "activate taste-skill for UI modules" (vague, wrong)
+  Now: page type → specific skill → dial settings + anti-slop rules summary
+- Clarified taste-skill scope: landing/portfolio/redesign only
+  NOT dashboards, NOT multi-step forms, NOT data tables
+
+### Fixed
+- taste-skill was being suggested generically for "any UI module"
+  taste-skill v2 explicitly excludes dashboards and multi-step product UI
+
 ## [0.4.2] — 2025-06
 ### Added
 - Boundary rule 4: "No raw external response passes the Adapter layer"
@@ -69,6 +144,81 @@
 ### Changed
 - Renamed from `senior-dev-workflow` to `shipright`
 - Slash command: `/shipright`
+
+## [0.5.0] — 2025-06 — PUBLISH READY
+### Breaking changes
+- All user-facing content converted to English (Option B decision)
+- Onboarding question: Vietnamese → English
+- All branch intake questions: English throughout
+
+### Added
+- Language rule in SKILL.md: "Respond in the user's language throughout"
+  Skills are English for GitHub discoverability; Claude responds in user's language
+- CONTRIBUTING.md — how to add new stacks, report bugs, guiding principles
+- README completely rewritten: correct tagline, full ecosystem table, token usage
+
+### Removed
+- references/domain-thinking.md (orphaned, 0 references)
+- references/error-handling.md (orphaned, 0 references)
+
+### Changed
+- README tagline: "Build any software project like a senior engineer" → "Ship your MVP fast. Grow it right."
+- README description: honest about scope (not "zero to production-ready" oversell)
+- SKILL.md taste-skill section: slimmed from 30 lines to 6, pointer to ui-design.md
+- prompts.md: rewritten to align with complexity tiers, ecosystem delegation, Adapter pattern
+- Q5b added to Branch A: detect third-party APIs in intake flow
+
+## [0.5.0] — 2025-06 — English-first release
+### Breaking change
+- All user-facing content converted to English (was mixed Vietnamese/English)
+- Shipright still responds in the user's language — skill language ≠ response language
+- Opening question, all branch files, onboarding router: now English
+
+### Added
+- Language note in onboarding.md: "responds in user's language automatically"
+- CONTRIBUTING.md: how to add new stacks, report issues, what's out of scope
+
+### Removed
+- references/domain-thinking.md (orphaned, 0 references)
+- references/error-handling.md (orphaned, 0 references)
+
+### Changed
+- README: tagline → "Ship your MVP fast. Grow it right."
+- README: description → honest scope (not "from empty folder to production-ready")
+- SKILL.md: taste-skill section slimmed (duplicated ui-design.md)
+- README: added "Works in your language" note
+
+## [0.4.4] — 2025-06
+### Added
+- Feature complexity classification in Branch B (Tier S/M/L/XL)
+  Tier S (1 file): no agent-skills needed
+  Tier M (2–5 files): test-driven + code-review
+  Tier L (5–10 files): spec-driven → /build auto → review
+  Tier XL (10+ files): full lifecycle
+
+### Fixed
+- Shipright was controlling WHEN TO INSTALL agent-skills (stage-based) but not
+  WHEN TO ACTIVATE each skill (complexity-based). Now both are controlled.
+- addyosmani already documented "When NOT to use" per skill —
+  shipright now exposes this decision tree at the right moment in Branch B.
+
+## [0.4.3] — 2025-06
+### Added
+- `references/ui-design.md` — complete taste-skill ecosystem mapping:
+  10+ specialized skills, page type → correct skill → dials → anti-slop rules
+  Includes pages OUTSIDE taste-skill scope (dashboard → vercel-labs, forms → addyosmani)
+- vercel-labs/agent-skills added to ecosystem for dashboard/admin/data UI
+
+### Changed
+- SKILL.md: taste-skill section replaced with precise mapping table
+  Was: "activate taste-skill for UI modules" (vague, wrong)
+  Now: page type → specific skill → dial settings + anti-slop rules summary
+- Clarified taste-skill scope: landing/portfolio/redesign only
+  NOT dashboards, NOT multi-step forms, NOT data tables
+
+### Fixed
+- taste-skill was being suggested generically for "any UI module"
+  taste-skill v2 explicitly excludes dashboards and multi-step product UI
 
 ## [0.4.2] — 2025-06
 ### Added
