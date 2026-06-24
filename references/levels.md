@@ -226,6 +226,18 @@ A well-structured modular monolith can serve millions of users (Shopify does).
 
 ---
 
+## L4 Hardening tracks
+
+Three tracks — only enter when production signal demands:
+
+**Performance:** profile first (don't guess) → cache / index / query plan / read replica
+**Reliability:** circuit breaker, retry with backoff+jitter, distributed lock for overlapping jobs
+**Observability:** when "we don't know where it's slow" → add OpenTelemetry;
+  when "errors found by users" → add Sentry; when "can't reproduce prod" → Correlation ID missing
+  Full patterns: `references/observability.md`
+
+---
+
 ## When shipright is no longer enough — graduate checklist
 
 These signals mean you need tools/practices beyond shipright:
@@ -254,5 +266,7 @@ These signals mean you need tools/practices beyond shipright:
     → Shipright's incident guidance (Branch F) is not SRE practice
 ```
 
-Shipright does not pretend to cover these. When you hit these signals,
+Shipright does not pretend to cover these.
+
+For Stage 1→2→3 architecture evolution: `references/scaling-guide.md` When you hit these signals,
 you've grown beyond what a skill can guide — you need organizational change.

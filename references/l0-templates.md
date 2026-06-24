@@ -68,6 +68,15 @@ Read: `references/observability.md` for full patterns.
 ## Environment variables
 [VAR_NAME] # description
 
+## AI/LLM conventions  [add only if project uses LLMs]
+LLM calls: only in llm/ or ai/ module — never in service or handler layers
+Prompts: files in prompts/ directory — never inline strings in code
+LLM responses: always pass through ResponseAdapter before entering domain logic
+Tests: assert structure/constraints, not exact string output (LLMs are non-deterministic)
+Cost: every LLM call logs model + input_tokens + output_tokens + cost_usd
+Evaluation: run eval suite before merging any retrieval or prompt changes
+See: references/stacks/ai-projects.md for full AI project patterns
+
 ## Tech debt log (MVP shortcuts — with triggers)
 | Shortcut | Trigger to fix |
 |---|---|

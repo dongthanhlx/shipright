@@ -42,7 +42,12 @@ Q5c (all modes): "Does the project need observability (logging, tracing)?
      → For new projects: add Correlation ID from day one (references/observability.md)
      → For existing projects without logging: load retrofit section in observability.md"
 
-Q6: "Tech stack? (Node.js/TS, Python, Go, undecided?)"
+Note on AI projects: if Q4b revealed AI/LLM usage, ai-projects.md was already loaded.
+That file routes to ai-rag.md and/or chatbot-platforms.md as needed.
+
+Q6: "Tech stack?
+     (Node.js/TypeScript, Python, Go, Browser Extension (MV3), undecided?)
+     → If Browser Extension: load references/stacks/browser-extension.md"
 
 Q7: "Most important constraint? (deadline, team size, required integrations)"
 ```

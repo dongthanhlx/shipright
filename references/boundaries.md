@@ -1,6 +1,6 @@
-# The 3 Boundary Rules
+# The 4 Boundary Rules
 
-These are the only rules that matter for long-term maintainability.
+These are the only 4 rules that matter for long-term maintainability.
 Everything else is preference. These are not.
 
 Violating any of these makes the codebase progressively harder to change,

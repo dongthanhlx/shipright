@@ -1,6 +1,6 @@
 # Claude Code Prompts — Copy-Paste Library
 
-Current as of v0.5.5. Aligned with complexity tiers and ecosystem delegation.
+Current as of v0.5.9. Aligned with complexity tiers and ecosystem delegation.
 
 All prompts follow this pattern:
 1. **Orient** — tell Claude Code what to read first

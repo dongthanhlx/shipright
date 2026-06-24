@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 0.5.5
+version: 0.5.9
 description: >
   Ship your MVP fast. Grow it right.
   Use when: starting ANY new project or codebase, adding a non-trivial feature
@@ -126,7 +126,7 @@ Senior thinking is knowing when NOT to apply a pattern.
 
 VALIDATE (MVP mode):
   Goal: working software in front of real users, fastest possible.
-  Constitution: minimal — 3 boundaries + core modules only + debt log.
+  Constitution: minimal — 4 boundary rules + core modules only + debt log.
   Process: walking skeleton first, validate, then feature loop.
   Timeline: days, not weeks.
 
@@ -237,6 +237,22 @@ If developer mentions a path → confirm: "You mean `[path]` relative to `[pwd]`
 
 ---
 
+## L4 — Production hardening signals
+
+L4 is NOT "make it better." Only when production gives a measurable signal.
+
+**Performance:** p95 latency > target, DB CPU > 60%, API quota exhausted, memory growth over time
+**Reliability:** external API flaky > 1 week → circuit breaker; cron jobs overlapping → distributed lock; error rate > 1%
+**Observability signals (load `references/observability.md`):**
+- "We don't know where it's slow" → add OpenTelemetry distributed tracing
+- "We find out about errors from users" → add Sentry + structured error logging
+- "Can't reproduce prod issues locally" → Correlation ID missing
+- "Third-party API changed silently" → schema validation logs not in place
+
+L4 constraint: fix stays inside one layer. Interface change needed → design problem, not optimization.
+
+---
+
 ## When project grows and architecture needs to evolve
 
 When project is growing and team is expanding, read `references/scaling-guide.md`:
@@ -267,7 +283,7 @@ foundational type change (Expand-Contract: optional → migrate → required, 3 
 |---|---|---|
 | Microservices from day 1 | Operational overhead before value proven | Modular monolith, split when team/load demands |
 | Build all features before shipping | Invalidated direction costs everything | Walking skeleton → validate → feature loop |
-| Skip the 3 boundaries "just for MVP" | Cheap now, rewrite later | 3 boundaries take minutes, save weeks |
+| Skip the 4 boundaries "just for MVP" | Cheap now, rewrite later | 4 boundaries take minutes, save weeks |
 | "Optimize it later" (vague) | "Later" = never | Add TODO[metric-trigger] with specific condition |
 | Refactor everything before new feature | Refactor without tests = rewrite | Characterization tests first, then refactor |
 | Module A queries module B's DB directly | Breaks the seam, impossible to split | Define interface in B's public boundary |
@@ -299,6 +315,10 @@ foundational type change (Expand-Contract: optional → migrate → required, 3 
 - `references/ui-design.md` — taste-skill page type → correct skill → dials → anti-slop rules
 - `references/stacks/nodejs.md` — Node.js/TypeScript concrete prompts
 - `references/stacks/python.md` — Python/FastAPI concrete prompts
+- `references/stacks/browser-extension.md` — Browser Extension MV3: manifest, components, chrome.* APIs, MV3 gotchas
+- `references/stacks/ai-projects.md` — AI projects entry point: project type routing, 5th boundary rule, eval-first mindset
+- `references/stacks/ai-rag.md` — RAG deep dive: framework decision, evaluation loop, vector DB, chunking, metrics
+- `references/stacks/chatbot-platforms.md` — AI Chatbot for Telegram/Discord: Platform Adapter pattern, conversation state, polling vs webhook, security
 
 ### Load when user asks "show me an example"
 - `references/examples/news-crawler-CLAUDE.md`
