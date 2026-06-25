@@ -1,325 +1,276 @@
 ---
 name: shipright
-version: 0.5.9
+version: 0.7.0
 description: >
-  Ship your MVP fast. Grow it right.
-  Use when: starting ANY new project or codebase, adding a non-trivial feature
-  (touches 2+ files), debugging a bug with unclear root cause, refactoring a module,
-  returning to a project after a break, or dealing with a production incident.
-  Triggers on phrases like: "build", "start a new project", "add feature to my app",
-  "there's a bug", "fix this issue", "refactor", "production is down", "I'm back on this",
-  "help me structure", "I want to create", "integrate API", "add logging/tracing".
-  Do NOT trigger for: single-line fixes, knowledge questions, mid-implementation steps,
-  writing README, generating commit messages.
-  Manual invoke: /shipright (most reliable — always works).
+  Ship your MVP fast. Grow it right. The Project Brain for AI coding workflow —
+  sets up constitution, enforces boundaries, orchestrates community skills.
+  Use when: starting ANY project, adding features (2+ files), fixing unclear bugs,
+  refactoring, resuming after break, production incidents, integrating APIs,
+  adding observability/tracing, building AI/RAG/chatbot projects.
+  Triggers: "build", "start project", "add feature", "bug", "refactor",
+  "production down", "back on this", "integrate API", "add tracing", "build chatbot".
+  Skip for: single-line fixes, knowledge questions, mid-implementation steps.
+  Manual invoke: /shipright — always reliable.
 allowed-tools: Read, Write, Bash, Glob, Grep
 ---
 
-## Working context (injected at runtime)
+## Working context — injected every session
 
-Shipright version: !`grep "^version:" "${CLAUDE_SKILL_DIR}/SKILL.md" 2>/dev/null | head -1 | awk '{print $2}' || echo "unknown"`
-Current directory: !`pwd`
-Project files: !`ls -1 2>/dev/null | head -20`
-Git status: !`git status --short 2>/dev/null || echo "not a git repo"`
-CLAUDE.md: !`test -f CLAUDE.md && echo "YES — read before asking anything" || echo "NO"`
-ARCHITECTURE.md: !`test -f ARCHITECTURE.md && echo "YES — read before asking anything" || echo "NO"`
-addyosmani/agent-skills: !`test -d "${HOME}/.claude/skills/agent-skills" && grep "^version:" "${HOME}/.claude/skills/agent-skills/SKILL.md" 2>/dev/null | head -1 | awk '{print $2}' || echo "not installed"`
-taste-skill: !`test -d "${HOME}/.claude/skills/taste-skill" && echo "installed" || echo "not installed"`
-
----
-
-# Shipright
-
-**Shipright is the conductor. External skills are the musicians.**
-Shipright knows: which piece to play, what order, which musician plays what.
-addyosmani/agent-skills knows: how to execute each part excellently.
-taste-skill knows: how to make UI not look like slop.
-These roles never overlap. Shipright does NOT duplicate their instructions.
+```
+Shipright:     !`grep "^version:" "${CLAUDE_SKILL_DIR}/SKILL.md" 2>/dev/null | awk '{print $2}'`
+Directory:     !`pwd`
+Git branch:    !`git branch --show-current 2>/dev/null || echo "no git"`
+Last commit:   !`git log --oneline -1 2>/dev/null || echo "no commits"`
+CLAUDE.md:     !`test -f CLAUDE.md && echo "EXISTS — read first" || echo "MISSING"`
+ARCHITECTURE:  !`test -f ARCHITECTURE.md && echo "EXISTS — read first" || echo "MISSING"`
+Project state: !`grep -A3 "## Shipright state" CLAUDE.md 2>/dev/null | tail -3 || echo "no state tracked"`
+Skills:        !`ls ~/.claude/skills/ 2>/dev/null | tr '\n' ' ' || echo "none detected"`
+Tests:         !`(npm test --silent 2>&1 | tail -2) || (pytest -q 2>&1 | tail -2) || echo "no test runner"`
+```
 
 ---
 
-## The one rule that never changes
+# Shipright v0.7 — Project Brain OS
 
-**4 boundaries. Absolute. Non-negotiable. In MVP and in production.**
+Three masters. Four boundaries. One living constitution.
 
-Based on Uncle Bob's Dependency Rule and Fowler's internal quality research:
-these are the only things that are cheap to do right from day one
-and expensive to fix later — even with AI coding fast.
+**Eric Evans:** Model the right domain (Ubiquitous Language, Bounded Contexts, Aggregates)
+**Uncle Bob:** Structure it correctly (SOLID, Clean Code, 20-line functions)
+**Fowler:** Keep it clean as it evolves (smell detection, compound engineering)
+
+---
+
+## The 4 boundaries — absolute, all modes, all stages
 
 ```
 1. Dependencies point inward only
-   Service never imports db directly. Module never imports another module's internals.
-   Cross-module calls go through index.ts / __init__.py only.
+   Service never imports db. Module never imports another module's internals.
+   Cross-module: index.ts / __init__.py only.
 
 2. Each layer has one job
-   Handler: parse → call service → format. No domain logic.
+   Handler: parse → call service → format. Zero domain logic.
    Service: business rules only. No HTTP, no DB.
-   Repository: DB queries only. Returns typed domain objects, not raw rows.
+   Repository: queries only. Returns typed domain objects, not raw rows.
 
 3. Modules do not share databases
-   If module A needs data from module B → call B's public interface.
-   Never query B's table directly. This is the seam for future service extraction.
+   Module A needs B's data → call B's public interface. Never B's table.
 
-4. No raw external response passes the Adapter layer  [applies when using third-party APIs]
-   Every external API has exactly one Adapter (Normalizer).
-   Raw response never enters service or domain logic directly.
-   When provider changes schema → fix Adapter only, service untouched.
-   See `references/third-party-apis.md` for full pattern.
+4. No raw external response passes the Adapter layer
+   Every external API/LLM has one Adapter (Normalizer/ACL).
+   Raw response never enters service or domain logic.
 ```
 
-Why these and nothing else as non-negotiable:
-Fowler showed internal quality pays off in weeks, not months.
-Uncle Bob showed the dependency rule is what makes systems testable and swappable.
-With AI coding fast, these boundaries are even cheaper to maintain —
-but the cost of violating them is unchanged: data model migrations still hurt,
-tangled dependencies still make AI generate wrong code at scale.
-
-Everything else — test coverage level, error taxonomy completeness, caching,
-full ADR set, idempotency on every operation — is signal-driven. Do it when
-the trigger condition is met, not upfront.
+Cheap to do right from day one. Expensive to fix at 10k users. Non-negotiable in MVP.
 
 ---
 
-## FIRST — One question, then branch
+## Session start — 3 checks before anything else
 
-Ask exactly this, wait for the answer, load ONE branch file:
+**Check 1: Read existing constitution**
+If CLAUDE.md and ARCHITECTURE.md exist → read both completely before asking anything.
+Project state section in CLAUDE.md shows where things left off last session.
+
+**Check 2: Assess skill availability**
+Skills detected in working context above → adapt behavior:
+- addyosmani/agent-skills: delegate spec/implementation/review/debug tasks
+- taste-skill: delegate UI tasks with correct variant
+- Other skills: check registry entry for this project type
+
+**Check 3: Note missing skills**
+If registry entry requires a skill not installed → mention once at session start:
+"Note: this project type works better with [skill]. Install: [command]"
+Then proceed — never block on missing skills.
+
+---
+
+## Route first, everything else second
 
 ```
 What's the current state of your project?
 
-  [A] Brand new — nothing exists yet
+  [A] New — nothing exists yet
   [B] Existing code — add a feature
   [C] Existing code — fix a bug
-  [D] Existing code — refactor
+  [D] Existing code — refactor or improve
   [E] Existing code — re-orient / continue after a break
-  [F] Production issue
+  [F] Production issue — slow, crashing, data problem
 ```
 
-| Answer | Load | Do NOT load others |
+Load ONE file. Do not load others until needed.
+
+| Answer | Load | Tokens |
 |---|---|---|
-| A | `references/branches/a-new-project.md` | B–F |
-| B | `references/branches/b-add-feature.md` | A,C–F |
-| C | `references/branches/c-fix-bug.md` | A,B,D–F |
-| D | `references/branches/d-refactor.md` | A–C,E,F |
-| E | `references/branches/e-resume.md` | A–D,F |
-| F | `references/branches/f-incident.md` | A–E |
+| A | `references/branches/a-new-project.md` | ~900 |
+| B | `references/branches/b-add-feature.md` | ~900 |
+| C | `references/branches/c-fix-bug.md` | ~600 |
+| D | `references/branches/d-refactor.md` | ~900 |
+| E | `references/branches/e-resume.md` | ~500 |
+| F | `references/branches/f-incident.md` | ~500 |
 
 ---
 
-## Is this workflow appropriate?
+## Registry — project type → curated skills
+
+After routing, if project type is identifiable, load:
+`references/registry.md` — find the project type entry (~300 tokens per entry)
+
+Registry tells: what to install, what shipright adds to CLAUDE.md, tested-with versions.
+Load only the relevant entry, not the full file.
+
+---
+
+## Quality system — 3 dimensions enforced throughout
+
+### At L0 (constitution)
+- Evans: Ubiquitous Language in CLAUDE.md (domain terms Claude must use)
+- Evans: Domain types in ARCHITECTURE.md (Entity vs Value Object vs Service)
+- Uncle Bob: Clean Code rules in CLAUDE.md (function max 20 lines, no AND/OR names)
+
+### At L3 (before every commit)
+Load `references/code-quality.md` for full gate. Quick version:
+```
+DDD:     Names from Ubiquitous Language? Value Objects immutable?
+SOLID:   Function > 20 lines? AND/OR in name? New type modified existing switch?
+Fowler:  Feature Envy? Primitive Obsession? Comment explaining WHAT?
+```
+Violation found → fix before committing + add rule to CLAUDE.md (compound engineering)
+
+### Compound engineering (ongoing)
+Every AI mistake → specific rule added to CLAUDE.md or `.claude/rules/[module].md`
+CLAUDE.md gets smarter every session. AI makes the same mistake twice: rare.
+
+---
+
+## Persistent state — tracking across sessions
+
+Shipright writes a state section to CLAUDE.md after significant milestones.
+This survives across sessions. Working context above reads it automatically.
+
+```markdown
+## Shipright state
+Level: L3
+Active: [module name]
+Next: [specific action — verb + object + acceptance criteria]
+Last updated: [date]
+Skills active: [comma-separated list]
+```
+
+When state exists: skip intake, start from "Next" action.
+When state missing: full intake flow.
+Branch E (resume) uses this to re-orient in seconds instead of minutes.
+
+---
+
+## L4 hardening — signal-driven only
+
+Never add L4 work proactively. Only when production gives a measurable signal.
+
+| Signal | Action | Load |
+|---|---|---|
+| "Don't know where it's slow" | OpenTelemetry tracing | `references/observability.md` |
+| "Users report errors before us" | Sentry + structured logging | `references/observability.md` |
+| "API changed silently" | Schema validation + contract tests | `references/third-party-apis.md` |
+| "Can't reproduce prod issues" | Correlation ID missing | `references/observability.md` |
+| Team > 10, merge conflicts rising | Module ownership + arch tests | `references/scaling-guide.md` |
+| Adding features getting slower | Fowler smells accumulated | `references/code-quality.md` |
+
+---
+
+## Ecosystem dispatch — who does what
+
+Shipright decides when and what. External skills execute how.
 
 ```
-Throwaway prototype, < 1 week lifespan?    → skip everything, just hack
-Script / CLI, < 200 lines, no domain?      → flat functions, no layers needed
-Solo, < 3 domain entities, read-only?      → simple modules, no DI needed
+Shipright owns:
+  Constitution (CLAUDE.md + ARCHITECTURE.md)
+  4 boundary rules + quality gate
+  Project state + routing
+  Registry-based skill suggestions
+  Irreversible architecture decisions
+
+addyosmani/agent-skills owns (install by stage):
+  MVP:      debugging-and-error-recovery
+  Traction: + incremental-implementation, test-driven-development, code-review-and-quality
+  Growth:   + spec-driven-development, security-and-hardening
+
+taste-skill owns (install by page type):
+  Landing/portfolio: design-taste-frontend
+  Product UI:        minimalist-skill
+  Premium/calm:      soft-skill
+  Redesign:          redesign-skill FIRST, then above
+  Dashboard/admin:   NOT taste-skill → vercel-labs/agent-skills
+
+AI ecosystem owns (install by project type):
+  RAG evaluation:    RAGAS + LangSmith / Arize Phoenix
+  LLM observability: datadog-labs/dd-llmo-eval-bootstrap
+  Agent evaluation:  DeepEval / Confident-AI
+
+SKIP (shipright already covers):
+  interview-me, idea-refine → Branch A intake
+  frontend-ui-engineering  → taste-skill
+  performance-optimization → L4 signal-driven
+```
+
+**For AI/RAG/chatbot projects:**
+addyosmani covers infrastructure code (adapters, handlers, CI/CD, code review).
+Shipright AI files cover AI-specific code (evaluation loop, LLM boundaries, conversation state).
+Use both — they don't overlap.
+
+---
+
+## When workflow is not appropriate
+
+```
+Throwaway prototype, < 1 week lifespan?    → skip everything, hack freely
+Script / CLI, < 200 lines, no domain?      → flat functions, no layers
+Solo, < 3 domain entities, read-only data? → simple modules, no DI
 Otherwise                                   → use shipright
 ```
 
-Senior thinking is knowing when NOT to apply a pattern.
+Senior judgment = knowing when NOT to apply a pattern.
 
 ---
 
-## The 2-mode decision (ask in Branch A)
+## Reference files — load on demand
 
-```
-"Building to VALIDATE an idea, or SCALE a proven solution?"
+### Branch files (load ONE per session start)
+- `references/branches/a-new-project.md`
+- `references/branches/b-add-feature.md`
+- `references/branches/c-fix-bug.md`
+- `references/branches/d-refactor.md`
+- `references/branches/e-resume.md`
+- `references/branches/f-incident.md`
 
-VALIDATE (MVP mode):
-  Goal: working software in front of real users, fastest possible.
-  Constitution: minimal — 4 boundary rules + core modules only + debt log.
-  Process: walking skeleton first, validate, then feature loop.
-  Timeline: days, not weeks.
+### Registry (load relevant entry only)
+- `references/registry.md` — project type → curated skill pack
 
-SCALE (Production mode):
-  Goal: architecture that supports team growth and load.
-  Constitution: full — all modules, error taxonomy, idempotency, ADRs.
-  Process: full L0 → L1 → L2 → L3.
-  Timeline: planned sprints.
-```
+### Core references (load on signal)
+- `references/code-quality.md` — Evans + Uncle Bob + Fowler: full quality system
+- `references/observability.md` — Correlation ID, logging, tracing, API tracing, retrofit
+- `references/scaling-guide.md` — Stage 1→2→3 playbook + Strangler Fig templates
+- `references/third-party-apis.md` — Adapter pattern, 3-layer testing, resilience
+- `references/ui-design.md` — taste-skill: page type → correct skill → dials
+- `references/l0-templates.md` — CLAUDE.md + ARCHITECTURE.md templates
+- `references/levels.md` — L0→L4 gates, Conway's Law, graduate checklist
+- `references/requirement-drift.md` — Expand-Contract + 3 architecture change scenarios
+- `references/debug-intermittent.md` — intermittent / production-only / resource-leak bugs
+- `references/boundaries.md` — 4 boundary rules with code examples
+- `references/prompts.md` — copy-paste Claude Code prompts
 
-The irreversible decisions that need to be right in BOTH modes:
-core domain model shape, module boundary map, dependency direction.
-These are cheap to do right now. Expensive to fix with 10k users and live data.
+### Stack files (load on project type — slim, defer to community skills)
+- `references/stacks/nodejs.md`
+- `references/stacks/python.md`
+- `references/stacks/browser-extension.md`
+- `references/stacks/ai-projects.md`
+- `references/stacks/ai-rag.md`
+- `references/stacks/chatbot-platforms.md`
 
----
-
-## The 4-Level Tree (Branch A only — new projects)
-
-```
-L0  Constitution  → CLAUDE.md + ARCHITECTURE.md
-L1  Skeleton      → compiles, runs, no logic
-L2  Interfaces    → layers defined, tests written (RED)
-L3  Implement     → one feature at a time, tests GREEN
-L4  Harden        → only when production signal demands it
-```
-
-Which branch uses which levels:
-
-| Branch | L0 | L1 | L2 | L3 | L4 |
-|---|---|---|---|---|---|
-| A — New project | ✓ Create | ✓ Create | ✓ Create | ✓ Loop | Signal |
-| B — Add feature | ✓ Read/update | — | ✓ Feature only | ✓ | Signal |
-| C — Fix bug | — | — | — | — | — |
-| D — Refactor | ✓ Read | — | — | — | — |
-| E — Resume | ✓ Read | Detect level | Resume at level | Continue | Signal |
-| F — Incident | — | — | — | — | — |
-
-Branch C and F: tree does NOT apply. Dedicated workflows in branch files.
-Branch D: read L0 docs for intent, follow refactor workflow (characterization tests first).
-
----
-
-## Ecosystem — install by stage, not all at once
-
-Shipright orchestrates. External skills execute specific parts.
-Do NOT install all 24 addyosmani skills upfront — context budget is finite.
-Install only what your current pain requires. Addy Osmani himself: "pick 4–5 closest to your pain."
-
-### Stage-based install guide
-
-**MVP stage** (validate idea, team 1–3):
-```
-Install: debugging-and-error-recovery   ← bugs happen from day one
-Skip everything else                    ← overhead > value at this stage
-```
-
-> **Complexity control:** Even when skills ARE installed, Branch B classifies
-> each feature as Tier S/M/L/XL and activates only the right skills.
-> Simple features (1 file) never trigger incremental-implementation or spec-driven.
-> addyosmani documented "When NOT to use" for every skill — shipright enforces it.
-
-**Traction stage** (feature loop active, team 3–8):
-```
-Add: incremental-implementation         ← features now span multiple files
-Add: test-driven-development            ← prevent regression as features grow
-Add: code-review-and-quality            ← team consistency matters now
-```
-
-**Growth stage** (proven product, pre-enterprise):
-```
-Add: spec-driven-development            ← complex features need specs
-Add: security-and-hardening            ← real users with real data
-Add: observability-and-instrumentation ← need visibility before incidents
-```
-
-### Skills to skip (shipright already covers or taste-skill does better)
-
-- `interview-me` → shipright Branch A onboarding does this
-- `idea-refine` → shipright Q2/Q3 in Branch A does this
-- `frontend-ui-engineering` → use taste-skill instead (more focused)
-- `using-agent-skills` → only needed if you have 10+ skills installed
-- `performance-optimization` → L4 signal-driven, never install proactively
-
-### addyosmani/agent-skills
-Install: `git clone https://github.com/addyosmani/agent-skills ~/.claude/skills/agent-skills`
-Then load only the skills you need — see stage guide above.
-
-### taste-skill (30k★ — anti-slop frontend)
-Install: `git clone https://github.com/Leonxlnx/taste-skill ~/.claude/skills/taste-skill`
-Read `references/ui-design.md` for page type → correct skill mapping.
-Skip entirely for: backend API, CLI, background jobs, dashboards.
+### Examples
+- `references/examples/news-crawler-CLAUDE.md`
+- `references/examples/news-crawler-ARCHITECTURE.md`
 
 ---
 
 ## Language rule
-
-**Respond in the user's language throughout the session.**
-These skill files are written in English for GitHub discoverability,
-but if the user writes in Vietnamese, French, or any other language,
-conduct the entire conversation in that language.
+Respond in the user's language. These files are English for GitHub discoverability.
 CLAUDE.md and ARCHITECTURE.md content stays in English (project convention).
-
-## Working directory rule
-
-ALL file operations happen in the current directory shown in the context above.
-If CLAUDE.md or ARCHITECTURE.md exist → read them BEFORE asking any questions.
-If developer mentions a path → confirm: "You mean `[path]` relative to `[pwd]`?"
-
----
-
-## L4 — Production hardening signals
-
-L4 is NOT "make it better." Only when production gives a measurable signal.
-
-**Performance:** p95 latency > target, DB CPU > 60%, API quota exhausted, memory growth over time
-**Reliability:** external API flaky > 1 week → circuit breaker; cron jobs overlapping → distributed lock; error rate > 1%
-**Observability signals (load `references/observability.md`):**
-- "We don't know where it's slow" → add OpenTelemetry distributed tracing
-- "We find out about errors from users" → add Sentry + structured error logging
-- "Can't reproduce prod issues locally" → Correlation ID missing
-- "Third-party API changed silently" → schema validation logs not in place
-
-L4 constraint: fix stays inside one layer. Interface change needed → design problem, not optimization.
-
----
-
-## When project grows and architecture needs to evolve
-
-When project is growing and team is expanding, read `references/scaling-guide.md`:
-- Stage 1 (team < 20): enforce boundaries harder, module ownership, architecture tests
-- Stage 2 (team 10–30): modular monolith patterns, async events, module-level CI
-- Stage 3 (team 20–50): selective extraction via Strangler Fig — only when 3 signals appear
-
-Signal to check: if any graduate checklist item fires → read scaling-guide.md immediately.
-
----
-
-## When requirements change architecture
-
-Read `references/requirement-drift.md` when:
-- New requirement doesn't fit current module structure
-- Developer wants to add a completely new bounded context
-- Core domain type needs to change
-
-3 scenarios: new implementation of existing interface (add, zero changes elsewhere),
-wrong abstraction revealed (refactor to new pattern under green tests),
-foundational type change (Expand-Contract: optional → migrate → required, 3 commits).
-
----
-
-## Common mistakes — redirect these
-
-| Wants to do | Why wrong | Redirect |
-|---|---|---|
-| Microservices from day 1 | Operational overhead before value proven | Modular monolith, split when team/load demands |
-| Build all features before shipping | Invalidated direction costs everything | Walking skeleton → validate → feature loop |
-| Skip the 4 boundaries "just for MVP" | Cheap now, rewrite later | 4 boundaries take minutes, save weeks |
-| "Optimize it later" (vague) | "Later" = never | Add TODO[metric-trigger] with specific condition |
-| Refactor everything before new feature | Refactor without tests = rewrite | Characterization tests first, then refactor |
-| Module A queries module B's DB directly | Breaks the seam, impossible to split | Define interface in B's public boundary |
-
----
-
-## Reference files — load on demand only
-
-### Always load
-- `references/onboarding.md` — thin router with branch table
-
-### Load after user selects branch
-- `references/branches/a-new-project.md` — MVP vs production, walking skeleton, L0 generation
-- `references/branches/b-add-feature.md` — codebase read, health check, feature implementation
-- `references/branches/c-fix-bug.md` — classify, reproduce, locate, root cause, fix
-- `references/branches/d-refactor.md` — define done, characterization tests, atomic steps
-- `references/branches/e-resume.md` — git orient, detect level, find position, next action
-- `references/branches/f-incident.md` — triage, mitigate first, investigate, post-incident
-
-### Load when needed
-- `references/boundaries.md` — 4 boundary rules with good/bad code examples
-- `references/levels.md` — L0→L4 definitions, gates, Conway's Law signals, graduate checklist
-- `references/l0-templates.md` — CLAUDE.md + ARCHITECTURE.md templates (MVP and production)
-- `references/requirement-drift.md` — architecture change: 3 scenarios + Expand-Contract
-- `references/debug-intermittent.md` — intermittent / production-only / resource-leak bugs
-- `references/third-party-apis.md` — 3-layer testing, Adapter pattern, fixture workflow, resilience
-- `references/observability.md` — Correlation ID, structured logging, API tracing, retrofit guide
-- `references/scaling-guide.md` — 3-stage scaling playbook + Strangler Fig extraction templates
-- `references/ui-design.md` — taste-skill page type → correct skill → dials → anti-slop rules
-- `references/stacks/nodejs.md` — Node.js/TypeScript concrete prompts
-- `references/stacks/python.md` — Python/FastAPI concrete prompts
-- `references/stacks/browser-extension.md` — Browser Extension MV3: manifest, components, chrome.* APIs, MV3 gotchas
-- `references/stacks/ai-projects.md` — AI projects entry point: project type routing, 5th boundary rule, eval-first mindset
-- `references/stacks/ai-rag.md` — RAG deep dive: framework decision, evaluation loop, vector DB, chunking, metrics
-- `references/stacks/chatbot-platforms.md` — AI Chatbot for Telegram/Discord: Platform Adapter pattern, conversation state, polling vs webhook, security
-
-### Load when user asks "show me an example"
-- `references/examples/news-crawler-CLAUDE.md`
-- `references/examples/news-crawler-ARCHITECTURE.md`

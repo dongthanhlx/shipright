@@ -1,153 +1,222 @@
 ## Branch A — New project
 
-> **Working directory**: all files in the directory shown in SKILL.md context.
-> If CLAUDE.md or ARCHITECTURE.md already exist → read them first, skip intake.
+> Read CLAUDE.md and ARCHITECTURE.md if they exist — skip intake if state section found.
+> Language: respond in user's language. CLAUDE.md/ARCHITECTURE.md content stays English.
 
 ---
 
-## Step 1 — MVP or Production? (ask first)
+## Step 0 — Check existing state
+
+If `## Shipright state` section exists in CLAUDE.md:
+```
+Read state section. Ask: "I see this project is at [Level], working on [module].
+Continue from there, or start fresh intake?"
+```
+If no state → proceed to Step 1.
+
+---
+
+## Step 1 — Mode decision
 
 ```
-"Is the goal right now to validate an idea, or build a production-ready solution?"
+"Validating an idea (ship fast, real users ASAP)?
+ Or building a production-ready solution (team, timeline, requirements clear)?"
 
-[A] Validate — get something working in front of real users as fast as possible
-[B] Production — team, timeline, and requirements are already clear
+[A] Validate (MVP mode) — days, not weeks
+[B] Production mode — planned sprints, full architecture
 ```
 
 ---
 
-## Step 2 — Intake (one question at a time, wait for each answer)
+## Step 2 — Intake (one question at a time)
 
 ```
-Q1: "What is the project name?"
+Q1: "Project name?"
 
 Q2: "One sentence: '[Who] struggles with [what]'"
 
-Q3: "Does a solution already exist? Why build something new?"
+Q2b: "3–5 key terms your domain experts use?"
+     → These become the Ubiquitous Language in CLAUDE.md
+     → Claude uses ONLY these terms for class/method/variable names
+     → Example: not 'User' but 'Subscriber'; not 'Item' but 'FeedArticle'
 
-Q4: "How does the system run?
+Q3: "Existing solution? Why build new?"
+
+Q4: "How does it run?
      [A] HTTP API  [B] Cron/scheduled  [C] CLI  [D] Background worker  [E] Mix"
 
-Q5 (MVP mode): "What specifically must a user be able to do in the first version?
-     One journey: '[User] does [X] to achieve [Y]'"
+Q4b: "Uses LLMs or AI models?
+     → YES: load references/registry.md — find rag-pipeline, chatbot-telegram-discord,
+             or ai-agent entry. Load that entry only (~300 tokens)."
 
-Q5 (Production mode): "About data: volume? read or write heavy? multi-tenant?"
+Q5 (MVP): "What must a user DO in version 1? One journey: '[User] does [X] to [achieve Y]'"
+Q5 (Production): "Data profile: volume? read/write ratio? multi-tenant?"
 
-Q5b (all modes): "Does the project integrate any third-party APIs?
-     (e.g. RapidAPI, Stripe, Twilio, YouTube, OpenAI, SearchAPI...)
-     → If yes: Adapter layer required in ARCHITECTURE.md from L0
-     → Load: references/third-party-apis.md
+Q5b: "Third-party APIs?
+     → YES: load references/third-party-apis.md (Adapter pattern + 3-layer testing)"
 
-Q5c (all modes): "Does the project need observability (logging, tracing)?
-     → For new projects: add Correlation ID from day one (references/observability.md)
-     → For existing projects without logging: load retrofit section in observability.md"
+Q5c: "Need observability from day one?
+     → Recommended for all projects with external APIs or async flows
+     → YES: Correlation ID setup in references/observability.md"
 
-Note on AI projects: if Q4b revealed AI/LLM usage, ai-projects.md was already loaded.
-That file routes to ai-rag.md and/or chatbot-platforms.md as needed.
+Q6: "Stack? (Node.js/TS, Python, Go, undecided?)"
+    → Load matching stack file for concrete prompts
 
-Q6: "Tech stack?
-     (Node.js/TypeScript, Python, Go, Browser Extension (MV3), undecided?)
-     → If Browser Extension: load references/stacks/browser-extension.md"
-
-Q7: "Most important constraint? (deadline, team size, required integrations)"
+Q7: "Most important constraint? (deadline, team size, must-have integration)"
 ```
 
-After Q7, synthesize WITH judgment — not just echo back:
-
+After Q7 — synthesize with judgment, not just echo:
 ```
-Summary:
-- Project: [name], Stack: [stack]
-- Problem: [one sentence]
-- Mode: MVP / Production
+Project: [name] | Stack: [stack] | Mode: MVP/Production
+Problem: [one sentence]
+Domain terms: [list from Q2b — these go in CLAUDE.md]
 
-[MVP]: Walking skeleton = "[user journey from Q5]"
-       Everything else → backlog, not MVP
+[MVP] Walking skeleton = "[user journey from Q5]"
+      Everything else → backlog
 
-[Production]: Irreversible decisions must be right upfront:
-              core domain model, module boundaries, dependency direction
+[Production] Irreversible decisions to get right upfront:
+             core domain model, module boundaries, dependency direction
 
-Risk I see: [specific, not generic]
-Recommendation: [scope adjustment if needed]
+Risk I see: [specific]
+Recommendation: [scope cut if deadline tight]
 
-Agreed? If so, I'll generate CLAUDE.md and ARCHITECTURE.md.
+Ready to generate CLAUDE.md and ARCHITECTURE.md?
 ```
 
 ---
 
-## Step 3 — Generate constitution
+## Step 3 — Load registry entry
 
-### MVP Constitution (validate mode)
+```
+Identify project type from references/registry.md:
+  web-api | rag-pipeline | chatbot-telegram-discord |
+  browser-extension | ai-agent | full-stack-web | cli-tool
 
-**CLAUDE.md MVP** — minimal, enough to avoid irreversible debt:
-- Project in one sentence
-- **4 boundary rules** (never skip, even in MVP)
-- Tech stack
-- Core modules needed for walking skeleton only
-- Tech debt log: record shortcuts + TODO[trigger] immediately
+Load that entry only. Note:
+  - Required skills to install
+  - Shipright-adds-to-CLAUDE rules specific to this type
+  - Tested-with versions for compatibility awareness
+  - Project-type-specific debt signals
+```
 
-**ARCHITECTURE.md MVP** — only what skeleton needs:
-- 1 ASCII diagram of core flow
-- 2–3 modules minimum
-- Core domain type (shape must be right — irreversible)
-- 1 ADR for the hardest decision
-
-**Skip for MVP:** full error taxonomy, idempotency for all operations,
-all ADRs, full module map, performance specs.
-
-### Production Constitution (production mode)
-
-Full CLAUDE.md + ARCHITECTURE.md per templates in `references/l0-templates.md`.
-Includes: error taxonomy, idempotency decisions, all modules, full ADRs.
+If skills required are not installed → mention once:
+```
+"Note: [skill] recommended for this project type.
+ Install: [command]
+ Proceeding without it — I'll guide manually for those parts."
+```
 
 ---
 
-## Step 4 — After constitution
+## Step 4 — Generate constitution
+
+### CLAUDE.md (always generated, content varies by mode)
+
+**MVP version (~60 lines):**
+```markdown
+# CLAUDE.md — [project-name] (MVP v0.1)
+
+## Project
+[One sentence from Q2]
+
+## Ubiquitous Language
+| Term | Meaning | Not |
+|---|---|---|
+| [from Q2b] | [definition] | [generic alias to avoid] |
+
+## The 4 boundaries (non-negotiable)
+1. Dependencies inward only: [specific banned import for this project]
+2. Each layer one job: [concrete example for this project]
+3. No shared databases: [module names that must not share]
+4. Adapter layer: [if external APIs — what the adapter is named]
+
+## Clean Code rules
+- Functions max 20 lines. Extract if longer.
+- Names from Ubiquitous Language above. Never: Manager, Helper, Utils, Processor.
+- No comment explaining WHAT — rename instead.
+
+## Tech stack
+[Stack, DB, test runner, key libs]
+
+## Environment variables
+[VAR_NAME] # description
+
+## Tech debt log (MVP shortcuts — pay when trigger fires)
+| Shortcut | Trigger |
+|---|---|
+| [from registry entry] | TODO[signal]: [action] |
+
+## When to ask before doing
+- Changing module's public interface (index.ts / __init__.py exports)
+- Adding dependency not in stack above
+- Creating module not in ARCHITECTURE.md
+
+## Shipright state
+Level: L0
+Active: constitution created
+Next: create L1 skeleton
+Last updated: [date]
+Skills active: [installed skills]
+```
+
+**Production version:** Full CLAUDE.md per `references/l0-templates.md`
+(adds: error taxonomy, idempotency decisions, all ADRs, module ownership)
+
+### ARCHITECTURE.md (generated per mode)
+
+**MVP version (~40 lines):**
+- ASCII flow diagram (core path only)
+- 2–3 modules max with public API
+- Core domain type (Entity/VO — must be right, irreversible)
+- 1 ADR for hardest decision
+
+**Production version:** Full per `references/l0-templates.md`
+
+---
+
+## Step 5 — After constitution
 
 ### MVP mode → Walking Skeleton
 
 ```
-After CLAUDE.md + ARCHITECTURE.md are done:
+1. Walking skeleton = the one user journey from Q5
 
-1. Identify walking skeleton = 1 end-to-end user journey (from Q5)
-   Example: "User pastes URL → crawl → sees article list"
-
-2. [if addyosmani installed] → activate spec-driven-development for skeleton only
-   [if not] → describe skeleton spec inline
-
-3. [if addyosmani installed] → activate incremental-implementation + test-driven-development
-   [if not] → implement inside-out: repository → service → handler
+2. [addyosmani installed] → activate incremental-implementation + test-driven-development
+   [not installed] → implement inside-out: repository → service → handler
    Tests: enough to prove skeleton works. Not edge cases.
 
-4. SHIP GATE: "npm start + [action] → user sees [result]?"
-   YES → deploy immediately, put in front of real users
+3. SHIP GATE:
+   "Can a real user complete [journey from Q5] right now?"
+   YES → deploy, put in front of real users
    NO  → skeleton not done, no new features
 
-5. [Developer validates with real users]
-   Users return → feature loop (Branch B for each feature)
-   Users don't return → pivot, don't add features
+4. Update Shipright state in CLAUDE.md:
+   Level: L1 (skeleton) or L3 (skeleton+validate)
+   Next: [specific action]
 ```
 
 ### Production mode → Full tree
 
-L0 (done) → L1 Skeleton → L2 Interfaces + tests (RED) → L3 Implement loop
+L0 → L1 Skeleton → L2 Interfaces + RED tests → L3 Implement loop
 
-[if addyosmani installed]:
-- L1: describe skeleton → activate incremental-implementation
-- L2: activate api-and-interface-design → test-driven-development
-- L3: activate incremental-implementation + test-driven-development per task
-- Review: activate code-review-and-quality before merge
-- Ship: activate shipping-and-launch
+[addyosmani installed]:
+- L1: incremental-implementation
+- L2: api-and-interface-design → test-driven-development
+- L3: incremental-implementation + test-driven-development per task
+- Review: code-review-and-quality before merge
+- Ship: shipping-and-launch
 
 ---
 
-## Gate — L0 done when:
+## Gate — constitution done when:
 
-- [ ] Both files are project-specific (not generic template)
-- [ ] 4 boundary rules written with specific banned import examples for this project
-- [ ] Core domain type defined (shape is irreversible — must be right)
-- [ ] Tech debt log has obvious MVP shortcuts with trigger conditions
+- [ ] Both files project-specific (not generic template)
+- [ ] Ubiquitous Language section has 3+ domain terms
+- [ ] 4 boundary rules with project-specific banned examples
+- [ ] Core domain type defined (Entity vs Value Object — must be right)
+- [ ] Registry entry loaded, required skills noted
+- [ ] Shipright state section written to CLAUDE.md
 - [ ] MVP: walking skeleton identified as 1 user journey
-- [ ] Production: all modules listed, error taxonomy defined
+- [ ] Production: all modules, error taxonomy, idempotency decisions
 
-> **Example output**: `references/examples/news-crawler-CLAUDE.md` +
-> `references/examples/news-crawler-ARCHITECTURE.md`
+> Example: `references/examples/news-crawler-CLAUDE.md` + `references/examples/news-crawler-ARCHITECTURE.md`

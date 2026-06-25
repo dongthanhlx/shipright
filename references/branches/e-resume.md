@@ -1,86 +1,102 @@
-## Branch E — Resume / re-entry
+## Branch E — Resume / re-orient after a break
 
-> Working directory: all files in directory shown in SKILL.md context.
+> This branch leverages Shipright state in CLAUDE.md for instant re-orientation.
+> With state: 30-second resume. Without state: 5-minute orient.
 
 ---
 
-## Step 1 — Orient first (5 minutes, no code yet)
+## Step 1 — Read state first
 
 ```bash
-git log --oneline -20    # what happened recently?
-git status               # any uncommitted changes?
-git stash list           # any forgotten stash?
-git branch -a            # which branch? any WIP branches?
+grep -A6 "## Shipright state" CLAUDE.md 2>/dev/null
 ```
+
+**If state exists:**
+```
+Report to developer:
+"Welcome back. Project state:
+  Level: [Level]
+  Working on: [module]
+  Next action: [specific action]
+  Last session: [date]
+
+Ready to continue? Or has something changed?"
+```
+
+Skip steps 2-5 if developer confirms → go directly to next action.
+
+**If no state → continue to Step 2 (full orient)**
 
 ---
 
-## Step 2 — Read existing docs
-
-Read CLAUDE.md and ARCHITECTURE.md (already detected in context above).
-If neither exists → use Branch A (Production mode) to reconstruct from codebase first.
-
----
-
-## Step 3 — Find last position
-
-```
-Look for "where did I stop?":
-- TODO/FIXME nearest to recent changes
-- Last commit message: what was being built?
-- Open PRs or issues if any
-- RED tests in uncommitted changes (WIP indicator)
-```
-
----
-
-## Step 4 — Detect which level the project is at
-
-```
-[ ] No L0 (no CLAUDE.md or ARCHITECTURE.md)
-    → Use Branch A to create before anything else
-
-[ ] L0 exists, L1 not done (project doesn't compile or run)
-    → Return to L1: fix build errors, no new features
-
-[ ] L1 done, L2 incomplete (interfaces missing, tests not written)
-    → Return to L2: define interfaces, write test cases
-
-[ ] L2 done, L3 in progress (tests RED correctly — feature being built)
-    → Continue L3: find which test is RED, implement to make it GREEN
-
-[ ] Normally in L3 loop (tests GREEN, need next feature)
-    → Use Branch B for next feature
-
-[ ] Production signal needs L4
-    → Read levels.md L4 section
-```
-
----
-
-## Step 5 — Health check
+## Step 2 — Git orient (5 min, no code)
 
 ```bash
-npm test / pytest / go test
+git log --oneline -10    # what happened?
+git status               # uncommitted work?
+git stash list           # forgotten stash?
+git branch -a            # which branch? WIP branches?
 ```
 
-GREEN → continue from detected level
-RED → fix failing tests before doing anything else
-(Were they broken before? Or WIP that was left incomplete?)
+Read CLAUDE.md + ARCHITECTURE.md fully.
+If neither exists → use Branch A Production mode to reconstruct.
 
 ---
 
-## Step 6 — State next action clearly
+## Step 3 — Detect level
 
 ```
-Write out: "Project is at [Level]. Next action: [verb + object + acceptance criteria]"
-Do not start coding until this sentence is clear and specific.
+[ ] No L0 (no CLAUDE.md / ARCHITECTURE.md)
+    → Branch A to create constitution
 
-Good: "Project at L3. Next: implement OrderService.cancelOrder()
-       — test cases exist in service.test.ts, currently RED"
-Good: "Project missing L0. Next: generate CLAUDE.md + ARCHITECTURE.md
-       using Branch A Production mode"
+[ ] L0 exists, L1 not done (project won't compile/run)
+    → Fix build errors. No new features.
 
-Bad: "Continue the orders module"
-Bad: "Fix remaining stuff"
+[ ] L1 done, L2 incomplete (interfaces/tests missing)
+    → Write interfaces + RED tests before implementing
+
+[ ] L2 done, L3 in progress (RED tests exist, feature being built)
+    → Find which test is RED → implement to GREEN
+
+[ ] L3 loop (tests GREEN, next feature needed)
+    → Branch B for next feature
+
+[ ] Production signals firing
+    → Read L4 signals in SKILL.md
 ```
+
+---
+
+## Step 4 — Health check
+
+```bash
+npm test 2>/dev/null || pytest -q 2>/dev/null || go test ./...
+```
+
+GREEN → continue from detected level.
+RED → fix failing tests before anything else.
+Committed RED tests = someone left WIP. Trace via git log.
+
+---
+
+## Step 5 — State next action clearly
+
+Write before coding:
+```
+"Project is at [Level]. Next: [verb + object + acceptance criteria]"
+```
+
+Good: "L3. Next: implement OrderService.cancelOrder() — RED test exists in service.test.ts line 47"
+Good: "Missing L0. Next: Branch A constitution, production mode"
+Bad:  "Continue the orders thing" / "Fix remaining stuff"
+
+**Write state to CLAUDE.md before proceeding:**
+```markdown
+## Shipright state
+Level: [detected level]
+Active: [module]
+Next: [specific action]
+Last updated: [today]
+```
+
+This ensures next session resumes in 30 seconds, not 5 minutes.

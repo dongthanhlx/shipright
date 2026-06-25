@@ -17,7 +17,19 @@ Q1: "What specifically is causing pain, measurably?
      [E] Preparing for: larger team / data volume / service extraction"
 
 Q2: "Which specific module or file is the problem?"
+
+Q3: "Which Fowler smell best describes it?
+     [A] Long Method — functions > 20 lines, hard to understand
+     [B] Feature Envy — code belongs in a different class
+     [C] Primitive Obsession — using string/int where domain type belongs
+     [D] Divergent Change — one class changes for many reasons (SRP violation)
+     [E] Shotgun Surgery — one change requires edits in many files
+     [F] Data Clumps — same fields always appear together, need a class
+     [G] Comments explaining WHAT — rename instead"
 ```
+
+Identifying the specific smell is the DONE condition for naming what to fix.
+Load `references/code-quality.md` Fowler section for specific refactoring move.
 
 If the answer is "the code looks messy" or "I want to restructure":
 → Redirect: "Refactor without measurable pain rarely delivers value.

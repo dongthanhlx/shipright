@@ -1,170 +1,177 @@
 ## Branch B — Existing project, add feature
 
-> **Working directory**: all files in directory shown in SKILL.md context.
-> If CLAUDE.md or ARCHITECTURE.md exist → read them BEFORE asking anything.
-> L0→L4 tree: L0 already exists. L1 done (project runs). Entry point is L2.
+> Read CLAUDE.md and ARCHITECTURE.md FIRST. Check Shipright state section.
+> Ubiquitous Language in CLAUDE.md → use those terms, not generic names.
 
 ---
 
-## Step 1 — Intake (one at a time)
+## Step 0 — Check state & registry
 
+If Shipright state exists in CLAUDE.md:
 ```
-Q1: "Project name and one sentence describing what it does?"
-Q2: "Feature needed: 'User can [do what] to [achieve what]'"
-Q3: "Does this feature need a new module, or extend an existing one?"
-Q4: "Do CLAUDE.md and ARCHITECTURE.md exist?"
-     → If not → create them first (Branch A Production mode), then return here
+"Last session: [Level], [module], next: [action]. Work on that, or a new feature?"
 ```
+
+If no state → intake:
+```
+Q1: "Project name and one sentence: what does it do?"
+Q2: "Feature: 'User can [do what] to [achieve what]'"
+Q3: "New module needed, or extend existing?"
+```
+
+If project type unknown → check registry for matching entry, load it.
+Note any required skills not installed → mention once, then proceed.
 
 ---
 
-## Step 2 — Read codebase (structured report required)
+## Step 1 — Read codebase (structured report)
 
 ```
-Read the codebase. Do NOT modify anything. Report in this format:
+Read without modifying. Report:
 
 ## Codebase report: [name]
 Entry points:    [file → what it starts]
 Module map:      [module] → [1-sentence job] → [depends on]
 Data flow:       Request → [A] → [B] → [C] → Response
-Patterns:        [what patterns exist, where]
-Landmines:       [dangerous areas — global state, tight coupling]
-Feature touches: [which modules affected and why]
-Unknowns:        [what needs clarification before coding]
+Ubiquitous Lang: [domain terms actually used in code vs CLAUDE.md list]
+Drift:           [any generic names where domain term should be used]
+Landmines:       [global state, tight coupling, boundary violations]
+Feature touches: [which modules affected]
+```
+
+Domain term drift = immediate fix before new feature.
+Generic `OrderManager` when `FulfillmentPolicy` exists in Ubiquitous Language → rename.
+
+---
+
+## Step 2 — Health check
+
+```
+TIER 1 — Blockers (fix before feature):
+□ Boundary violations? (service imports db, module imports module internals)
+□ Circular deps? (npx madge --circular src/)
+□ Empty catch blocks swallowing errors?
+
+TIER 2 — Warnings (proceed with care, document):
+□ Tests covering touched modules?
+□ File > 300 lines?
+□ Function > 20 lines in area being changed?
+
+Verdict: SAFE / TIER1-BLOCKER / TIER2-CAUTION
+```
+
+TIER1-BLOCKER effort > 20% deadline → workaround + TODO[fix-before-scale], proceed.
+
+---
+
+## Step 3 — Classify complexity
+
+```
+1 file, obvious change            → Tier S (trivial, < 30 min)
+2–5 files, clear scope            → Tier M (simple, < 2 hrs)
+5–10 files OR unclear reqs        → Tier L (complex, 2–8 hrs)
+10+ files OR multiple devs        → Tier XL (system-level, days)
+```
+
+**Tier S — No external skills needed**
+```
+Shipright handles: implement → quality gate → commit
+Exception: bug → always activate debugging-and-error-recovery if installed
+```
+
+**Tier M — TDD + review**
+```
+[addyosmani test-driven-development]: activate
+[addyosmani code-review-and-quality]: activate before merge
+[neither]: write test (RED) → implement → GREEN → quality gate
+```
+
+**Tier L — Spec first**
+```
+[addyosmani spec-driven-development]: activate FIRST, get approved
+  → then: /build auto (incremental + TDD internally)
+  → then: code-review-and-quality before merge
+[not installed]:
+  1. Write acceptance criteria explicitly (what is true when done)
+  2. Break into subtasks ordered by dependency
+  3. Implement one subtask → test → GREEN → commit
+  4. Feature flag if incomplete work must merge
+```
+
+**Tier XL — Architecture update first**
+```
+1. Update ARCHITECTURE.md (module added/changed)
+2. Note in Shipright state: "architecture updated for [feature]"
+3. [addyosmani]: spec → planning → /build auto → security → review
+4. Feature flag always
 ```
 
 ---
 
-## Step 3 — Health check (tiered)
-
-```
-TIER 1 — Blockers (fix before adding feature):
-□ Global mutable state? (module-level variables being mutated)
-□ Circular dependencies? (run: npx madge --circular src/)
-□ Empty catch blocks swallowing errors silently?
-□ Race condition risk with the new feature?
-
-TIER 2 — Warnings (proceed with caution, document):
-□ Test coverage of modules being touched?
-□ Service importing db directly?
-□ Business logic in handler?
-
-Verdict: [SAFE / TIER1-BLOCKER / TIER2-CAUTION] with specific reason.
-```
-
-**TIER1-BLOCKER** → estimate effort first:
-```
-Effort < 20% of remaining deadline → fix first, separate commit
-Effort > 20% deadline             → workaround + TODO[fix-before-scale]
-Effort > 50% deadline             → escalate before doing anything
-```
-
----
-
-## Step 4 — Classify complexity (mandatory before touching code)
-
-```
-Files this feature will touch:
-  1 file, obvious change       → Tier S (trivial)
-  2–5 files, clear scope       → Tier M (simple)
-  5–10 files OR unclear reqs   → Tier L (complex)
-  10+ files OR multiple devs   → Tier XL (system-level)
-```
-
-**Tier S — Trivial** (1 file, < 30 min):
-```
-No agent-skills needed.
-Shipright handles: write code → boundary check → commit.
-Exception: if it's a bug → always activate debugging-and-error-recovery.
-```
-
-**Tier M — Simple** (2–5 files, scope is clear):
-```
-[if test-driven-development installed]:
-  → activate for this change
-[if code-review-and-quality installed]:
-  → activate before merging
-
-[if neither installed]:
-  Shipright built-in: write test (RED) → implement → GREEN → boundary check
-```
-
-**Tier L — Complex** (5–10 files, requirements need clarification):
-```
-[if spec-driven-development installed]:
-  → activate FIRST, get spec approved
-  → then: /build auto
-  → activate code-review-and-quality before merge
-
-[if not installed]:
-  1. Write acceptance criteria explicitly
-  2. Break into sub-tasks, implement one at a time
-  3. Test after each sub-task, not at the end
-```
-
-**Tier XL — System-level** (10+ files, days of work):
-```
-→ Update ARCHITECTURE.md FIRST (shipright constitution step)
-→ [if addyosmani installed]: spec → planning → /build auto → security → review
-→ Feature flag all incomplete work before merging
-```
-
-**Gate for all tiers:** tests GREEN + boundary check pass + no regression
-
----
-
-## Step 5 — Implement
+## Step 4 — Implement
 
 **Extend existing module:**
 ```
-[Tier M+] Write test cases for new behavior (RED — Outside-In TDD)
-Interface emerges from what the test needs to call.
+[Tier M+] Write test (RED) before code — Outside-In TDD
+Interface emerges from what test needs to call.
 Implement inside-out: repository → service → handler
-Boundary check before every commit.
 ```
 
-**New module needed:**
+**New module:**
 ```
-1. Update ARCHITECTURE.md first:
-   - Add module: responsibility (1 sentence), public API, forbidden deps
-   - Verify: no circular dependency introduced
-   - Commit: "docs: add [module] to ARCHITECTURE.md"
-
-2. Then L2 → L3 for new module
-   [delegate to addyosmani if installed for Tier L/XL]
+1. Update ARCHITECTURE.md: module name, job, public API, forbidden deps
+2. Commit: "docs: add [module] to ARCHITECTURE.md"
+3. Create module skeleton (index.ts + types.ts + stubs)
+4. L2: define interface + write RED tests
+5. L3: implement
 ```
 
 ---
 
-## Boundary checklist (run after every feature)
+## Step 5 — Quality gate (before every commit)
 
+**Automated:**
 ```bash
-grep -r "shared/db" src/modules/          # must be empty
-grep -r "\.service" src/modules/*/index   # must be empty
-npx tsc --noEmit                          # must pass
+grep -r "shared/db\|shared/database" src/modules/ # must be empty
+npx tsc --noEmit 2>/dev/null || python -m mypy src/  # must pass
 ```
 
-Manual:
-- [ ] Repository returns typed object, not raw row
-- [ ] Handler has zero domain if/else
-- [ ] Mutation is idempotent (if applicable)
+**DDD (Evans):**
+- [ ] All new names from Ubiquitous Language in CLAUDE.md?
+- [ ] New Entity has id + equals-by-id?
+- [ ] New Value Object immutable (readonly / Object.freeze)?
+- [ ] Repository interface in domain, implementation in infrastructure?
+
+**SOLID (Uncle Bob):**
+- [ ] Function > 20 lines? → extract with domain name
+- [ ] AND/OR in function name? → split
+- [ ] New type added by modifying existing switch? → new class instead
+- [ ] Interface method no implementation uses? → split interface
+
+**Fowler smells:**
+- [ ] Feature Envy? (method uses another class's data more) → move it
+- [ ] Primitive Obsession? (string/int where Value Object belongs) → create type
+- [ ] Comment explaining WHAT? → rename instead
+
+**Violation found:** fix → add specific rule to CLAUDE.md (compound engineering)
+**Load** `references/code-quality.md` for fix guidance on specific violation.
 
 ---
 
-## Special case: adding observability to existing project
+## Step 6 — Update state
 
-If the feature being "added" is observability (logging, tracing, correlation ID):
-→ Do NOT use the normal feature flow above
-→ Load `references/observability.md` — section "Retrofitting observability"
-→ Follow the 6-step surgical approach (audit → infrastructure → entry points → modules)
-→ Never do all files in one PR
-
-Signal that triggers this: "we can't debug production issues" or "we need logging"
-or "add tracer/correlation ID to existing project"
+After feature complete, update CLAUDE.md Shipright state:
+```markdown
+## Shipright state
+Level: L3
+Active: [module just completed]
+Next: [next feature or "validate with users"]
+Last updated: [date]
+```
 
 ---
 
-## taste-skill (if installed, UI features only)
+## UI features
 
-Read `references/ui-design.md` first — pick the right variant for the page type.
-Skip entirely for: backend API, CLI, background jobs, data tables.
+Load `references/ui-design.md` — page type → correct taste-skill variant.
+Skip for: backend API, CLI, background jobs, dashboards (use vercel-labs instead).

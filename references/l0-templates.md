@@ -14,6 +14,17 @@ The 3 boundary rules appear in BOTH — they are never optional.
 ## Project
 [One sentence: Input → Process → Output]
 
+## Ubiquitous Language — shared vocabulary for this codebase
+All class names, method names, and variable names MUST use these terms.
+Claude uses ONLY these terms — never invents generic alternatives.
+
+| Term | Meaning in this context | NOT |
+|---|---|---|
+| [domain term] | [precise definition] | [generic alias to avoid] |
+
+Signal that language is wrong: class named Manager, Helper, Processor, Utils.
+When that happens: stop, define the right domain term, rename.
+
 ## The 3 boundaries — always enforced, even in MVP
 
 1. Dependencies point inward only
@@ -191,3 +202,24 @@ Same as MVP, plus:
 - [ ] Does the consequence section acknowledge what's being given up?
 
 If any unchecked → this decision doesn't need an ADR. Document inline in code.
+
+---
+
+## Shipright state section — add at END of CLAUDE.md
+
+```markdown
+## Shipright state
+Level: L0
+Active: constitution created
+Next: create L1 skeleton — [describe specific skeleton target]
+Last updated: [date]
+Skills active: [comma-separated list of installed skills]
+Registry: [project type from registry.md]
+```
+
+This section is read by shipright at every session start.
+Update after every significant milestone (L0 complete, L1 done, L2 done, feature shipped).
+Do NOT update after every single commit — only milestones.
+
+Shipright reads this via working context injection:
+`!grep -A6 "## Shipright state" CLAUDE.md`
