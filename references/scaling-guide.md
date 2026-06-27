@@ -1,5 +1,28 @@
 # Scaling Guide — When and How to Grow Architecture
 
+## Ubiquitous Language at scale
+
+When team grows, Ubiquitous Language consistency becomes critical.
+New team members default to generic names if no shared vocabulary exists.
+
+```
+Stage 1 (team < 20):
+  Ubiquitous Language in CLAUDE.md is the team dictionary.
+  Code review checks: "Is this name in our Ubiquitous Language?"
+
+Stage 2 (team 10–30):
+  Split to .claude/rules/ — module-specific language per module.
+  payments.md: "Amount is always integer cents — never 'price' or 'cost'"
+  shipping.md: "Delivery window not 'eta' or 'date' — 'DeliveryWindow' entity"
+
+Stage 3 (team 20–50):
+  Each service has its own Bounded Context with its own Ubiquitous Language.
+  "Account" means different things in Auth vs Billing — that's correct.
+  Document in each service's CLAUDE.md, not a shared global one.
+```
+
+---
+
 ## The most important rule
 
 **Do not split what you can strengthen.**

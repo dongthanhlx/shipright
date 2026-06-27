@@ -73,29 +73,50 @@ TIER1-BLOCKER effort > 20% deadline → workaround + TODO[fix-before-scale], pro
 10+ files OR multiple devs        → Tier XL (system-level, days)
 ```
 
-**Tier S — No external skills needed**
+**Tier S — Trivial (1 file, < 30 min)**
 ```
-Shipright handles: implement → quality gate → commit
-Exception: bug → always activate debugging-and-error-recovery if installed
+Does change affect business logic?
+  NO (config change, copy update, rename) → implement → commit
+  YES → write test first (RED) → implement → GREEN → commit
+
+No external skills needed for Tier S.
+Exception: bug → activate debugging-and-error-recovery if installed.
 ```
 
-**Tier M — TDD + review**
+**Tier M — Simple (2–5 files, < 2 hrs)**
 ```
-[addyosmani test-driven-development]: activate
-[addyosmani code-review-and-quality]: activate before merge
-[neither]: write test (RED) → implement → GREEN → quality gate
+PHASE: before implement
+  [skill/spec-driven = YES] → NOT needed for Tier M (scope already clear)
+  → Write acceptance criteria inline (2-3 sentences)
+
+PHASE: implementing
+  [skill/tdd = YES] → activate test-driven-development NOW
+  [skill/tdd = NO]  → write RED test manually → implement → GREEN
+
+PHASE: before commit/merge
+  [skill/review = YES] → activate code-review-and-quality
+  [skill/review = NO]  → run quality gate checklist in Step 5 below
 ```
 
-**Tier L — Spec first**
+**Tier L — Complex (5–10 files, 2–8 hrs)**
 ```
-[addyosmani spec-driven-development]: activate FIRST, get approved
-  → then: /build auto (incremental + TDD internally)
-  → then: code-review-and-quality before merge
-[not installed]:
-  1. Write acceptance criteria explicitly (what is true when done)
-  2. Break into subtasks ordered by dependency
-  3. Implement one subtask → test → GREEN → commit
-  4. Feature flag if incomplete work must merge
+PHASE: before implement (required — do not skip)
+  [skill/spec-driven = YES] → activate spec-driven-development FIRST
+    Wait for spec approved before writing any code.
+  [skill/spec-driven = NO]  → write spec manually:
+    File: SPEC-[feature-name].md
+    Include: problem, acceptance criteria, risks, out-of-scope
+    Gate: SPEC reviewed before coding starts
+
+PHASE: implementing
+  [skill/incremental = YES + skill/tdd = YES] → /build auto
+  [skill/incremental = YES only] → activate incremental-implementation
+  [skill/tdd = YES only] → activate test-driven-development
+  [neither] → implement subtask by subtask, RED→GREEN per subtask
+
+PHASE: before merge
+  [skill/review = YES] → activate code-review-and-quality (mandatory for Tier L)
+  [skill/review = NO]  → full quality gate checklist (Step 5) + 2nd human review if team
 ```
 
 **Tier XL — Architecture update first**

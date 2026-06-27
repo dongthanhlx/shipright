@@ -1,5 +1,10 @@
 # ARCHITECTURE.md — news-crawler
 
+> **Ubiquitous Language** (from CLAUDE.md): FeedItem, Crawler, Normalizer, Source, Quota
+> All module names, type names, and method names below use these domain terms.
+
+# ARCHITECTURE.md — news-crawler
+
 > Real output example from following the shipright skill.
 
 ## System diagram

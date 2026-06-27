@@ -289,7 +289,8 @@ shipright-adds-to-CLAUDE:
   boundary-oracle: "Never single oracle source for financial data — Chainlink/Pyth"
   boundary-contracts: "All contract calls validate return values — never assume success"
   money-rule: "Token amounts in native units (wei/lamports). No floats for money."
-  security-gate: "Run slither + forge test before EVERY testnet deploy"
+  test-first: "Write failing test BEFORE implementation. Smart contracts have no undo button."
+  security-gate: "Run slither + forge test before EVERY testnet deploy. Tests must GREEN first."
   audit-gate: "No mainnet without audit report + all critical/high fixed"
   debt-signals:
     - "TODO[tvl>$10k]: engage professional audit firm"

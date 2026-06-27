@@ -95,7 +95,20 @@ When DONE condition is met → STOP.
 
 ---
 
-## Step 5 — Update constitution after
+## Step 5 — Update constitution + Shipright state
+
+Update ARCHITECTURE.md if module structure changed.
+Update tech debt log (trigger met → remove).
+Add new rules to CLAUDE.md or .claude/rules/ from patterns discovered.
+
+**Write Shipright state:**
+```markdown
+## Shipright state
+Level: L3 (post-refactor)
+Active: [module refactored]
+Next: [verify DONE condition met / run perf test / next feature]
+Last updated: [date]
+```
 
 If refactor changed module structure → update ARCHITECTURE.md.
 If a boundary violation was in tech debt log with a trigger → remove it (trigger met).

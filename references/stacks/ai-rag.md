@@ -208,6 +208,14 @@ Gate: python scripts/ingest.py --sample 10 completes without error
 Regular L2: write tests (RED) → implement → GREEN.
 AI L2: write question set → establish baseline → implement → compare to baseline.
 
+### Minimum question set — this IS your test suite
+
+> **Kent Beck applied to AI:** The question set is your RED test.
+> Write 20+ questions BEFORE building the retrieval pipeline.
+> Questions that fail to be answered = RED.
+> After building retrieval: answers are GREEN.
+> This is TDD for probabilistic systems.
+
 ### Minimum question set (create BEFORE building)
 
 ```python

@@ -5,6 +5,25 @@ Using the wrong skill for the wrong page type produces worse output than no skil
 
 ---
 
+## Ubiquitous Language for UI
+
+UI component names should reflect domain terms, not generic UI patterns.
+
+```
+Wrong: UserCard, DataTable, InfoModal
+Right: SubscriberProfile, OrderHistory, CancellationConfirmation
+
+Domain terms from CLAUDE.md Ubiquitous Language apply to:
+  - Component names (FeedItemCard, not ArticleCard if FeedItem is the domain term)
+  - Event names (onFeedItemSelected, not onItemClick)
+  - Prop names (feedItem: FeedItem, not data: any)
+```
+
+taste-skill handles visual quality. Ubiquitous Language handles naming.
+Both must be defined before writing UI components.
+
+---
+
 ## Scope of taste-skill (what it covers and what it doesn't)
 
 **taste-skill covers:**

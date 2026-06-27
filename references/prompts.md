@@ -322,6 +322,43 @@ For high volume (advanced):
 Never: fetch nonce 'latest' and process multiple payouts in parallel from same address
 ```
 
+## Blockchain tests (Foundry / Anchor)
+
+### EVM — Foundry test template
+```
+Write Foundry tests for [contract name]:
+
+test/[ContractName].t.sol:
+  setUp(): deploy contract, set up accounts
+  test_[function]_happyPath(): expected success case
+  test_[function]_revertWhen_[condition](): vm.expectRevert(...)
+  test_[function]_emitsEvent(): vm.expectEmit(...)
+  test_[function]_edgeCase_zero(): zero amount behavior
+  test_[function]_edgeCase_max(): max uint256 behavior
+  testFuzz_[function](uint256 amount): fuzz with bound(amount, 1, MAX)
+
+Run: forge test -vvv
+Coverage: forge coverage --report lcov
+All tests must pass before: forge script / forge create
+```
+
+### Solana — Anchor test template
+```
+Write Anchor tests for [program name]:
+
+tests/[program-name].ts:
+  before(): create wallets, airdrop SOL, initialize program
+  it("[instruction] — happy path"): ...
+  it("[instruction] — fails when unauthorized"): try/catch, check error code
+  it("[instruction] — handles zero amount"): edge case
+  it("[instruction] — idempotent"): call twice, assert same state
+
+Run: anchor test
+All tests must pass before: anchor deploy
+```
+
+---
+
 ## Strangler Fig (extract module from monolith)
 
 > Full 4-phase playbook with prompt templates in `references/scaling-guide.md`.

@@ -1,5 +1,21 @@
 # Observability — Logging, Tracing, Alerting
 
+## Integration with Shipright state
+
+When adding observability to a project, update CLAUDE.md Shipright state:
+```markdown
+## Shipright state
+Level: L4
+Active: observability setup
+Next: verify Correlation ID flows end-to-end (curl request → check logs → find requestId)
+Last updated: [date]
+```
+
+Observability is a L4 concern — only add when production signal demands it.
+See SKILL.md L4 signals table for when each layer (Correlation ID / Sentry / OpenTelemetry) is appropriate.
+
+---
+
 ## The core principle
 
 Observability is not "add monitoring later."

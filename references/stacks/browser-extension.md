@@ -219,7 +219,26 @@ npm run dev  # opens Chrome with extension loaded + hot reload
 
 ---
 
-## Walking skeleton for extension MVP
+## Walking skeleton for extension MVP — test-first
+
+> **Test before deploying to Chrome.** Extensions can't be "hot-fixed" once published.
+> Write failing test first → implement → test passes → then load in Chrome.
+
+### Test-first skeleton flow
+```
+1. Write failing test (jest-webextension-mock):
+   it('popup sends message → background responds with data', async () => {
+     chrome.runtime.onMessage.addListener.mockImplementation(
+       (listener) => listener({ type: 'GET_DATA' }, null, mockSendResponse)
+     )
+     expect(mockSendResponse).toHaveBeenCalledWith({ data: expect.any(Array) })
+   })
+   → Test FAILS (nothing implemented)
+
+2. Implement background.js handler until test passes
+3. Load unpacked extension in Chrome
+4. Verify: popup → message → response works in real browser
+```
 
 The minimal extension that proves the architecture works end-to-end:
 

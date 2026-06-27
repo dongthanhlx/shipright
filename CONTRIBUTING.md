@@ -1,5 +1,15 @@
 # Contributing to shipright
 
+## Adding to the registry
+
+The most impactful contribution is adding a new project type to `references/registry.md`:
+- Define: project type name, required skills, tested-with versions
+- Add: shipright-adds-to-CLAUDE rules (boundaries, debt signals, CLAUDE.md additions)
+- Include: Ubiquitous Language examples for this domain
+- Include: test-first setup for this stack/framework
+
+See existing entries (web-api, rag-pipeline, blockchain-dapp) as templates.
+
 ## Adding a new stack
 
 The most impactful contribution: stack-specific prompts for languages not yet covered.

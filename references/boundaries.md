@@ -205,3 +205,21 @@ without touching FeedService? If yes, Rule 4 is followed.
 - Service file imports from external SDK (e.g., `import { AlchemySDK } from 'alchemy-sdk'`)
 - Domain types have fields named after external API fields (`snippet`, `items[0]`, `contractRet`)
 - Multiple files updated when provider changes schema
+
+---
+
+## Ubiquitous Language and boundaries work together
+
+Boundaries define WHERE code can go.
+Ubiquitous Language defines HOW code is named.
+Both must be set at L0 — neither works well without the other.
+
+```
+Without Ubiquitous Language: boundaries are followed but code is hard to read.
+Without boundaries: Ubiquitous Language is consistent but architecture rots.
+With both: Claude generates code that is correctly structured AND domain-expressive.
+```
+
+Add to CLAUDE.md at L0:
+1. Ubiquitous Language table (domain terms)
+2. 4 boundary rules (with specific banned examples for THIS project)

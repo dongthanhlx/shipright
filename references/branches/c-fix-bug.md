@@ -99,7 +99,17 @@ After fix: could this same pattern occur elsewhere?
 
 ---
 
-## After fix — update constitution if structural
+## After fix — quality gate + update constitution
+
+**Quality gate** (same as Branch B — run before committing fix):
+```
+DDD:    Does the fix use correct Ubiquitous Language terms?
+SOLID:  Is fix in the correct layer? (service bug → fix service, not handler)
+Fowler: Does fix address root cause, not symptom?
+Tests:  Is the originally failing test now GREEN? No new RED tests?
+```
+
+**Update CLAUDE.md if structural cause:**
 
 If the bug happened because of a boundary violation (service importing db directly):
 fix the boundary AND update CLAUDE.md boundary checklist.

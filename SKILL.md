@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 0.7.3
+version: 0.7.6
 description: >
   Ship your MVP fast. Grow it right. The Project Brain for AI coding workflow —
   sets up constitution, enforces boundaries, orchestrates community skills.
@@ -24,7 +24,14 @@ Last commit:   !`git log --oneline -1 2>/dev/null || echo "no commits"`
 CLAUDE.md:     !`test -f CLAUDE.md && echo "EXISTS — read first" || echo "MISSING"`
 ARCHITECTURE:  !`test -f ARCHITECTURE.md && echo "EXISTS — read first" || echo "MISSING"`
 Project state: !`grep -A3 "## Shipright state" CLAUDE.md 2>/dev/null | tail -3 || echo "no state tracked"`
-Skills:        !`ls ~/.claude/skills/ 2>/dev/null | tr '\n' ' ' || echo "none detected"`
+# Granular skill detection (checks both personal + project-scoped)
+skill/spec-driven: !`test -f ~/.claude/skills/agent-skills/skills/spec-driven-development/SKILL.md || test -f .claude/skills/agent-skills/skills/spec-driven-development/SKILL.md && echo YES || echo NO`
+skill/incremental: !`test -f ~/.claude/skills/agent-skills/skills/incremental-implementation/SKILL.md || test -f .claude/skills/agent-skills/skills/incremental-implementation/SKILL.md && echo YES || echo NO`
+skill/tdd:         !`test -f ~/.claude/skills/agent-skills/skills/test-driven-development/SKILL.md || test -f .claude/skills/agent-skills/skills/test-driven-development/SKILL.md && echo YES || echo NO`
+skill/review:      !`test -f ~/.claude/skills/agent-skills/skills/code-review-and-quality/SKILL.md || test -f .claude/skills/agent-skills/skills/code-review-and-quality/SKILL.md && echo YES || echo NO`
+skill/debug:       !`test -f ~/.claude/skills/agent-skills/skills/debugging-and-error-recovery/SKILL.md || test -f .claude/skills/agent-skills/skills/debugging-and-error-recovery/SKILL.md && echo YES || echo NO`
+skill/security:    !`test -f ~/.claude/skills/agent-skills/skills/security-and-hardening/SKILL.md || test -f .claude/skills/agent-skills/skills/security-and-hardening/SKILL.md && echo YES || echo NO`
+skill/taste:       !`test -f ~/.claude/skills/taste-skill/SKILL.md || test -f .claude/skills/taste-skill/SKILL.md && echo YES || echo NO`
 Tests:         !`(npm test --silent 2>&1 | tail -2) || (pytest -q 2>&1 | tail -2) || echo "no test runner"`
 ```
 
@@ -70,11 +77,33 @@ Cheap to do right from day one. Expensive to fix at 10k users. Non-negotiable in
 If CLAUDE.md and ARCHITECTURE.md exist → read both completely before asking anything.
 Project state section in CLAUDE.md shows where things left off last session.
 
-**Check 2: Assess skill availability**
-Skills detected in working context above → adapt behavior:
-- addyosmani/agent-skills: delegate spec/implementation/review/debug tasks
-- taste-skill: delegate UI tasks with correct variant
-- Other skills: check registry entry for this project type
+**Check 2: Read granular skill detection above, then adapt precisely**
+
+```
+skill/spec-driven = YES  → activate /spec for Tier L/XL BEFORE implementation starts
+skill/spec-driven = NO   → guide spec writing manually (write acceptance criteria as markdown)
+
+skill/incremental = YES  → activate for Tier M+ features with multiple files
+skill/incremental = NO   → implement inside-out manually (repository → service → handler)
+
+skill/tdd = YES          → activate for all feature implementation (all tiers with logic)
+skill/tdd = NO           → write RED test manually first, then implement
+
+skill/review = YES       → activate BEFORE every merge/commit on Tier M+
+skill/review = NO        → run quality gate checklist manually (code-quality.md)
+
+skill/debug = YES        → activate for ALL bug classifications (Branch C)
+skill/debug = NO         → follow Branch C 5-step flow manually
+
+skill/security = YES     → activate before production deploy / growth stage
+skill/security = NO      → manual OWASP checklist (note: not sufficient for smart contracts)
+
+skill/taste = YES        → activate for UI pages — read ui-design.md for correct variant
+skill/taste = NO         → describe design direction manually, reference ui-design.md dials
+```
+
+When skill = NO: always say "X not installed — using shipright's built-in guidance instead."
+Never pretend skill is available when it's not. Never skip the step entirely.
 
 **Check 3: Note missing skills**
 If registry entry requires a skill not installed → mention once at session start:
@@ -125,10 +154,30 @@ Load only the relevant entry, not the full file.
 - Evans: Ubiquitous Language in CLAUDE.md (domain terms Claude must use)
 - Evans: Domain types in ARCHITECTURE.md (Entity vs Value Object vs Service)
 - Uncle Bob: Clean Code rules in CLAUDE.md (function max 20 lines, no AND/OR names)
+- **Test runner configured** — Jest/pytest/Foundry/Anchor set up at L0, not later
+
+### At L1 (skeleton) — test BEFORE implementation
+**Kent Beck's TDD rule: Red → Green → Refactor. Never Green → Red.**
+Write the failing test FIRST, then implement until it passes.
+This applies in MVP mode AND production mode. There is no "skip tests for speed" mode.
+
+```
+MVP skeleton test: 1 test that proves the skeleton works end-to-end
+  → test FAILS (nothing implemented) → implement → test PASSES → commit
+
+Production L2 tests: all interface contracts as RED tests
+  → tests FAIL → implement → tests PASS → commit
+```
+
+Uncle Bob: "The only way to go fast is to go well."
+Fowler: "Any fool can write code that a computer can understand.
+         Good programmers write code that humans can understand."
+Test-first makes code understandable because it was designed to be tested.
 
 ### At L3 (before every commit)
 Load `references/code-quality.md` for full gate. Quick version:
 ```
+Tests:   New code has tests? Tests written BEFORE implementation?
 DDD:     Names from Ubiquitous Language? Value Objects immutable?
 SOLID:   Function > 20 lines? AND/OR in name? New type modified existing switch?
 Fowler:  Feature Envy? Primitive Obsession? Comment explaining WHAT?
@@ -188,10 +237,11 @@ Shipright owns:
   Registry-based skill suggestions
   Irreversible architecture decisions
 
-addyosmani/agent-skills owns (install by stage):
-  MVP:      debugging-and-error-recovery
-  Traction: + incremental-implementation, test-driven-development, code-review-and-quality
-  Growth:   + spec-driven-development, security-and-hardening
+addyosmani/agent-skills owns (install by stage, check individually):
+  MVP:      debugging-and-error-recovery ← most valuable from day one
+  Traction: + incremental-implementation + test-driven-development + code-review-and-quality
+  Growth:   + spec-driven-development + security-and-hardening
+  Note: agent-skills folder ≠ all 24 skills installed. Detection checks individual skills.
 
 taste-skill owns (install by page type):
   Landing/portfolio: design-taste-frontend

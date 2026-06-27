@@ -1,5 +1,77 @@
 # Changelog
 
+## [0.7.6] — 2025-06 — Full file upgrade pass (18/18 checks)
+### Updated files (15 files upgraded)
+- boundaries.md: Ubiquitous Language + boundaries work together section
+- branches/c-fix-bug.md: quality gate before commit after fix
+- branches/d-refactor.md: Shipright state update in Step 5
+- code-health.md: Kent Beck TDD note at top
+- examples/news-crawler-ARCHITECTURE.md: Ubiquitous Language reference
+- observability.md: Shipright state integration note
+- scaling-guide.md: Ubiquitous Language at each scale stage
+- prompts.md: Foundry and Anchor blockchain test templates added
+- stacks/ai-rag.md: eval question set framed as TDD test suite
+- stacks/browser-extension.md: test-first in walking skeleton
+- stacks/chatbot-platforms.md: Ubiquitous Language for chatbot domain
+- third-party-apis.md: Ubiquitous Language at Adapter boundary
+- ui-design.md: Ubiquitous Language for UI component naming
+- stacks/nodejs.md: Jest/Vitest test setup + Red→Green→Refactor example
+- stacks/python.md: pytest setup + Red→Green→Refactor example
+- CONTRIBUTING.md: registry.md contribution guide added
+
+### Audit result: 18/18 checks pass
+
+## [0.7.5] — 2025-06 — Precise skill detection and suggestion
+### Problem fixed
+Shipright used `ls ~/.claude/skills/` to detect skills — this gives folder names only.
+`agent-skills` folder could contain 0 or 24 sub-skills — shipright couldn't tell.
+Result: wrong skill suggestions, suggesting skills user doesn't have.
+
+### Changed: SKILL.md working context
+- Replaced vague `ls` detection with granular per-skill checks
+- Checks both ~/.claude/skills/ AND .claude/skills/ (project-scoped)
+- 7 specific skills checked: spec-driven, incremental, tdd, review, debug, security, taste
+- Each shows YES or NO — no ambiguity
+
+### Changed: SKILL.md session checks
+- "Check 2" now maps each skill YES/NO to specific behavior
+- skill=NO: explicit fallback behavior defined, not "suggest to install"
+- Always says "X not installed — using shipright's built-in guidance instead"
+- Never skips the workflow step, never pretends skill is available
+
+### Changed: Branch B tier suggestions
+- Tier M/L now split into PHASE: before/implementing/after
+- Spec-driven: only triggered BEFORE implement starts (not mid-feature)
+- TDD: triggered DURING implementation (all tiers with logic)
+- Review: triggered BEFORE merge (all tiers M+)
+- Each phase shows: if skill=YES → action, if skill=NO → fallback
+
+## [0.7.4] — 2025-06 — Test-first enforcement (Kent Beck)
+### Critical fix
+Shipright was not enforcing test-first in MVP mode.
+"Tests: enough to prove skeleton works" was passive — Claude skipped tests entirely.
+
+### Changed
+- Branch A MVP skeleton: now mandates RED test FIRST before any implementation
+  "Write the failing test FIRST. This applies in MVP and production. No exceptions."
+  Added blockchain-specific note: "No undo button → test before testnet deploy"
+- Branch B Tier S: clarified — config/copy changes no test, logic changes test first
+- SKILL.md quality system: Kent Beck TDD added at L1 level
+  "Never Green → Red. Always Red → Green → Refactor."
+- l0-templates.md: CLAUDE.md template now includes "Test runner configured at L0"
+  + "Test first, implement second — no exceptions for speed"
+- code-quality.md: new Kent Beck TDD section before SOLID
+  Red→Green→Refactor, when to write tests in L0→L4, narrow exceptions defined
+- blockchain.md: walking skeleton now test-first with Foundry/Anchor examples
+  Minimum coverage: happy path + failure case + edge case + revert case
+- registry.md: blockchain-dapp entry has test-first mandate
+
+### Why this matters
+Kent Beck: "TDD is not about testing. It's about design."
+Code written after tests is harder to test — it wasn't designed to be testable.
+Uncle Bob: "The only way to go fast is to go well."
+Fowler: Internal quality pays off in weeks. Test-first IS internal quality investment.
+
 ## [0.7.3] — 2025-06 — Full file audit pass
 ### Fixed
 - code-health.md: was orphaned (not in SKILL.md) — now referenced in Core references

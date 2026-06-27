@@ -173,6 +173,49 @@ different computational models. An ACL is appropriate here."
 
 ---
 
+## Kent Beck's TDD — precedes everything else
+
+"Test-Driven Development is not about testing. It's about design."
+
+Write the test first. This is not optional, not a best practice — it is the workflow.
+A test written after implementation is a test for code that was not designed to be tested.
+
+### Red → Green → Refactor
+
+```
+RED:     Write a test that fails (the desired behavior doesn't exist yet)
+GREEN:   Write minimum code to make it pass (no more, no less)
+REFACTOR: Clean up without breaking the test (apply SOLID + Fowler)
+```
+
+### When to write tests in shipright's L0→L4
+
+```
+L0 (constitution): configure test runner (Jest/pytest/Foundry/Anchor)
+L1 (skeleton):     1 end-to-end test that proves skeleton works → RED → implement → GREEN
+L2 (interfaces):   all interface contracts as tests → RED → implement → GREEN
+L3 (each feature): test each behavior before coding it
+Branch B (add feature): test before implement, regardless of complexity tier
+Branch D (refactor): characterization tests FIRST, before changing anything
+```
+
+### What counts as "written first"
+
+The test must FAIL before you write the implementation.
+If you can't run the test and see it fail → you haven't written it first.
+
+### Exceptions (narrow, specific)
+
+```
+Config change (env var, constant): no test needed
+Pure UI layout change (no logic): no test needed
+Exploratory spike (throw-away): no test needed — but delete the spike
+```
+
+Everything else: test first.
+
+---
+
 ## Layer 2: Uncle Bob — SOLID + Clean Code
 
 ### 5 SOLID principles as checkpoints (enforce at every L3 commit)

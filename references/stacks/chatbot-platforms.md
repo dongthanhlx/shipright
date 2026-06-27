@@ -1,5 +1,21 @@
 # Stack Reference: AI Chatbot — Telegram, Discord, and Multi-Platform
 
+## Ubiquitous Language for chatbot domain
+
+Define in CLAUDE.md before writing any chatbot code:
+```markdown
+## Ubiquitous Language (chatbot)
+| Term | Meaning | Not |
+|---|---|---|
+| NormalizedMessage | Platform-agnostic inbound message | Message, Event, Update |
+| BotResponse | Platform-agnostic outbound message | Reply, Output, Result |
+| ConversationState | Persisted conversation history | Session, Context, Memory |
+| PlatformAdapter | Translates platform ↔ domain | Provider, Integration, Bridge |
+| Turn | One exchange (user + bot) in conversation | Message pair, Round |
+```
+
+---
+
 ## The core architecture insight
 
 Platform-specific code should be minimal and isolated.

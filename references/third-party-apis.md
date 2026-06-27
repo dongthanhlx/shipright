@@ -6,6 +6,27 @@ The goal is not "how to call the API" — it is "how to isolate your system from
 
 ---
 
+## Ubiquitous Language at the Adapter boundary
+
+Domain terms should be used inside the Adapter output (normalized type),
+not the provider's field names.
+
+```typescript
+// Wrong: leaks provider's language into domain
+interface YouTubeItem {
+  snippet: { title: string }  // YouTube's language
+}
+
+// Right: Adapter translates to Ubiquitous Language
+interface FeedItem {          // project's Ubiquitous Language
+  title: string
+  source: 'youtube'
+  publishedAt: Date
+}
+```
+
+---
+
 ## The 4th boundary rule (add to CLAUDE.md when project has external APIs)
 
 ```

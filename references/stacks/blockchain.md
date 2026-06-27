@@ -120,12 +120,35 @@ Key decisions at L0:
 
 ### DApp with smart contract
 ```
-Phase 1 (testnet): Off-chain skeleton first
-  1. Deploy mock/stub contract to local testnet (Anvil/Hardhat node)
-  2. Build off-chain API that calls mock contract
-  3. Build frontend that calls API
-  4. Full flow works with mock contract
-  Gate: user can complete 1 journey end-to-end on local testnet
+Phase 1 (local testnet): Test-first from day one
+  1. Write failing test FIRST:
+     EVM:    forge test → RED (contract not written yet)
+     Solana: anchor test → RED
+  2. Implement contract until test GREEN
+  3. Deploy to local chain (Anvil/Hardhat node/Bankrun)
+  4. Build off-chain adapter calling deployed contract
+  5. Gate: forge test (or anchor test) PASSES on local chain
+
+  NEVER deploy to public testnet with failing tests.
+  NEVER write contract code before test. Smart contracts have no undo button.
+
+  Minimum test coverage for any function handling funds:
+    □ happy path (correct input, expected output)
+    □ failure case (wrong caller, insufficient balance)
+    □ edge case (zero amount, max uint256)
+    □ revert case (invalid state, unauthorized)
+
+  EVM example:
+    function test_deposit_emits_event() public {
+      vm.expectEmit(true, true, false, true);
+      emit Deposited(user, 100e18);
+      vault.deposit{value: 100e18}();
+    }
+    function test_deposit_reverts_when_paused() public {
+      vault.pause();
+      vm.expectRevert("Pausable: paused");
+      vault.deposit{value: 1 ether}();
+    }
 
 Phase 2 (testnet): Real contract
   1. Write contract with tests (100% line coverage minimum)
