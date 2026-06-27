@@ -1,4 +1,4 @@
-# shipright v0.7.0
+# shipright v0.7.3
 
 > **Ship your MVP fast. Grow it right.**
 
@@ -84,6 +84,7 @@ Branch E reads this instantly. Resume in 30 seconds, not 5 minutes.
 | AI agent | ai-agent | DeepEval + addyosmani |
 | Full-stack web | full-stack-web | addyosmani + taste-skill |
 | CLI tool | cli-tool | optional |
+| Blockchain / DApp | blockchain-dapp | Foundry + Slither + addyosmani |
 
 ---
 
@@ -163,7 +164,8 @@ shipright/
       python.md
       ai-projects.md          # AI entry point + 5th boundary rule
       ai-rag.md               # RAG deep dive: eval loop, vector DB, metrics
-      chatbot-platforms.md    # Telegram/Discord: adapter, state, security
+      chatbot-platforms.md
+      blockchain.md              # EVM/Solana/TON/SUI: security, audit gate, chain patterns    # Telegram/Discord: adapter, state, security
       browser-extension.md    # MV3: manifest, components, chrome.* APIs
     examples/
       news-crawler-CLAUDE.md

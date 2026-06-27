@@ -83,3 +83,23 @@ npx jest --passWithNoTests && echo "Tests passed"
 npx madge --circular --extensions ts src/
 # Must return: No circular dependency found!
 ```
+
+---
+
+## Ubiquitous Language for this stack
+
+Define domain terms in CLAUDE.md BEFORE naming any class/function.
+Claude will use these terms for all generated code in this project.
+
+Common mistake: letting Claude default to generic names:
+- `UserService` → should be `SubscriberEnrollmentService` (domain term)
+- `DataProcessor` → should be `FeedNormalizer` (domain term)
+- `ItemRepository` → should be `ArticleRepository` (domain term)
+
+Add to CLAUDE.md:
+```markdown
+## Ubiquitous Language
+| Term | Meaning | Not |
+|---|---|---|
+| [your term] | [precise definition] | [generic alias Claude would default to] |
+```

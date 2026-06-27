@@ -1,5 +1,8 @@
 # The 4 Boundary Rules
 
+> These 4 rules are the non-negotiable foundation of every shipright project.
+> Cheap to follow from day one. Expensive to retrofit. Never optional — even in MVP.
+
 These are the only 4 rules that matter for long-term maintainability.
 Everything else is preference. These are not.
 
@@ -155,3 +158,50 @@ flip a feature flag. One day of work instead of weeks of untangling.
 
 **If you're not sure where something goes**: ask "what is the smallest layer
 that needs to know about this?" — put it there.
+
+---
+
+## Rule 4 — No raw external response passes the Adapter layer
+
+**The rule**: Every external system (third-party API, blockchain RPC, LLM, payment gateway)
+has exactly one Adapter/Normalizer. Raw external responses never enter service or domain logic.
+
+**Why**: External systems change without warning. When YouTube changes their API schema,
+you fix one file (the Adapter). Without this boundary, you fix everywhere the raw response is used.
+This is Eric Evans's Anti-Corruption Layer (ACL) in practice.
+
+```typescript
+// ✅ CORRECT — Adapter translates, service gets domain types
+class YouTubeAdapter implements ICrawler {
+  async fetch(): Promise<FeedItem[]> {
+    const raw = await this.httpClient.get(YOUTUBE_API_URL)
+    return youtubeNormalizer(raw.data)  // raw never leaves here
+  }
+}
+
+class FeedService {
+  async ingest(items: FeedItem[]) { ... }  // receives FeedItem, not raw YouTube response
+}
+
+// ❌ WRONG — raw response leaks into domain
+class FeedService {
+  async ingest(youtubeResponse: YouTubeRawResponse) {
+    const title = youtubeResponse.items[0].snippet.title  // domain knows YouTube schema
+  }
+}
+```
+
+**Applies to**:
+- Third-party REST APIs (Stripe, Twilio, YouTube, RapidAPI)
+- Blockchain RPCs (eth_getTransaction, getSignatureStatuses)
+- LLM responses (OpenAI, Anthropic) — ResponseAdapter before domain logic
+- Payment gateways (raw gateway response → domain PaymentResult)
+- Platform webhooks (raw Telegram/Discord message → NormalizedMessage)
+
+**The test**: Can you swap YouTube for a different news source
+without touching FeedService? If yes, Rule 4 is followed.
+
+**Signal that Rule 4 is violated**:
+- Service file imports from external SDK (e.g., `import { AlchemySDK } from 'alchemy-sdk'`)
+- Domain types have fields named after external API fields (`snippet`, `items[0]`, `contractRet`)
+- Multiple files updated when provider changes schema

@@ -1,6 +1,11 @@
-# Code Health — SOLID + Fowler Enforcement
+# Code Health — SOLID Tactical Enforcement
 
-Shipright loads this file at 3 specific moments:
+> **Relationship to code-quality.md:**
+> `code-quality.md` = strategic: Evans + Uncle Bob + Fowler as unified system
+> This file = tactical: SOLID enforcement per L0→L4, actionable signals per level
+> Load both when doing quality gate (Branch B) or refactoring (Branch D)
+
+ipright loads this file at 3 specific moments:
 1. L2 — when designing interfaces (OCP, LSP, ISP checks)
 2. L3 — before every commit (SRP signals, Fowler 7 smells)
 3. Branch D — when refactoring (Fowler catalog)

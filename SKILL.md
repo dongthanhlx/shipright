@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 0.7.0
+version: 0.7.3
 description: >
   Ship your MVP fast. Grow it right. The Project Brain for AI coding workflow —
   sets up constitution, enforces boundaries, orchestrates community skills.
@@ -245,7 +245,8 @@ Senior judgment = knowing when NOT to apply a pattern.
 - `references/registry.md` — project type → curated skill pack
 
 ### Core references (load on signal)
-- `references/code-quality.md` — Evans + Uncle Bob + Fowler: full quality system
+- `references/code-quality.md`
+- `references/code-health.md` — SOLID tactical enforcement per level — Evans + Uncle Bob + Fowler: full quality system
 - `references/observability.md` — Correlation ID, logging, tracing, API tracing, retrofit
 - `references/scaling-guide.md` — Stage 1→2→3 playbook + Strangler Fig templates
 - `references/third-party-apis.md` — Adapter pattern, 3-layer testing, resilience
@@ -264,6 +265,7 @@ Senior judgment = knowing when NOT to apply a pattern.
 - `references/stacks/ai-projects.md`
 - `references/stacks/ai-rag.md`
 - `references/stacks/chatbot-platforms.md`
+- `references/stacks/blockchain.md` — EVM/Solana/TON/SUI/TRON: smart contract security, chain-specific patterns, audit gate
 
 ### Examples
 - `references/examples/news-crawler-CLAUDE.md`

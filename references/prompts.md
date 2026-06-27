@@ -1,6 +1,6 @@
 # Claude Code Prompts — Copy-Paste Library
 
-Current as of v0.5.9. Aligned with complexity tiers and ecosystem delegation.
+Current as of v0.7.2. Aligned with complexity tiers and ecosystem delegation.
 
 All prompts follow this pattern:
 1. **Orient** — tell Claude Code what to read first
@@ -23,10 +23,21 @@ Stack: [stack]
 Third-party APIs: [list or none]
 
 Generate:
-1. CLAUDE.md — 4 boundary rules specific to this project,
-   tech stack, core modules for skeleton only, tech debt log with TODO[trigger]
+1. CLAUDE.md — include:
+   - Ubiquitous Language table (3-5 domain terms from Q2b)
+   - 4 boundary rules specific to this project with banned examples
+   - Clean Code rules (functions max 20 lines, no AND/OR names)
+   - Tech stack
+   - Core modules for skeleton only
+   - Tech debt log with TODO[trigger]
+   - Registry entry loaded: [project type]
+   - Shipright state section at end:
+     Level: L0 | Active: constitution | Next: L1 skeleton | Skills active: [list]
 2. ARCHITECTURE.md — ASCII flow diagram, 2-3 modules max,
    core domain type with comments, 1 ADR for hardest decision
+
+After generating: load references/registry.md entry for this project type.
+Note which skills to install + which CLAUDE.md additions to copy.
 
 Do NOT include: full error taxonomy, all ADRs, performance specs.
 MVP constitution must fit under 80 lines each.
@@ -206,6 +217,110 @@ If any test goes RED: revert that step, find a different approach.
 ```
 
 ---
+
+
+---
+
+## Financial / Custodial wallet prompts
+
+### Generate accounts (multi-chain)
+```
+Read CLAUDE.md and ARCHITECTURE.md.
+Generate [N] accounts for network: [EVM/SOL/TRON/TON/SUI]
+
+Rules:
+- Use battle-tested library for key generation (ethers.js, @solana/web3.js, etc.)
+- NEVER self-implement cryptographic key generation
+- Encrypt private key immediately after generation using Crypt service
+- Private key must NOT exist in plaintext anywhere after encryption
+- Store encrypted key + public address only
+- Log: "Generated N accounts for [network]" — never log key material
+```
+
+### Sign and send transaction (payout)
+```
+Read CLAUDE.md payout signing rules.
+Implement sendTransaction(ticket, account) for [network]:
+
+Rules (Boundary 6 — private key lifecycle):
+  1. Decrypt private key INSIDE this function only
+  2. Create wallet/signer from decrypted key
+  3. Build transaction
+  4. Sign and broadcast
+  5. Clear decrypted key from memory (account.privateKey = '')
+  6. Return transaction hash ONLY
+
+Never: return account object with decrypted key, log key material, pass key as argument
+Gate: grep for 'privateKey' in payout provider — should appear in exactly one place
+```
+
+### Financial state machine (ticket lifecycle)
+```
+Add explicit state machine to [PayoutTicket/PayinLog/Entity]:
+
+States: [list all states]
+Transitions (explicit, no skipping):
+  [FromState] → [ToState]: condition + action + log
+
+Rules:
+- Validate current state before transitioning
+- Log every transition with: from_state, to_state, reason, actor, timestamp
+- Terminal states ([Processed/Failed]) must throw if transition attempted
+- State stored in DB — never derive from other fields
+```
+
+### Idempotency for financial operation
+```
+Add persistent idempotency to [operation]:
+
+Pattern (DB-based):
+  1. Check: existing = await db.findUnique({ where: { idempotencyKey: ticket.id } })
+  2. If exists: return existing result (do NOT process again)
+  3. Process operation
+  4. Mark: await db.create({ data: { idempotencyKey: ticket.id, result } })
+
+Rules:
+- idempotencyKey = ticket/operation ID (not random UUID each call)
+- Check-and-mark must be atomic where possible (use DB transaction)
+- Never use in-memory Map or boolean — lost on restart
+- For blockchain: use txHash as additional idempotency check after broadcast
+```
+
+### Scheduler with distributed lock
+```
+Add distributed lock + session audit to [SchedulerName]:
+
+Pattern:
+  1. Check lock: if (await settings.isLocked(LockKey.[NAME])) return
+  2. Acquire lock: await settings.lock(LockKey.[NAME])
+  3. Open session: session = await this.openSession('[name]', 0)
+  4. Process in chunks: CHUNK_SIZE = [N], never process all at once
+  5. Close session: await this.closeSession(session)
+  6. Release lock in finally: await settings.unlock(LockKey.[NAME])
+
+Rules:
+- Lock key must be unique per scheduler
+- Chunk size configured via settings table, not hardcoded
+- Always release lock in finally block (even on error)
+- Log chunk progress: 'Processing batch N of M accounts'
+```
+
+### Blockchain nonce management (EVM, concurrent payouts)
+```
+Add sequential payout processing to prevent nonce conflicts:
+
+For low-medium volume (recommended):
+  - Ensure only ONE payout scheduler runs at a time (DB lock)
+  - Process payout queue sequentially, not concurrently
+  - Fetch fresh nonce (eth_getTransactionCount 'pending') before each tx
+
+For high volume (advanced):
+  - Maintain pending nonce counter in Redis per sender address
+  - INCR before signing, DECR on failure/timeout
+  - Reconcile with on-chain count on startup
+
+Never: fetch nonce 'latest' and process multiple payouts in parallel from same address
+```
 
 ## Strangler Fig (extract module from monolith)
 

@@ -1,5 +1,11 @@
 # Level Definitions
 
+**Ubiquitous Language precedes every L0:**
+  Q2b in Branch A intake: "What terms do domain experts use?"
+  Claude uses these terms for ALL class, method, and variable names in the project.
+  Generic names (Manager, Handler, Utils) = Ubiquitous Language not yet defined.
+**Extract Ubiquitous Language first** — before L0 constitution generation.
+
 ## L0 — Contract (before any code)
 
 **What it is**: Two markdown files that define the project's constitution.

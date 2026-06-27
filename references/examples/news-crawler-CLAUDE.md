@@ -3,6 +3,17 @@
 > This is a real output example from following the shipright skill.
 > Use it as a reference for what a good CLAUDE.md looks like.
 
+## Ubiquitous Language
+| Term | Meaning | Not |
+|---|---|---|
+| FeedItem | A normalized article/video from any source | Article, Post, Content |
+| Crawler | Component that fetches raw data from a source | Fetcher, Scraper |
+| Normalizer | Pure function: raw API response → FeedItem | Parser, Transformer |
+| Source | External data provider (Google, YouTube) | Provider, Channel |
+| Quota | API usage allowance per day/month | Limit, Budget |
+
+---
+
 ## Project in one sentence
 Crawl latest news from Google (SearchAPI) and YouTube Shorts (YouTube Data API v3),
 normalize to unified FeedItem shape, deduplicate by URL hash, persist every 10 minutes.
@@ -134,3 +145,13 @@ LOG_LEVEL               # default: info
 - Changing DB schema requiring data migration
 - Creating a module not in ARCHITECTURE.md
 - Any change touching > 2 modules simultaneously
+
+---
+
+## Shipright state
+Level: L0
+Active: constitution created
+Next: create L1 skeleton — src/ folder structure + compiles with npx tsc --noEmit
+Last updated: 2025-06
+Skills active: debugging-and-error-recovery
+Registry: web-api
