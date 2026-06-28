@@ -258,4 +258,4 @@ L0 → L1 Skeleton → L2 Interfaces + RED tests → L3 Implement loop
 - [ ] MVP: walking skeleton identified as 1 user journey
 - [ ] Production: all modules, error taxonomy, idempotency decisions
 
-> Example: `references/examples/news-crawler-CLAUDE.md` + `references/examples/news-crawler-ARCHITECTURE.md`
+> Example: `references/examples/orders-api-CLAUDE.md` + `references/examples/orders-api-ARCHITECTURE.md`

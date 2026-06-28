@@ -1,4 +1,4 @@
-# shipright v0.8.1
+# shipright v0.8.2
 
 > **Ship your MVP fast. Grow it right.**
 
@@ -9,6 +9,26 @@ Works in your language. Write Vietnamese, English, or any language — shipright
 ```
 /shipright
 ```
+
+---
+
+## Why shipright?
+
+AI coding agents are great at writing code and bad at deciding *what* to build, *when*, and
+*what not to*. The community skills you already have (addyosmani/agent-skills, taste-skill,
+RAGAS…) each do one job well — but nothing decides which to use, when, or stops you
+over-building. shipright is the **conductor**, not another player:
+
+- **Decides** — one executive question (one-way vs two-way door) sizes every choice, so an MVP
+  ships fast *without* painting the architecture into a corner you pay for three features later.
+- **Guards** — 5 boundary rules + a quality gate that hold from day one to millions of users.
+- **Orchestrates** — activates the right community skill at the right trigger, and refuses to
+  load the ones a small project doesn't need yet (context budget = reasoning quality).
+- **Remembers** — a living constitution (CLAUDE.md) that gets smarter every session, plus
+  project state so you resume in 30 seconds.
+
+If you've ever watched an AI agent confidently build the wrong thing, over-engineer a
+prototype, or break the architecture later — that's the gap shipright fills.
 
 ---
 
@@ -149,8 +169,7 @@ shipright/
   SKILL.md                    # Project Brain OS core (always loaded): executive + 5 boundaries + spine + dispatch
   hooks/check-update.sh       # SessionStart update checker
   references/
-    onboarding.md             # State check + 6-branch router
-    registry.md               # Project type → curated skill pack (dispatched by trigger)
+    registry.md               # Capability/signal → skill (trigger dispatch) + project-type packs
     branches/
       a-new-project.md        # MVP/Production + registry integration + state tracking
       b-add-feature.md        # Health check + complexity tiers + quality gate
@@ -184,8 +203,8 @@ shipright/
       blockchain.md           # EVM/Solana/TON/SUI: security, audit gate, chain patterns
       browser-extension.md    # MV3: manifest, components, chrome.* APIs
     examples/
-      news-crawler-CLAUDE.md
-      news-crawler-ARCHITECTURE.md
+      orders-api-CLAUDE.md      # canonical example: e-commerce orders + payments API
+      orders-api-ARCHITECTURE.md
 ```
 
 ---

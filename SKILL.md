@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 0.8.1
+version: 0.8.2
 description: >
   Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
   sets up constitution, enforces boundaries, judges what to build now vs defer,
@@ -403,8 +403,8 @@ mistake. Full "when to break each rule" guidance: `references/judgment.md`.
 - `references/stacks/blockchain.md` — EVM/Solana/TON/SUI/TRON: smart contract security, chain-specific patterns, audit gate
 
 ### Examples
-- `references/examples/news-crawler-CLAUDE.md`
-- `references/examples/news-crawler-ARCHITECTURE.md`
+- `references/examples/orders-api-CLAUDE.md`
+- `references/examples/orders-api-ARCHITECTURE.md`
 
 ---
 
