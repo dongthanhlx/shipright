@@ -17,6 +17,13 @@ If no state → intake:
 Q1: "Project name and one sentence: what does it do?"
 Q2: "Feature: 'User can [do what] to [achieve what]'"
 Q3: "New module needed, or extend existing?"
+
+Q3b (if adding third-party API integration):
+  "Has this API been explored yet? Do fixtures exist in tests/fixtures/?"
+  → NO fixtures: do Layer 1 Exploration FIRST (before writing Adapter)
+     Bruno → call sandbox → save real responses → then write Adapter
+  → YES fixtures: proceed with implementation using existing fixtures
+  → Load: references/third-party-apis.md§Layer-1 for exploration steps
 ```
 
 If project type unknown → check registry for matching entry, load it.

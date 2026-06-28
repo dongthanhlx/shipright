@@ -52,8 +52,38 @@ Q4b: "Uses LLMs or AI models?
 Q5 (MVP): "What must a user DO in version 1? One journey: '[User] does [X] to [achieve Y]'"
 Q5 (Production): "Data profile: volume? read/write ratio? multi-tenant?"
 
-Q5b: "Third-party APIs?
-     → YES: load references/third-party-apis.md (Adapter pattern + 3-layer testing)"
+Q5b: "Does the project integrate any third-party APIs?
+     (e.g. RapidAPI, Stripe, Twilio, YouTube, OpenAI, SearchAPI, blockchain RPC...)
+     → If YES: BEFORE writing any integration code, do Layer 1 Exploration:
+
+     Phase A — Read docs first (before any API call):
+       Create: api-exploration/[provider]/API-NOTES.md
+       Document: auth method, every param (name/location/type/required/default/notes),
+       what each key param does, response shape, error codes, rate limits.
+       Question to answer: "What params control what I need? What are valid values?"
+
+     Phase B — Setup Bruno + build request from docs knowledge:
+       mkdir -p api-exploration/[provider-name]
+       (Bruno: https://usebruno.com — local, git-friendly)
+       Build request with REALISTIC test values from docs understanding.
+       Not placeholder strings — actual values that test your use case.
+
+     Phase C — Call sandbox, compare docs vs reality:
+       Scenarios: happy path, missing optional params, each error case, rate limit
+       Save responses: tests/fixtures/[provider]-success.json
+                       tests/fixtures/[provider]-minimal.json
+                       tests/fixtures/[provider]-error-[code].json
+                       tests/fixtures/[provider]-rate-limit.json
+       Note discrepancies: fields in response not in docs, type mismatches
+
+     Phase D — Update API-NOTES.md with "Reality vs Docs" findings:
+       Undocumented fields, wrong types, truly optional vs documented-optional
+
+     Phase E — THEN write Adapter using fixtures as source of truth:
+       Adapter normalizes raw response → domain type
+       Unit tests use fixtures (no real API calls, runs offline)
+
+     Load: references/third-party-apis.md for full Layer 1→2→3 strategy"
 
 Q5c: "Need observability from day one?
      → Recommended for all projects with external APIs or async flows

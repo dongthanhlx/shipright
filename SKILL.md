@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 0.7.6
+version: 0.7.9
 description: >
   Ship your MVP fast. Grow it right. The Project Brain for AI coding workflow —
   sets up constitution, enforces boundaries, orchestrates community skills.

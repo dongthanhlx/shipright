@@ -45,6 +45,10 @@ shipright-adds-to-CLAUDE:
 ## rag-pipeline
 RAG system, knowledge base, document Q&A, semantic search.
 
+> **Exploration note:** LLM API (OpenAI/Anthropic/etc.) must be explored before writing
+> LLM module. Save real responses including token usage fields, error formats,
+> rate limit headers. LLM response shapes change between model versions.
+
 ```
 install:
   required:

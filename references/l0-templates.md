@@ -51,13 +51,21 @@ When that happens: stop, define the right domain term, rename.
 [Runtime, database, test runner, key libs]
 
 ## External API integrations  [fill if applicable]
-| Provider | Purpose | Sandbox URL | Quota |
-|---|---|---|---|
-| [name] | [what for] | [sandbox endpoint] | [limit] |
+| Provider | Purpose | Limit | Scope | Implementation |
+|---|---|---|---|---|
+| [name] | [what for] | [N/window] | [per-key/IP] | [quota-tracker/retry/bottleneck] |
 
-Fixtures location: `tests/fixtures/`
-Bruno collection: `api-exploration/`
-Read: `references/third-party-apis.md` for full strategy.
+Rate limit policy: check before call, record after success, respect Retry-After on 429.
+
+Rate limit rules:
+- Check quota BEFORE every call — never after
+- On 429: respect Retry-After header, never retry immediately
+- Alert: TODO[[provider]-quota>80%]: [action]
+- On exhaustion: degrade gracefully, never crash
+
+Fixtures: `tests/fixtures/[provider]-*.json`
+Bruno collection: `api-exploration/[provider]/`
+Rate limit setup: `references/third-party-apis.md § Rate limit setup`
 
 ## Observability conventions
 Correlation ID: every HTTP request and cron job runs inside RequestContext.run()

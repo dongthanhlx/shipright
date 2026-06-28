@@ -359,6 +359,49 @@ All tests must pass before: anchor deploy
 
 ---
 
+
+## Third-party API exploration (Layer 1 — do before Adapter)
+
+```
+Before writing Adapter code for [provider name]:
+
+Phase A — Study docs (do before any API call):
+  Create api-exploration/[provider]/API-NOTES.md
+  Document each endpoint:
+    - Auth: type, header name, how to get test credentials
+    - Params: name | location (body/query/header) | type | required | default | constraints
+    - What each key param does and valid values
+    - Documented response shape (paste from docs)
+    - Error codes and how to handle each
+    - Rate limits: N req/window, headers for remaining quota
+
+Phase B — Build Bruno request from docs:
+  api-exploration/[provider]/[endpoint-name].bru
+  Use REALISTIC test values — not placeholder strings.
+  Values should exercise the specific behavior you need.
+
+Phase C — Call sandbox, document reality:
+  Run each scenario and save responses:
+    tests/fixtures/[provider]-success.json        (happy path)
+    tests/fixtures/[provider]-minimal.json        (only required params)
+    tests/fixtures/[provider]-error-401.json      (auth failure)
+    tests/fixtures/[provider]-empty.json          (valid but no results)
+    tests/fixtures/[provider]-rate-limit.json     (429 response)
+  For each: note fields present but not in docs, type mismatches
+
+Phase D — Update API-NOTES.md with "Reality vs Docs":
+  - Fields in response not in docs
+  - Type surprises (price is string not number)
+  - Params that ARE optional despite docs saying required
+  - Undocumented error codes encountered
+
+Phase E — Write Adapter using fixtures as source of truth:
+  Normalizer: raw response fixture → domain type
+  Unit tests: feed fixtures, assert output shape
+  Zero real API calls in test suite — runs offline, no quota consumed
+```
+
+---
 ## Strangler Fig (extract module from monolith)
 
 > Full 4-phase playbook with prompt templates in `references/scaling-guide.md`.

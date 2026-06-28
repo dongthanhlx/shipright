@@ -1,5 +1,63 @@
 # Changelog
 
+## [0.7.9] — 2025-06 — Rate limit decision point
+### Problem fixed
+Rate limits were mentioned in docs but never enforced as a decision point.
+Developer would discover rate limits only after getting 429 in production.
+
+### Changed
+- third-party-apis.md Phase A: 6 mandatory rate limit questions
+  Q1: exists? Q2: behavior on exceed? Q3: track remaining? Q4: recovery?
+  Q5: sandbox limits? Q6: cost implications?
+- third-party-apis.md: new "Rate limit setup" section after Layer 1
+  Decision tree: per-second → Bottleneck, per-day → QuotaTracker, unknown → retry+backoff
+  Code templates: Node.js Bottleneck, DB quota tracker, Retry-After aware retry
+  Python: async rate limiter with sliding window
+- Branch A Q5b Phase A: rate limit Q&A added as mandatory before writing code
+  "If NO documented rate limit: ask provider or assume 60 req/min"
+- l0-templates.md: CLAUDE.md external APIs table now includes limit/scope/implementation
+  + rate limit rules (check before call, respect Retry-After, alert at 80%)
+- registry.md: rate limit check note added to web-api entry
+
+## [0.7.8] — 2025-06 — Docs study before API calls
+### Problem fixed
+v0.7.7 triggered API exploration (Layer 1) but jumped straight to calling.
+Without reading docs first, Bruno requests use wrong params, wrong auth format,
+or test wrong scenarios — wasting API quota and getting wrong fixtures.
+
+### Changed
+- third-party-apis.md Layer 1: restructured into 4 phases:
+  Phase A — Study docs: create API-NOTES.md with params, types, error codes, rate limits
+  Phase B — Build Bruno request with REALISTIC values from docs understanding
+  Phase C — Call and compare: docs vs reality, save all scenario fixtures
+  Phase D — Update API-NOTES.md with "Reality vs Docs" discrepancies
+  (Phase E was already there: write Adapter using fixtures)
+- Branch A Q5b: Phase A (docs study) explicitly added as first step
+- prompts.md: API exploration prompt restructured into same 5-phase flow
+  Key addition: "Build request with REALISTIC test values — not placeholder strings"
+
+### Why docs + real calls together
+Docs tell you: what params exist, what they do, valid values, expected errors
+Real calls tell you: actual response shape, field optionality, type mismatches,
+undocumented errors, actual rate limit behavior
+Together: Adapter is grounded in both intent AND reality
+
+## [0.7.7] — 2025-06 — API exploration trigger (Layer 1)
+### Problem fixed
+Layer 1 Exploration (Bruno → call API → save fixture) existed in third-party-apis.md
+but was NEVER triggered by Branch A or B. Claude would skip it and write Adapters
+from documentation alone — docs are often wrong, incomplete, or outdated.
+
+### Changed
+- Branch A Q5b: now explicitly triggers Layer 1 Exploration with 4 concrete steps
+  before any Adapter code is written
+- Branch B Q3b: checks "do fixtures exist?" — if NO, explore first
+- third-party-apis.md Layer 1: added "most skipped step in AI coding" warning
+  + "When to do / When NOT needed" guidance
+  + Claude Code prompt for exploration workflow
+- prompts.md: API exploration prompt template added
+- registry.md: exploration note for rag-pipeline (LLM API shape changes by model)
+
 ## [0.7.6] — 2025-06 — Full file upgrade pass (18/18 checks)
 ### Updated files (15 files upgraded)
 - boundaries.md: Ubiquitous Language + boundaries work together section
