@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 0.8.2
+version: 0.9.0
 description: >
   Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
   sets up constitution, enforces boundaries, judges what to build now vs defer,
@@ -39,7 +39,7 @@ Tests:         !`(npm test --silent 2>&1 | tail -2) || (pytest -q 2>&1 | tail -2
 
 ---
 
-# Shipright v0.8 — Project Brain OS
+# Shipright v0.9 — Project Brain OS
 
 Two hemispheres. One executive. One living constitution.
 
@@ -94,6 +94,10 @@ construction is ON from day one (it's the irreversible quadrant); operation turn
 
 Boundaries 1–4: cheap to do right from day one, expensive to fix at 10k users — non-negotiable in MVP.
 Boundary 5: timeouts + idempotency from day one; full resilience patterns on signal (not at SEED).
+
+Optional **enforcement**: `hooks/boundary-guard.sh` is a PreToolUse hook that BLOCKS the two
+highest-confidence violations (service→db import, deep cross-module import) before they're written —
+boundaries that block, not just advise. Opt-in, fails open. See `references/enforcement.md`.
 
 ---
 
@@ -391,6 +395,7 @@ mistake. Full "when to break each rule" guidance: `references/judgment.md`.
 - `references/requirement-drift.md` — Expand-Contract + 3 architecture change scenarios
 - `references/debug-intermittent.md` — intermittent / production-only / resource-leak bugs
 - `references/boundaries.md` — 5 boundary rules with code examples
+- `references/enforcement.md` — optional PreToolUse hook that BLOCKS boundary violations (install, bypass, limits)
 - `references/prompts.md` — copy-paste Claude Code prompts
 
 ### Stack files (load on project type — slim, defer to community skills)

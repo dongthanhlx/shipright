@@ -1,5 +1,37 @@
 # Changelog
 
+## [0.9.0] — 2026-06 — Boundaries that block, not just advise
+### Added — the flagship enforcement hook
+- `hooks/boundary-guard.sh` — a **PreToolUse hook** (matcher `Edit|Write`) that inspects the code
+  Claude is about to write and **blocks** the two highest-confidence boundary violations before
+  they land in a file:
+  - **Boundary 2**: a service-layer file importing the shared DB module (`shared/db` or `shared.db`)
+  - **Boundary 1**: a deep import into another module's internals (bypassing its public index),
+    keyed on `.service`/`.repository`/`.controller`/`.store`/`.gateway` suffixes so `shared/` and
+    `config/` never false-positive.
+  On a violation it exits 2 with a reason on stderr; Claude reads it and self-corrects (import via
+  index / inject a repository) — usually on the next attempt, no human needed.
+- `references/enforcement.md` — install (settings.json), what it catches, configuration
+  (`SHIPRIGHT_GUARD=off`, module-dir auto-detection), the `shipright-ignore` line bypass, the
+  fail-open/no-op guarantees, and explicit limits (project-specific rules stay in CLAUDE.md).
+
+### Design — restraint on purpose
+- Enforces ONLY the two universal, near-zero-false-positive rules. Everything project-specific
+  stays in CLAUDE.md + the Branch B quality gate. A guard that false-positives gets disabled —
+  this is `references/judgment.md` applied to the guard itself (know when NOT to fire).
+- **Fails open**: missing jq/python3, malformed input, or any internal error → allow, never block.
+  A guard must never brick editing.
+- **No-op outside module-structured projects** → safe to enable globally in `~/.claude/settings.json`.
+- **Escapable**: a `shipright-ignore` comment on the offending line allows a named, deliberate
+  exception (break the rule when you say why — never silently).
+- Ships with a built-in **`--self-test`** (11 logic cases) plus verified end-to-end against the
+  documented PreToolUse stdin/exit-code contract.
+
+### Changed
+- SKILL.md: boundaries section notes the optional enforcement hook; reference list + roadmap updated.
+- README: new install block for the PreToolUse hook; "Guards" pitch now mentions blocking, not just
+  documenting; structure + roadmap updated.
+
 ## [0.8.2] — 2026-06 — Consistency & public-readiness pass
 ### Changed
 - registry.md: added a **Trigger index** (capability/signal → skill) as the PRIMARY dispatch
