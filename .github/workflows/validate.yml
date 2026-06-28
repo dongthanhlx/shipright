@@ -30,10 +30,26 @@ jobs:
           test -f "references/examples/news-crawler-ARCHITECTURE.md" || (echo "Missing example" && exit 1)
           echo "✓ Example files present"
 
-      - name: Check no broken internal links
+      - name: Check no broken internal reference links (hard fail)
         run: |
-          # Find all references/[file].md mentions in SKILL.md and verify files exist
-          grep -oE 'references/[a-z/-]+\.md' SKILL.md | while read ref; do
-            test -f "$ref" || echo "WARNING: referenced file not found: $ref"
+          # CHANGELOG is a historical record — allowed to mention intentionally-removed files.
+          grep -rhoE 'references/[a-zA-Z0-9/_-]+\.md' --include='*.md' --exclude=CHANGELOG.md . | sort -u > /tmp/refs.txt
+          rc=0
+          while read ref; do
+            if [ ! -f "$ref" ]; then echo "BROKEN LINK: $ref"; rc=1; fi
+          done < /tmp/refs.txt
+          if [ $rc -ne 0 ]; then exit 1; fi
+          echo "✓ No broken reference links"
+
+      - name: Check no orphaned reference files (hard fail)
+        run: |
+          # A reference file must be linked from a live file (CHANGELOG mention does not count).
+          rc=0
+          for f in $(find references -name '*.md'); do
+            base=$(basename "$f")
+            if ! grep -rqF "$base" --include='*.md' --exclude="$base" --exclude=CHANGELOG.md .; then
+              echo "ORPHAN (referenced nowhere live): $f"; rc=1
+            fi
           done
-          echo "✓ Link check done"
+          if [ $rc -ne 0 ]; then exit 1; fi
+          echo "✓ No orphaned reference files"

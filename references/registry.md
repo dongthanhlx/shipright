@@ -1,7 +1,37 @@
-# Shipright Registry v0.7.0
-# Project type → curated skill pack + what shipright adds to CLAUDE.md
-# Load only the entry matching your project type (each entry ~300 tokens)
-# Format: type | install | tested-with | shipright-adds
+# Shipright Registry
+# Two dispatch paths: (1) trigger index below — the PRIMARY path, activate by signal;
+# (2) project-type packs — the secondary heuristic for what to pre-install for a known type.
+# Load only the trigger row(s) that fired + the one project-type entry (~300 tokens each).
+
+---
+
+## Trigger index — capability/signal → skill (dispatch by trigger, not by stage)
+
+Activate a skill the MOMENT its trigger appears, regardless of lifecycle phase. Stage is only
+the default heuristic (a payment MVP needs security on day one; a read-only Growth app may not).
+
+| Trigger / signal happening now | Activate | Where |
+|---|---|---|
+| Any bug / unexpected behavior | debugging-and-error-recovery | addyosmani |
+| Writing logic or changing behavior | test-driven-development | addyosmani |
+| Feature touches 2+ files | incremental-implementation | addyosmani |
+| Before merging Tier M+ | code-review-and-quality | addyosmani |
+| Tier L/XL with unclear requirements | spec-driven-development | addyosmani |
+| Auth / payments / untrusted input appears | security-and-hardening | addyosmani |
+| Prod behavior invisible ("can't tell what happened") | observability-and-instrumentation | addyosmani |
+| A dependency can take the system down | (shipright built-in) | references/resilience.md |
+| p95 latency / DB CPU over target | (shipright built-in) | references/performance.md |
+| Building a user-facing UI page | taste-skill (per page type) | references/ui-design.md |
+| Dashboard / admin / data-heavy UI | vercel-labs/agent-skills | vercel-labs |
+| RAG retrieval/prompt change to evaluate | RAGAS | `pip install ragas` |
+| Agent trajectory to evaluate | DeepEval / Confident-AI | — |
+| LLM tracing needed | LangSmith / Arize Phoenix | — |
+
+Shipright already covers — do NOT load these: interview-me, idea-refine (→ Branch A intake);
+frontend-ui-engineering (→ taste-skill); performance-optimization (→ L4 + performance.md).
+
+Default ladder when no specific trigger has fired yet (by lifecycle phase):
+SEED debug · VALIDATE +tdd/incremental/review · HARDEN +spec/security/observability · SCALE +specialized.
 
 ---
 

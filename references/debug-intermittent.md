@@ -1,6 +1,6 @@
 # Debug: Intermittent & Production-Only Bugs
 
-For bugs that don't reproduce consistently. Called from onboarding.md Branch C [B][C][D].
+For bugs that don't reproduce consistently. Loaded from Branch C (c-fix-bug.md) for cases [B][C][D].
 
 ---
 

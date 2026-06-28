@@ -48,6 +48,12 @@ import { FeedRepository } from '../feed/...'        // ← BANNED
 import { SomeType } from '../feed/feed.service'     // ← BANNED, use '../feed'
 ```
 
+### Integration resilience (Boundary 5)
+- Every `Crawler` HTTP call has a timeout (axios `timeout: 5000`) — no call waits forever
+- SearchAPI/YouTube down → crawler returns `[]` (degrade), never throws into the cron loop
+- Cron crawl is idempotent: `pg_try_advisory_lock` + `ON CONFLICT DO NOTHING` (see below)
+- HARDEN signal `TODO[error-rate>5%]`: add circuit breaker per source → references/resilience.md
+
 ---
 
 ## Coding workflow — always in this order

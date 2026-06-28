@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.8.2] — 2026-06 — Consistency & public-readiness pass
+### Changed
+- registry.md: added a **Trigger index** (capability/signal → skill) as the PRIMARY dispatch
+  path, matching SKILL.md's trigger-based narrative. Project-type packs are now the secondary
+  heuristic. "Activate the moment the trigger appears, regardless of stage."
+- README: new **"Why shipright?"** section — the 30-second pitch (conductor, not another
+  player) answering "why this vs just installing community skills." For public communication.
+- news-crawler example: added **Boundary 5** (integration resilience) block — timeout, graceful
+  degradation, idempotent cron — so the canonical example reflects v0.8.
+
+### Removed
+- references/onboarding.md — it duplicated SKILL.md's "Route first" router verbatim (legacy
+  v0.7). The router lives in the always-loaded core; the duplicate was dead weight. Updated the
+  two live references (debug-intermittent.md, README structure).
+
+### CI
+- validate.yml: broken internal reference links now **hard-fail** (was a silent warning).
+- validate.yml: new **orphan check** — fails if any references/*.md is referenced nowhere.
+  (This is the gate that would have caught the v0.5.0 orphan landmine automatically.)
+
 ## [0.8.1] — 2026-06 — Wire the v0.8 pillars into the workflow
 ### Problem fixed
 v0.8.0 added the executive layer + operation hemisphere as SKILL.md content and reference
