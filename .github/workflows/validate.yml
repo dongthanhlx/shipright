@@ -26,8 +26,8 @@ jobs:
 
       - name: Check examples exist
         run: |
-          test -f "references/examples/news-crawler-CLAUDE.md" || (echo "Missing example" && exit 1)
-          test -f "references/examples/news-crawler-ARCHITECTURE.md" || (echo "Missing example" && exit 1)
+          test -f "references/examples/orders-api-CLAUDE.md" || (echo "Missing example" && exit 1)
+          test -f "references/examples/orders-api-ARCHITECTURE.md" || (echo "Missing example" && exit 1)
           echo "✓ Example files present"
 
       - name: Check no broken internal reference links (hard fail)

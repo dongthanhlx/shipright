@@ -7,8 +7,14 @@
   heuristic. "Activate the moment the trigger appears, regardless of stage."
 - README: new **"Why shipright?"** section — the 30-second pitch (conductor, not another
   player) answering "why this vs just installing community skills." For public communication.
-- news-crawler example: added **Boundary 5** (integration resilience) block — timeout, graceful
-  degradation, idempotent cron — so the canonical example reflects v0.8.
+- **Replaced the canonical example**: news-crawler (a niche data-pipeline shape) → **orders-api**
+  (e-commerce orders + payments). More universally relatable AND consistent with the Order/Payment
+  examples already used throughout boundaries.md / code-health.md / error-handling.md /
+  domain-thinking.md — the example now matches the skill's running teaching domain. It exercises
+  every pillar: Money Value Object (no float), Order aggregate + invariants ("can't ship unpaid"),
+  payment-gateway Adapter (Boundary 4), idempotent charge + timeout (Boundary 5), error taxonomy
+  (declined = operational vs gateway-down = infrastructure), and ADRs that name one-way vs two-way
+  doors (judgment.md). Removed both news-crawler example files.
 
 ### Removed
 - references/onboarding.md — it duplicated SKILL.md's "Route first" router verbatim (legacy

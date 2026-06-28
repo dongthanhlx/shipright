@@ -203,8 +203,8 @@ shipright/
       blockchain.md           # EVM/Solana/TON/SUI: security, audit gate, chain patterns
       browser-extension.md    # MV3: manifest, components, chrome.* APIs
     examples/
-      news-crawler-CLAUDE.md
-      news-crawler-ARCHITECTURE.md
+      orders-api-CLAUDE.md      # canonical example: e-commerce orders + payments API
+      orders-api-ARCHITECTURE.md
 ```
 
 ---
