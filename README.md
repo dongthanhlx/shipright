@@ -1,4 +1,4 @@
-# shipright v0.8.2
+# shipright v0.9.0
 
 > **Ship your MVP fast. Grow it right.**
 
@@ -21,7 +21,8 @@ over-building. shipright is the **conductor**, not another player:
 
 - **Decides** — one executive question (one-way vs two-way door) sizes every choice, so an MVP
   ships fast *without* painting the architecture into a corner you pay for three features later.
-- **Guards** — 5 boundary rules + a quality gate that hold from day one to millions of users.
+- **Guards** — 5 boundary rules + a quality gate that hold from day one to millions of users,
+  and an optional PreToolUse hook that *blocks* the worst violations before they're written.
 - **Orchestrates** — activates the right community skill at the right trigger, and refuses to
   load the ones a small project doesn't need yet (context budget = reasoning quality).
 - **Remembers** — a living constitution (CLAUDE.md) that gets smarter every session, plus
@@ -160,6 +161,24 @@ git -C ~/.claude/skills/shipright pull
 }
 ```
 
+**Boundary enforcement (optional) — block violations as they're written:**
+```json
+// ~/.claude/settings.json
+{
+  "hooks": {
+    "PreToolUse": [{
+      "matcher": "Edit|Write",
+      "hooks": [{
+        "type": "command",
+        "command": "~/.claude/skills/shipright/hooks/boundary-guard.sh"
+      }]
+    }]
+  }
+}
+```
+Opt-in, fails open, safe to enable globally (no-ops outside module-structured projects).
+Details + bypass: `references/enforcement.md`. Verify: `hooks/boundary-guard.sh --self-test`.
+
 ---
 
 ## Structure
@@ -168,6 +187,7 @@ git -C ~/.claude/skills/shipright pull
 shipright/
   SKILL.md                    # Project Brain OS core (always loaded): executive + 5 boundaries + spine + dispatch
   hooks/check-update.sh       # SessionStart update checker
+  hooks/boundary-guard.sh     # PreToolUse hook — BLOCKS boundary violations as written (--self-test)
   references/
     registry.md               # Capability/signal → skill (trigger dispatch) + project-type packs
     branches/
@@ -191,6 +211,7 @@ shipright/
     l0-templates.md           # CLAUDE.md + ARCHITECTURE.md templates + state section
     levels.md                 # Lifecycle spine + L0→L4, gates, Conway's Law, graduate checklist
     boundaries.md             # 5 boundary rules with code examples
+    enforcement.md            # the PreToolUse boundary-guard hook: install, bypass, guarantees, limits
     requirement-drift.md      # Expand-Contract + 3 architecture scenarios
     debug-intermittent.md     # Intermittent / production-only / resource leak bugs
     prompts.md                # Copy-paste Claude Code prompts
@@ -231,7 +252,7 @@ shipright/
 - [ ] Go stack file
 - [ ] references/registry.md: capability/signal → skill index (trigger-based)
 - [ ] references/registry.md community contributions
-- [ ] PreToolUse boundary enforcement hook
+- [x] **v0.9: PreToolUse boundary-enforcement hook (blocks service→db + deep cross-module imports; opt-in, fails open, self-test)**
 
 ---
 
