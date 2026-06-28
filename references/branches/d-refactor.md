@@ -31,6 +31,11 @@ Q3: "Which Fowler smell best describes it?
 Identifying the specific smell is the DONE condition for naming what to fix.
 Load `references/code-quality.md` Fowler section for specific refactoring move.
 
+> Watch the OPPOSITE smell too (Ousterhout, `references/code-health.md`): over-extraction —
+> many shallow 5-line methods / one-implementation interfaces that fragment a single idea and
+> widen the interface more than they shrink the body. The fix there is INLINE, not extract.
+> Refactoring toward "deeper modules with smaller interfaces" is as valid as splitting.
+
 If the answer is "the code looks messy" or "I want to restructure":
 → Redirect: "Refactor without measurable pain rarely delivers value.
    Use the codebase for a few more days, note the real friction points."
@@ -132,7 +137,7 @@ works in a matching directory.
 ```
 .claude/
   rules/
-    boundaries.md       # 3 boundary rules — always loaded
+    boundaries.md       # 5 boundary rules — always loaded
     testing.md          # test conventions — always loaded
     api-conventions.md  # only loads when working in src/api/
     payments.md         # only loads when working in src/modules/payments/

@@ -313,7 +313,7 @@ The backend API, indexer, frontend — these follow standard shipright workflow:
 ```
 Backend API (reads blockchain data, serves frontend):
   → web-api registry entry
-  → Standard 4 boundaries apply
+  → Standard boundaries apply
   → RPC calls to blockchain = third-party API (Boundary Rule 4 applies)
   → Use references/third-party-apis.md: Adapter pattern for RPC responses
 

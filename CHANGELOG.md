@@ -1,5 +1,45 @@
 # Changelog
 
+## [0.8.1] — 2026-06 — Wire the v0.8 pillars into the workflow
+### Problem fixed
+v0.8.0 added the executive layer + operation hemisphere as SKILL.md content and reference
+files, but an audit found the 6 BRANCH files (the workflow Claude actually runs each session)
+invoked NONE of them — judgment.md / resilience.md / performance.md / Boundary 5 were
+documented but never dispatched. The pillars behaved like v0.7. This release threads them in.
+
+### Changed — pillars now fire inside the branches
+- Branch F (incident): mitigate → resilience.md containment patterns; investigate → error
+  taxonomy (operational/infra/programmer); post-incident → "which Nygard pattern would have
+  contained this?" + fault-injection test. An incident now permanently raises fault tolerance.
+- Branch A (new project): mode decision → one-way-door budgeting (judgment.md MVP matrix);
+  Q2b → domain-thinking.md (aggregates/invariants); MVP CLAUDE.md template gains Boundary 5.
+- Branch B (add feature): sizing → executive one-way-door check; quality gate gains a
+  Resilience (Boundary 5 + idempotency) block and a Performance (N+1 / bounded sets) block.
+- Branch C (fix bug): classify errors by category before handling (error-handling.md).
+- Branch D (refactor): Ousterhout lens — watch the OPPOSITE smell (over-extraction / shallow
+  modules); fix toward deeper modules is as valid as splitting.
+
+### Changed — resurrected two high-value orphaned files
+- references/error-handling.md and references/domain-thinking.md existed on disk, were
+  referenced nowhere, and were wrongly listed as "Removed" in the 0.5.0 changelog (see
+  correction below). They are high-value (error taxonomy, Result type, saga, race conditions;
+  aggregate roots, invariants, domain events). Re-referenced in SKILL.md, cross-linked to their
+  hemisphere companions (error-handling↔resilience, domain-thinking↔code-quality/judgment),
+  and wired into the branches above.
+
+### Fixed — stale boundary counts (now 5, was drifting between 3/4)
+- l0-templates.md: MVP CLAUDE.md template header said "The 3 boundaries" while listing 4 —
+  fixed to a count-free header and added Boundary 5. This template generates real constitutions,
+  so the stale count was propagating into projects.
+- d-refactor.md (.claude/rules example), code-health.md, a-new-project.md gate, blockchain.md,
+  prompts.md: genericized passing "N boundary" mentions (per the no-hardcoded-counts convention —
+  the numbered list is the source of truth).
+
+### Correction to [0.5.0]
+The 0.5.0 entry claimed error-handling.md and domain-thinking.md were "Removed". They were
+de-referenced from SKILL.md but never deleted — they remained on disk as orphans until v0.8.1
+re-integrated them. The 0.5.0 "Removed" lines below are annotated accordingly.
+
 ## [0.8.0] — 2026-06 — BrainOS: executive layer + operation hemisphere
 ### The reframe
 Shipright was a strong CONSTRUCTION-phase OS (Evans + Uncle Bob + Fowler + Beck) but lopsided:
@@ -344,8 +384,8 @@ Real multi-chain custodial payment hub (EVM/SOL/TRON/TON/SUI/NEAR) analysis.
 - CONTRIBUTING.md
 
 ### Removed
-- references/domain-thinking.md (orphaned)
-- references/error-handling.md (orphaned)
+- references/domain-thinking.md (de-referenced — NOTE: not actually deleted; re-integrated in 0.8.1)
+- references/error-handling.md (de-referenced — NOTE: not actually deleted; re-integrated in 0.8.1)
 
 ### Changed
 - README: tagline → "Ship your MVP fast. Grow it right."

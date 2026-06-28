@@ -26,6 +26,10 @@ If no state → proceed to Step 1.
 [B] Production mode — planned sprints, full architecture
 ```
 
+> Whichever mode: spend the "do-it-right" budget only on ONE-WAY DOORS (domain model,
+> boundaries, data identity, money units) and hack the rest. This is how an MVP ships fast
+> WITHOUT breaking architecture later. Full guidance: `references/judgment.md` (the MVP matrix).
+
 ---
 
 ## Step 2 — Intake (one question at a time)
@@ -39,6 +43,8 @@ Q2b: "3–5 key terms your domain experts use?"
      → These become the Ubiquitous Language in CLAUDE.md
      → Claude uses ONLY these terms for class/method/variable names
      → Example: not 'User' but 'Subscriber'; not 'Item' but 'FeedArticle'
+     → For the domain MODEL (which terms are aggregate roots vs value objects, what
+       invariants must never break, "is this even a DDD project?"): references/domain-thinking.md
 
 Q3: "Existing solution? Why build new?"
 
@@ -104,8 +110,9 @@ Domain terms: [list from Q2b — these go in CLAUDE.md]
 [MVP] Walking skeleton = "[user journey from Q5]"
       Everything else → backlog
 
-[Production] Irreversible decisions to get right upfront:
-             core domain model, module boundaries, dependency direction
+[Production] Irreversible (one-way-door) decisions to get right upfront:
+             core domain model, module boundaries, dependency direction,
+             data identity, money units, where state lives (judgment.md)
 
 Risk I see: [specific]
 Recommendation: [scope cut if deadline tight]
@@ -154,11 +161,13 @@ If skills required are not installed → mention once:
 |---|---|---|
 | [from Q2b] | [definition] | [generic alias to avoid] |
 
-## The 4 boundaries (non-negotiable)
+## The 5 boundaries (non-negotiable)
 1. Dependencies inward only: [specific banned import for this project]
 2. Each layer one job: [concrete example for this project]
 3. No shared databases: [module names that must not share]
 4. Adapter layer: [if external APIs — what the adapter is named]
+5. Integration timeout + fallback: [each external call has a timeout; side effects idempotent]
+   (full resilience patterns deferred to HARDEN — see references/resilience.md)
 
 ## Clean Code rules
 - Functions max 20 lines. Extract if longer.
@@ -242,7 +251,7 @@ L0 → L1 Skeleton → L2 Interfaces + RED tests → L3 Implement loop
 
 - [ ] Both files project-specific (not generic template)
 - [ ] Ubiquitous Language section has 3+ domain terms
-- [ ] 4 boundary rules with project-specific banned examples
+- [ ] Boundary rules (incl. integration timeout) with project-specific banned examples
 - [ ] Core domain type defined (Entity vs Value Object — must be right)
 - [ ] Registry entry loaded, required skills noted
 - [ ] Shipright state section written to CLAUDE.md

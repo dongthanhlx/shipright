@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 0.8.0
+version: 0.8.1
 description: >
   Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
   sets up constitution, enforces boundaries, judges what to build now vs defer,
@@ -378,6 +378,8 @@ mistake. Full "when to break each rule" guidance: `references/judgment.md`.
 - `references/judgment.md` — EXECUTIVE layer: one-way/two-way doors, MVP matrix, when to break each rule
 - `references/code-quality.md`
 - `references/code-health.md` — SOLID tactical enforcement + Ousterhout (deep modules) — construction quality
+- `references/domain-thinking.md` — Evans tactical: aggregate roots, invariants, domain events, "DDD or not?" decision
+- `references/error-handling.md` — error taxonomy (operational/infra/programmer), Result type, saga, race conditions, idempotency
 - `references/resilience.md` — RIGHT hemisphere: Nygard 8 stability patterns, Boundary 5, fault-injection tests
 - `references/performance.md` — measure-first optimization ladder, N+1, mechanical sympathy, budgets
 - `references/observability.md` — Correlation ID, logging, tracing, SLO/error budget, retrofit
