@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 0.9.0
+version: 0.9.1
 description: >
   Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
   sets up constitution, enforces boundaries, judges what to build now vs defer,
@@ -401,6 +401,7 @@ mistake. Full "when to break each rule" guidance: `references/judgment.md`.
 ### Stack files (load on project type — slim, defer to community skills)
 - `references/stacks/nodejs.md`
 - `references/stacks/python.md`
+- `references/stacks/go.md` — packages + internal/ (compile-time Boundary 1), context timeouts (Boundary 5), pgx/sqlc, error taxonomy
 - `references/stacks/browser-extension.md`
 - `references/stacks/ai-projects.md`
 - `references/stacks/ai-rag.md`

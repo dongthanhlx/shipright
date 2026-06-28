@@ -1,4 +1,4 @@
-# shipright v0.9.0
+# shipright v0.9.1
 
 > **Ship your MVP fast. Grow it right.**
 
@@ -218,6 +218,7 @@ shipright/
     stacks/
       nodejs.md
       python.md
+      go.md                   # packages + internal/ (compile-time Boundary 1), context timeouts, pgx/sqlc
       ai-projects.md          # AI entry point + LLM boundary rule
       ai-rag.md               # RAG deep dive: eval loop, vector DB, metrics
       chatbot-platforms.md    # Telegram/Discord: adapter, state, security
@@ -249,7 +250,7 @@ shipright/
 - [x] **v0.8: Ousterhout counterweight (deep modules, define errors out of existence)**
 - [x] **v0.8: Lifecycle spine (unifies L0–L4 / Stage 1–3 / MVP–Scale)**
 - [x] **v0.8: Trigger-based skill dispatch + SLO/error budget/DORA**
-- [ ] Go stack file
+- [x] **v0.9.1: Go stack file (packages + internal/ compile-time boundaries, context timeouts, pgx/sqlc, error taxonomy)**
 - [ ] references/registry.md: capability/signal → skill index (trigger-based)
 - [ ] references/registry.md community contributions
 - [x] **v0.9: PreToolUse boundary-enforcement hook (blocks service→db + deep cross-module imports; opt-in, fails open, self-test)**
