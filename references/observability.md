@@ -383,6 +383,78 @@ Growth (add these):
 
 ---
 
+## SLO, error budget, golden signals (Growth / HARDEN phase)
+
+> Resilience without measurement is faith. "Fault tolerant" only means something if you can
+> say *how* tolerant, against a target. This is the SRE loop (Google SRE, Charity Majors):
+> instrument → set a target → spend the budget → decide with data.
+
+Add this when the signal is "we need to know if we're reliable enough" — typically once you
+have real users and an on-call expectation. Not before.
+
+### The four golden signals — measure these on every critical path
+```
+Latency      — how long requests take (track p50/p95/p99, and latency of ERRORS separately)
+Traffic      — demand on the system (req/s, jobs/min)
+Errors       — rate of failed requests (explicit 5xx + implicit: wrong answer, timeout)
+Saturation   — how full the system is (CPU, memory, pool utilization, queue depth)
+```
+If you instrument only four things, instrument these. Saturation is the leading indicator —
+it rises before latency and errors do.
+
+### SLI → SLO → error budget
+```
+SLI (indicator): a measured ratio.   e.g. "% of /feed requests < 300ms and 2xx"
+SLO (objective): the target for it.  e.g. "99.5% over 30 days"
+Error budget:    1 − SLO.            e.g. 0.5% = ~3.6h of allowed failure per 30 days
+```
+The error budget is the bridge between the two hemispheres: it makes "ship fast vs harden"
+a *data* decision, not an argument.
+```
+Budget remaining  → ship features faster, spend it. Reliability is "good enough" right now.
+Budget exhausted  → freeze risky launches, spend the next cycle on resilience/perf
+                    (references/resilience.md, references/performance.md) until it recovers.
+```
+Set SLOs only on what users actually feel (the critical journeys). An SLO on an internal cron
+nobody waits for is noise.
+
+### Implementation — start simple
+```
+MVP/VALIDATE → don't. Logs + Correlation ID are enough.
+HARDEN       → emit golden-signal metrics (Prometheus client / OpenTelemetry metrics),
+               graph p95/error-rate per critical path, define 1–3 SLOs in a doc.
+SCALE        → error-budget policy automated: burn-rate alerts (fast burn = page,
+               slow burn = ticket), SLO dashboard, budget gates launches.
+```
+
+```typescript
+// Minimal golden-signal histogram (prom-client) — wrap the critical handler
+const httpDuration = new Histogram({
+  name: 'http_request_duration_seconds',
+  help: 'Request duration', labelNames: ['route', 'status'],
+  buckets: [0.05, 0.1, 0.3, 0.5, 1, 3],
+})
+app.use((req, res, next) => {
+  const end = httpDuration.startTimer()
+  res.on('finish', () => end({ route: req.route?.path ?? 'unknown', status: res.statusCode }))
+  next()
+})
+```
+
+### DORA — is the architecture itself healthy?
+Four delivery metrics (Forsgren, *Accelerate*) tell you if the boundaries are actually paying
+off. Architecture that "scales" should improve these over time, not degrade them:
+```
+Deployment frequency   — how often you ship (higher = smaller, safer changes)
+Lead time for changes  — commit → production (shorter = healthier pipeline)
+Change failure rate     — % of deploys causing an incident (lower = better gates)
+MTTR                    — mean time to restore after an incident (shorter = better observability)
+```
+Rising change-failure-rate or MTTR while the codebase grows = a boundary/observability problem,
+not a "we need more people" problem. Treat it as an architecture signal.
+
+---
+
 ## Add to CLAUDE.md when setting up observability
 
 ```markdown

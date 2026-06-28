@@ -1,5 +1,26 @@
 # Level Definitions
 
+## Lifecycle spine — the one model everything maps onto
+
+Shipright grew four overlapping vocabularies. They are the SAME timeline. Use this mapping
+whenever a doc says "L2" / "Stage 1" / "Traction" / "Growth" — translate to a phase:
+
+| Phase | aka | Levels here | Scaling stage | Masters active | Resilience dial |
+|---|---|---|---|---|---|
+| **SEED** | MVP | L0–L1 | — | Evans, Beck | OFF (except one-way-door items) |
+| **VALIDATE** | Traction | L2–L3 | — | + Uncle Bob, Fowler | MINIMAL (timeouts, Correlation ID) |
+| **HARDEN** | Growth | L4 | Stage 1–2 | + Nygard, SRE | FULL on signal (resilience.md, SLO) |
+| **SCALE** | Scale | L4 | Stage 3 | + Ousterhout (deep modules) | + bulkheads, backpressure |
+
+- The **construction** masters (Evans/Bob/Fowler/Beck) ramp up early — their work is in the
+  irreversible quadrant, cheap now and expensive later (see `references/judgment.md`).
+- The **operation** masters (Nygard/SRE) turn on by *signal*, not by reaching a phase label.
+  Adding them at SEED is over-engineering; missing them at HARDEN is how systems fall over.
+- L0–L4 below are the construction mechanics inside SEED→HARDEN. Stage 1–3 (team/scale
+  growth) lives in `references/scaling-guide.md`. Both are this one spine, seen from two angles.
+
+---
+
 **Ubiquitous Language precedes every L0:**
   Q2b in Branch A intake: "What terms do domain experts use?"
   Claude uses these terms for ALL class, method, and variable names in the project.

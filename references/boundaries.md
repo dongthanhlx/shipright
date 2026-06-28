@@ -1,9 +1,11 @@
-# The 4 Boundary Rules
+# The 5 Boundary Rules
 
-> These 4 rules are the non-negotiable foundation of every shipright project.
+> Rules 1–4 are the non-negotiable foundation of every shipright project.
 > Cheap to follow from day one. Expensive to retrofit. Never optional — even in MVP.
+> Rule 5 (failure isolation) is the operation-hemisphere boundary: timeouts + idempotency
+> from day one, full resilience patterns on signal (HARDEN phase). See references/resilience.md.
 
-These are the only 4 rules that matter for long-term maintainability.
+These are the rules that matter for long-term maintainability and fault tolerance.
 Everything else is preference. These are not.
 
 Violating any of these makes the codebase progressively harder to change,
@@ -208,6 +210,53 @@ without touching FeedService? If yes, Rule 4 is followed.
 
 ---
 
+## Rule 5 — Every integration point has a timeout + a deliberate fallback
+
+**The rule**: No outbound call (HTTP, DB, queue, RPC, LLM) waits forever, and every one has
+a defined behavior for when it fails. One slow or dead dependency must not stall the system.
+
+**Why**: Large systems die from failure *propagation*, not logic bugs (Michael Nygard,
+*Release It!*). A dependency with no timeout holds a thread hostage; enough hostage threads
+and the whole service is down — a slow dependency is worse than a dead one. A timeout converts
+a slow failure into a fast, contained one. A fallback keeps partial service alive.
+
+```typescript
+// ✅ CORRECT — bounded wait + defined fallback
+async getRecommendations(userId: string): Promise<Item[]> {
+  try {
+    return await this.recs.fetch(userId, { timeout: 800 })   // bounded
+  } catch (e) {
+    logger.warn({ userId, err: e.code }, 'recs degraded → popular items')
+    return this.popularItems()                                // graceful degradation
+  }
+}
+
+// ❌ WRONG — unbounded wait, no fallback
+async getRecommendations(userId: string): Promise<Item[]> {
+  return await this.recs.fetch(userId)   // hangs forever if recs is slow → cascades
+}
+```
+
+**Dial by phase** (do NOT add full resilience at SEED — that's over-engineering):
+- SEED: timeouts on outbound calls + idempotency keys for side effects. Nothing more.
+- VALIDATE: + retry (backoff+jitter) + graceful degradation on the calls that fail most.
+- HARDEN: + circuit breakers + bulkheads, Rule 5 enforced on every integration point.
+- SCALE: + backpressure / load shedding.
+
+**The test**: kill or hang each dependency in a test — does the request fail fast (within the
+timeout) with a defined fallback, or does it hang and cascade? See fault-injection tests in
+`references/resilience.md`.
+
+**Signal that Rule 5 is violated**:
+- An outbound call with no timeout option set
+- A `catch` that only logs and rethrows on a non-critical dependency (no fallback)
+- Your latency/thread count spikes when a *downstream* dependency slows down
+- Idempotency tracked in an in-memory Map (lost on restart — must be DB/Redis)
+
+Full patterns (8 stability patterns, retry budgets, steady state): `references/resilience.md`.
+
+---
+
 ## Ubiquitous Language and boundaries work together
 
 Boundaries define WHERE code can go.
@@ -222,4 +271,5 @@ With both: Claude generates code that is correctly structured AND domain-express
 
 Add to CLAUDE.md at L0:
 1. Ubiquitous Language table (domain terms)
-2. 4 boundary rules (with specific banned examples for THIS project)
+2. Boundary rules 1–4 (with specific banned examples for THIS project)
+3. Boundary 5 timeouts for any integration point (full resilience deferred to HARDEN)

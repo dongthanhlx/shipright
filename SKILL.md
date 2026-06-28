@@ -1,14 +1,16 @@
 ---
 name: shipright
-version: 0.7.9
+version: 0.8.0
 description: >
-  Ship your MVP fast. Grow it right. The Project Brain for AI coding workflow —
-  sets up constitution, enforces boundaries, orchestrates community skills.
+  Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
+  sets up constitution, enforces boundaries, judges what to build now vs defer,
+  hardens for fault tolerance, and orchestrates community skills at the right moment.
   Use when: starting ANY project, adding features (2+ files), fixing unclear bugs,
   refactoring, resuming after break, production incidents, integrating APIs,
-  adding observability/tracing, building AI/RAG/chatbot projects.
+  adding observability/tracing/resilience, scaling, building AI/RAG/chatbot projects.
   Triggers: "build", "start project", "add feature", "bug", "refactor",
-  "production down", "back on this", "integrate API", "add tracing", "build chatbot".
+  "production down", "back on this", "integrate API", "add tracing", "make it resilient",
+  "scale this", "build chatbot".
   Skip for: single-line fixes, knowledge questions, mid-implementation steps.
   Manual invoke: /shipright — always reliable.
 allowed-tools: Read, Write, Bash, Glob, Grep
@@ -37,17 +39,35 @@ Tests:         !`(npm test --silent 2>&1 | tail -2) || (pytest -q 2>&1 | tail -2
 
 ---
 
-# Shipright v0.7 — Project Brain OS
+# Shipright v0.8 — Project Brain OS
 
-Three masters. Four boundaries. One living constitution.
+Six masters. Five boundaries. One executive layer. One living constitution.
 
-**Eric Evans:** Model the right domain (Ubiquitous Language, Bounded Contexts, Aggregates)
-**Uncle Bob:** Structure it correctly (SOLID, Clean Code, 20-line functions)
-**Fowler:** Keep it clean as it evolves (smell detection, compound engineering)
+A brain with two hemispheres and an executive that decides how much of each to use:
+
+```
+EXECUTIVE (prefrontal cortex) — references/judgment.md
+  Bezos:  one-way vs two-way doors — get irreversible decisions right, move fast on the rest
+  "Senior judgment = knowing when NOT to apply a pattern."
+
+LEFT HEMISPHERE — construction (right structure, right model, kept clean)
+  Eric Evans:    Model the right domain (Ubiquitous Language, Bounded Contexts, Aggregates)
+  Uncle Bob:     Structure it correctly (SOLID, Clean Code, 20-line functions)
+  John Ousterhout: Deep modules, define errors out of existence (counterweight to Uncle Bob)
+  Fowler:        Keep it clean as it evolves (smell detection, compound engineering)
+  Kent Beck:     Prove it (TDD: Red → Green → Refactor)
+
+RIGHT HEMISPHERE — operation (survives failure, stays fast, stays observable)
+  Michael Nygard: Survive failure (timeouts, circuit breakers, bulkheads — resilience.md)
+  SRE / Majors:   Stay observable + measured (SLO, error budget — observability.md)
+```
+
+The executive sets the **dial** on each hemisphere by lifecycle phase (see spine below):
+construction is ON from day one (it's the irreversible quadrant); operation turns on by signal.
 
 ---
 
-## The 4 boundaries — absolute, all modes, all stages
+## The 5 boundaries — absolute, all modes, all stages
 
 ```
 1. Dependencies point inward only
@@ -65,9 +85,47 @@ Three masters. Four boundaries. One living constitution.
 4. No raw external response passes the Adapter layer
    Every external API/LLM has one Adapter (Normalizer/ACL).
    Raw response never enters service or domain logic.
+
+5. Every integration point has a timeout + a deliberate fallback   (failure isolation)
+   No outbound call (HTTP/DB/queue/RPC) waits forever. One slow dependency must not
+   stall the system. Enforced from the HARDEN phase. See references/resilience.md.
 ```
 
-Cheap to do right from day one. Expensive to fix at 10k users. Non-negotiable in MVP.
+Boundaries 1–4: cheap to do right from day one, expensive to fix at 10k users — non-negotiable in MVP.
+Boundary 5: timeouts + idempotency from day one; full resilience patterns on signal (not at SEED).
+
+---
+
+## The executive question — ask before every non-trivial decision
+
+```
+"Is this a one-way door, and is the need real today?"
+
+  One-way + real      → do it right, now (domain model, boundaries, data identity, money units)
+  One-way + not yet   → design the seam so it stays reversible, defer the rest
+  Two-way + real      → simplest thing that works, move on (cache, log format, retry count)
+  Two-way + not yet   → don't build it. Write a debt signal and ship.
+```
+
+This defeats both failure modes: over-engineering (treating a two-way door as one-way) and
+architecture rot (treating a one-way door as two-way). Full matrix + "when to break each rule":
+`references/judgment.md`. Load it at L0 and at every "should I add X?" moment.
+
+---
+
+## Lifecycle spine — one model, four phases
+
+Shipright's older vocabularies (L0–L4, Stage 1–3, MVP/Production, Traction/Growth/Scale) all
+map onto one spine. Each phase declares which masters are active and the resilience dial level.
+
+| Phase | aka | Levels / Stage | Construction dial | Operation dial |
+|---|---|---|---|---|
+| **SEED** | MVP | L0–L1 | boundaries + naming + core domain model | OFF — except one-way-door items (idempotency, money units, state location) |
+| **VALIDATE** | Traction | L2–L3 | + TDD + quality gate | MINIMAL — timeouts + Correlation ID |
+| **HARDEN** | Growth | L4 · Stage 1–2 | + Fowler refactoring | FULL Nygard + SLO/error budget (on signal) |
+| **SCALE** | Scale | Stage 3 | + Ousterhout deep modules | + bulkheads, backpressure, Strangler Fig |
+
+Detail: `references/levels.md` (spine + L0–L4 gates), `references/judgment.md` (the dial logic).
 
 ---
 
@@ -148,7 +206,7 @@ Load only the relevant entry, not the full file.
 
 ---
 
-## Quality system — 3 dimensions enforced throughout
+## Quality system — construction hemisphere, enforced throughout
 
 ### At L0 (constitution)
 - Evans: Ubiquitous Language in CLAUDE.md (domain terms Claude must use)
@@ -218,6 +276,11 @@ Never add L4 work proactively. Only when production gives a measurable signal.
 |---|---|---|
 | "Don't know where it's slow" | OpenTelemetry tracing | `references/observability.md` |
 | "Users report errors before us" | Sentry + structured logging | `references/observability.md` |
+| "One dependency takes the system down" | Timeout + circuit breaker + bulkhead | `references/resilience.md` |
+| "Retries storm a struggling dependency" | Backoff+jitter + retry budget | `references/resilience.md` |
+| "Duplicate charges / double-processing" | Idempotency key (DB/Redis, structural) | `references/resilience.md` |
+| "p95 latency / DB CPU over target" | Profile → fix query/N+1 → cache → replica | `references/performance.md` |
+| "Need SLOs / error budget" | Golden signals + SLO + alerting | `references/observability.md` |
 | "API changed silently" | Schema validation + contract tests | `references/third-party-apis.md` |
 | "Can't reproduce prod issues" | Correlation ID missing | `references/observability.md` |
 | Team > 10, merge conflicts rising | Module ownership + arch tests | `references/scaling-guide.md` |
@@ -225,22 +288,36 @@ Never add L4 work proactively. Only when production gives a measurable signal.
 
 ---
 
-## Ecosystem dispatch — who does what
+## Ecosystem dispatch — shipright is the conductor
 
-Shipright decides when and what. External skills execute how.
+Shipright owns WHEN and WHAT. Community skills own HOW. Two hard rules:
+1. Never self-execute work a dedicated skill already covers.
+2. Never load a skill you'd duplicate, and never load heavy skills a small project doesn't
+   need yet — every loaded skill spends context budget and dilutes reasoning. Few skills
+   when small is a correctness concern, not minimalism.
 
 ```
 Shipright owns:
   Constitution (CLAUDE.md + ARCHITECTURE.md)
-  4 boundary rules + quality gate
-  Project state + routing
-  Registry-based skill suggestions
-  Irreversible architecture decisions
+  5 boundary rules + quality gate + the executive/judgment layer
+  Lifecycle spine + project state + routing
+  Registry-based skill suggestions (by trigger)
+  Irreversible (one-way-door) architecture decisions
 
-addyosmani/agent-skills owns (install by stage, check individually):
-  MVP:      debugging-and-error-recovery ← most valuable from day one
-  Traction: + incremental-implementation + test-driven-development + code-review-and-quality
-  Growth:   + spec-driven-development + security-and-hardening
+Dispatch by TRIGGER, not by stage label. Stage is only the default heuristic; the trigger
+is the truth. A payment MVP needs security on day one; a read-only Growth app may never.
+
+addyosmani/agent-skills — activate by trigger (detection checks each skill individually):
+  debugging-and-error-recovery   ← any bug. Most valuable from day one — install at SEED.
+  test-driven-development        ← any logic/behavior change (all phases).
+  incremental-implementation     ← any feature touching 2+ files.
+  code-review-and-quality        ← before any merge on Tier M+.
+  spec-driven-development        ← before a Tier L/XL feature with unclear requirements.
+  security-and-hardening         ← the MOMENT auth / payments / untrusted input appears
+                                    (regardless of phase — not "at Growth").
+  observability-and-instrumentation ← when prod behavior becomes invisible (HARDEN signal).
+  Default ladder if no specific trigger: SEED=debug · VALIDATE=+tdd/incremental/review ·
+  HARDEN=+spec/security/observability · SCALE=+specialized.
   Note: agent-skills folder ≠ all 24 skills installed. Detection checks individual skills.
 
 taste-skill owns (install by page type):
@@ -277,7 +354,9 @@ Solo, < 3 domain entities, read-only data? → simple modules, no DI
 Otherwise                                   → use shipright
 ```
 
-Senior judgment = knowing when NOT to apply a pattern.
+Senior judgment = knowing when NOT to apply a pattern. Applying the full tree to a 50-line
+script is the same failure as skipping it on a payment system — opposite directions, same
+mistake. Full "when to break each rule" guidance: `references/judgment.md`.
 
 ---
 
@@ -295,17 +374,20 @@ Senior judgment = knowing when NOT to apply a pattern.
 - `references/registry.md` — project type → curated skill pack
 
 ### Core references (load on signal)
+- `references/judgment.md` — EXECUTIVE layer: one-way/two-way doors, MVP matrix, when to break each rule
 - `references/code-quality.md`
-- `references/code-health.md` — SOLID tactical enforcement per level — Evans + Uncle Bob + Fowler: full quality system
-- `references/observability.md` — Correlation ID, logging, tracing, API tracing, retrofit
+- `references/code-health.md` — SOLID tactical enforcement + Ousterhout (deep modules) — construction quality
+- `references/resilience.md` — RIGHT hemisphere: Nygard 8 stability patterns, Boundary 5, fault-injection tests
+- `references/performance.md` — measure-first optimization ladder, N+1, mechanical sympathy, budgets
+- `references/observability.md` — Correlation ID, logging, tracing, SLO/error budget, retrofit
 - `references/scaling-guide.md` — Stage 1→2→3 playbook + Strangler Fig templates
 - `references/third-party-apis.md` — Adapter pattern, 3-layer testing, resilience
 - `references/ui-design.md` — taste-skill: page type → correct skill → dials
 - `references/l0-templates.md` — CLAUDE.md + ARCHITECTURE.md templates
-- `references/levels.md` — L0→L4 gates, Conway's Law, graduate checklist
+- `references/levels.md` — lifecycle spine + L0→L4 gates, Conway's Law, graduate checklist
 - `references/requirement-drift.md` — Expand-Contract + 3 architecture change scenarios
 - `references/debug-intermittent.md` — intermittent / production-only / resource-leak bugs
-- `references/boundaries.md` — 4 boundary rules with code examples
+- `references/boundaries.md` — 5 boundary rules with code examples
 - `references/prompts.md` — copy-paste Claude Code prompts
 
 ### Stack files (load on project type — slim, defer to community skills)

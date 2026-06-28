@@ -1,8 +1,8 @@
-# shipright v0.7.9
+# shipright v0.8.0
 
 > **Ship your MVP fast. Grow it right.**
 
-The Project Brain for AI coding workflow. Sets up the minimal irreversible architecture decisions, enforces three masters of software quality (Evans + Uncle Bob + Fowler), orchestrates community skills at the right moment, and tracks project state across sessions.
+The Project Brain OS for AI coding workflow. Sets up the minimal irreversible architecture decisions, judges what to build now versus defer, enforces six masters of software quality across two hemispheres (construction + operation), hardens for fault tolerance, orchestrates community skills at the right moment, and tracks project state across sessions.
 
 Works in your language. Write Vietnamese, English, or any language — shipright responds accordingly.
 
@@ -14,8 +14,9 @@ Works in your language. Write Vietnamese, English, or any language — shipright
 
 ## What it does
 
-**Layer 1 — Always active:** 4 boundary rules + 3-master quality system + 6-branch routing
-**Layer 2 — Registry:** Project type → curated skill pack + CLAUDE.md additions
+**Layer 0 — Executive:** judgment layer (one-way/two-way doors) sets the dial on everything else
+**Layer 1 — Always active:** 5 boundary rules + two-hemisphere quality system + lifecycle spine + 6-branch routing
+**Layer 2 — Registry:** Project type → curated skill pack (dispatched by trigger) + CLAUDE.md additions
 **Layer 3 — On demand:** Branch files (one per session), reference files (load on signal)
 
 | You say | Shipright does |
@@ -29,27 +30,36 @@ Works in your language. Write Vietnamese, English, or any language — shipright
 
 ---
 
-## The 4 boundaries — never negotiable
+## The 5 boundaries — never negotiable
 
 ```
 1. Dependencies point inward only
 2. Each layer has one job (handler / service / repository)
 3. Modules do not share databases
 4. No raw external response passes the Adapter layer
+5. Every integration point has a timeout + a deliberate fallback (failure isolation)
 ```
 
 Backed by Uncle Bob's Dependency Rule, Fowler's internal quality research,
-and Eric Evans's Anti-Corruption Layer pattern.
+Eric Evans's Anti-Corruption Layer, and Michael Nygard's stability patterns.
 
 ---
 
-## Three masters, one quality system
+## A brain with two hemispheres and an executive
 
-| Master | Dimension | When |
-|---|---|---|
-| Evans (DDD) | Model the right domain | L0: Ubiquitous Language, domain types |
-| Uncle Bob (SOLID) | Structure it correctly | L3: quality gate before every commit |
-| Fowler (Refactoring) | Keep it clean as it evolves | Branch D: smell-driven refactoring |
+| Tier | Master | Dimension | When |
+|---|---|---|---|
+| **Executive** | Bezos (reversibility) | Decide what to build now vs defer | Every non-trivial decision |
+| Construction | Evans (DDD) | Model the right domain | L0: Ubiquitous Language, domain types |
+| Construction | Uncle Bob (SOLID) | Structure it correctly | L3: quality gate before every commit |
+| Construction | Ousterhout | Deep modules, define errors out of existence | L2: interface design (counterweight to Bob) |
+| Construction | Fowler (Refactoring) | Keep it clean as it evolves | Branch D: smell-driven refactoring |
+| Construction | Kent Beck (TDD) | Prove it works | L1–L3: Red → Green → Refactor |
+| Operation | Nygard (Release It!) | Survive failure | HARDEN: timeouts, circuit breakers, bulkheads |
+| Operation | SRE / Majors | Stay observable + measured | HARDEN: SLO, error budget, golden signals |
+
+The **executive** sets the dial: construction is ON from day one (irreversible quadrant),
+operation turns on by signal (adding it at MVP is over-engineering).
 
 Compound Engineering: every AI violation → specific rule added to CLAUDE.md.
 CLAUDE.md gets smarter every session.
@@ -136,11 +146,11 @@ git -C ~/.claude/skills/shipright pull
 
 ```
 shipright/
-  SKILL.md                    # Project Brain core (~3,500 tokens always loaded)
+  SKILL.md                    # Project Brain OS core (always loaded): executive + 5 boundaries + spine + dispatch
   hooks/check-update.sh       # SessionStart update checker
   references/
     onboarding.md             # State check + 6-branch router
-    registry.md               # Project type → curated skill pack (NEW v0.7)
+    registry.md               # Project type → curated skill pack (dispatched by trigger)
     branches/
       a-new-project.md        # MVP/Production + registry integration + state tracking
       b-add-feature.md        # Health check + complexity tiers + quality gate
@@ -148,24 +158,28 @@ shipright/
       d-refactor.md           # Fowler smells + characterization tests
       e-resume.md             # State-first orient (30s resume) + git fallback
       f-incident.md           # Triage → mitigate → investigate
+    judgment.md               # EXECUTIVE: one-way/two-way doors, MVP matrix, when to break each rule (NEW v0.8)
+    resilience.md             # Nygard 8 stability patterns, Boundary 5, fault-injection tests (NEW v0.8)
+    performance.md            # Measure-first optimization ladder, N+1, mechanical sympathy, budgets (NEW v0.8)
     code-quality.md           # Evans + Uncle Bob + Fowler: full quality system
-    observability.md          # Correlation ID, logging, API tracing, retrofit
+    code-health.md            # SOLID tactical + Ousterhout (deep modules, define errors out of existence)
+    observability.md          # Correlation ID, logging, API tracing, SLO/error budget, DORA, retrofit
     scaling-guide.md          # Stage 1→2→3 + Strangler Fig templates
     third-party-apis.md       # Adapter pattern, 3-layer testing, resilience
     ui-design.md              # taste-skill: page type → correct skill → dials
     l0-templates.md           # CLAUDE.md + ARCHITECTURE.md templates + state section
-    levels.md                 # L0→L4, gates, Conway's Law, graduate checklist
-    boundaries.md             # 4 boundary rules with code examples
+    levels.md                 # Lifecycle spine + L0→L4, gates, Conway's Law, graduate checklist
+    boundaries.md             # 5 boundary rules with code examples
     requirement-drift.md      # Expand-Contract + 3 architecture scenarios
     debug-intermittent.md     # Intermittent / production-only / resource leak bugs
     prompts.md                # Copy-paste Claude Code prompts
     stacks/
       nodejs.md
       python.md
-      ai-projects.md          # AI entry point + 5th boundary rule
+      ai-projects.md          # AI entry point + LLM boundary rule
       ai-rag.md               # RAG deep dive: eval loop, vector DB, metrics
-      chatbot-platforms.md
-      blockchain.md              # EVM/Solana/TON/SUI: security, audit gate, chain patterns    # Telegram/Discord: adapter, state, security
+      chatbot-platforms.md    # Telegram/Discord: adapter, state, security
+      blockchain.md           # EVM/Solana/TON/SUI: security, audit gate, chain patterns
       browser-extension.md    # MV3: manifest, components, chrome.* APIs
     examples/
       news-crawler-CLAUDE.md
@@ -188,7 +202,13 @@ shipright/
 - [x] **v0.7: Persistent state (CLAUDE.md state section)**
 - [x] **v0.7: Session-start state check (30-second resume)**
 - [x] **v0.7: Ecosystem dispatch (who owns what)**
+- [x] **v0.8: Executive/judgment layer (one-way/two-way doors, MVP matrix, when to break each rule)**
+- [x] **v0.8: Operation hemisphere — Nygard resilience (Boundary 5, 8 stability patterns, fault-injection tests)**
+- [x] **v0.8: Ousterhout counterweight (deep modules, define errors out of existence)**
+- [x] **v0.8: Lifecycle spine (unifies L0–L4 / Stage 1–3 / MVP–Scale)**
+- [x] **v0.8: Trigger-based skill dispatch + SLO/error budget/DORA**
 - [ ] Go stack file
+- [ ] references/registry.md: capability/signal → skill index (trigger-based)
 - [ ] references/registry.md community contributions
 - [ ] PreToolUse boundary enforcement hook
 

@@ -11,7 +11,7 @@
 > This file = tactical: SOLID enforcement per L0→L4, actionable signals per level
 > Load both when doing quality gate (Branch B) or refactoring (Branch D)
 
-ipright loads this file at 3 specific moments:
+Shipright loads this file at 3 specific moments:
 1. L2 — when designing interfaces (OCP, LSP, ISP checks)
 2. L3 — before every commit (SRP signals, Fowler 7 smells)
 3. Branch D — when refactoring (Fowler catalog)
@@ -185,6 +185,67 @@ After split (ISP respected):
 
 ---
 
+## John Ousterhout — *A Philosophy of Software Design* (deliberate counterweight to Uncle Bob)
+
+A veteran does not follow Uncle Bob blindly. Ousterhout sharpens — and sometimes contradicts —
+Clean Code. Hold both; let judgment pick per case. The goal is the same (manage complexity),
+the tactics differ.
+
+### Deep modules over many shallow ones
+Complexity = **interface size relative to the functionality behind it**. A *deep* module hides
+a lot behind a small interface; a *shallow* module exposes nearly as much as it does.
+
+```
+Uncle Bob, taken too far:  split a 40-line method into four 10-line methods.
+Ousterhout's caution:      if the four pieces only make sense together and each needs the
+                           others' context, you created four shallow modules + 3 new
+                           interfaces to understand. That is MORE complexity, not less.
+
+Rule of thumb: extract when the piece has a clean, narrow interface and a real name from the
+Ubiquitous Language. Do NOT extract just to hit a line count. Cohesion and a small interface
+beat short length. A deep 30-line method can be simpler than four shallow 8-line ones.
+```
+This refines the SRP "20-line / >7 methods" signals above: those are *prompts to look*, not
+laws. If splitting widens the interface more than it shrinks the body, don't split.
+
+### Define errors out of existence
+The best error handling is an API where the error cannot occur. Reduce the number of places
+that must handle an exception by designing it away.
+
+```
+✗ deleteFile() throws if file is open → every caller must try/catch
+✓ deleteFile() marks for deletion, OS reclaims when last handle closes → no error to handle
+
+✗ substring(i, j) throws on out-of-range → callers guard every call
+✓ substring clamps to valid range → returns "" at the edges, no exception class needed
+
+✗ lookup(key) throws KeyNotFound → callers wrap every read
+✓ lookup(key) returns Option/null with a clear contract → one check, no exception path
+```
+Before adding a new exception type, ask: *can I define this error out of existence?* Fewer
+error paths = fewer tests, fewer bugs, simpler callers. (Pairs with LSP above: an interface
+that "returns [] on quota exceeded" instead of throwing is this principle in action.)
+
+### Complexity is incremental — and it's what you can't see
+Ousterhout's two symptoms to watch for at every commit:
+```
+Change amplification: a simple change requires edits in many places  → (= Fowler Shotgun Surgery)
+Cognitive load:       how much must a reader hold in their head to make a safe change here?
+Unknown unknowns:     the worst kind — it's not obvious what you must change to be correct.
+                      Fight it with obvious code + design docs (CLAUDE.md), not cleverness.
+```
+
+### When Bob and Ousterhout disagree — how to decide
+```
+Tiny function vs deep module?     → choose the one with the SMALLER interface for the reader.
+Comment vs self-documenting name? → Bob says rename; Ousterhout says SOME comments carry design
+                                    intent a name can't ("why", invariants, non-obvious contracts).
+                                    Keep WHY-comments; delete WHAT-comments. (Matches Fowler #7.)
+More classes vs fewer?            → fewer, deeper classes unless a real second reason-to-change exists.
+```
+
+---
+
 ## Martin Fowler — Refactoring: smell detection + catalog
 
 ### The 7 smells AI coding agents create most often
@@ -278,10 +339,13 @@ After defining each interface, run through:
 - OCP gate: "adding new type = new class, no changes to existing?"
 - ISP check: "any method that implementations won't need?"
 - LSP template: generate contract tests for this interface
+- Ousterhout depth check: is the interface small relative to what it hides? Can any error be
+  defined out of existence (return Option/clamp/no-op) instead of thrown?
 
 ### At L3 (before each commit)
 After writing code, before `git commit`, run:
-- SRP signals on every new class/method
+- SRP signals on every new class/method (as PROMPTS to look — not laws; see Ousterhout depth)
+- Ousterhout: did any split widen the interface more than it shrank the body? If so, inline it.
 - Fowler 7 smells on every changed file
 - If any signal fires → fix before committing, not after
 
