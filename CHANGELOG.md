@@ -1,5 +1,52 @@
 # Changelog
 
+## [0.8.0] — 2026-06 — BrainOS: executive layer + operation hemisphere
+### The reframe
+Shipright was a strong CONSTRUCTION-phase OS (Evans + Uncle Bob + Fowler + Beck) but lopsided:
+it modeled and structured code well, yet treated fault tolerance, performance, and judgment as
+scattered footnotes. v0.8 makes it a full-lifecycle brain: two hemispheres + an executive that
+decides how much of each to apply, by stage × risk × reversibility.
+
+### Added — Executive layer (the "veteran mindset")
+- references/judgment.md — one-way vs two-way doors (Bezos); the MVP cost×reversibility matrix
+  (ship fast WITHOUT breaking architecture); the rule-of-three / YAGNI / cost-of-carry gate;
+  explicit "when to break each shipright rule" (20-line, TDD, boundaries, DRY).
+  Promotes "Senior judgment = knowing when NOT to apply a pattern" from footnote to top tier.
+
+### Added — Operation hemisphere (fault tolerance + performance + measurement)
+- references/resilience.md — Michael Nygard's 8 stability patterns (timeout, retry+backoff+jitter
+  +budget, circuit breaker, bulkhead, graceful degradation, backpressure/load shedding,
+  idempotency, steady state), the anti-patterns they defend against, and fault-injection tests
+  that PROVE resilience instead of assuming it.
+- Boundary 5 — "Every integration point has a timeout + a deliberate fallback" (failure
+  isolation). Added to SKILL.md, boundaries.md (full Rule 5 with code + dial-by-phase).
+- references/performance.md — measure-first optimization ladder (profile → query → reduce →
+  cache → scale), N+1 + bounded result sets as structural early choices, mechanical sympathy
+  (Martin Thompson), performance budgets, benchmark-before/after.
+- observability.md — SLO / error budget / four golden signals (Google SRE, Charity Majors) +
+  DORA delivery metrics as an architecture-health signal.
+
+### Added — Ousterhout as deliberate counterweight to Uncle Bob
+- code-health.md — deep modules over many shallow ones; define errors out of existence;
+  complexity = change amplification + cognitive load + unknown unknowns; explicit guidance for
+  when Bob and Ousterhout disagree. SRP/20-line signals reframed as PROMPTS to look, not laws.
+
+### Changed — One lifecycle spine, trigger-based dispatch
+- SKILL.md — reframed as two hemispheres + executive; 6+ master roster; the executive question
+  ("Is this a one-way door, and is the need real today?"); unified lifecycle spine
+  (SEED → VALIDATE → HARDEN → SCALE) mapping L0–L4 / Stage 1–3 / MVP–Scale.
+- SKILL.md ecosystem dispatch — shifted from STAGE-based to TRIGGER-based ("activate
+  security-and-hardening the moment auth/payments/untrusted input appears — not 'at Growth'").
+  Conductor principle hardened: never self-execute a skill's job; never load skills a small
+  project doesn't need yet (context budget = reasoning quality).
+- levels.md — lifecycle spine table added at top (the one model the four vocabularies map onto).
+- L4 signal table — resilience, performance, and SLO signals added with their reference files.
+
+### Fixed
+- code-health.md: corrupted first line ("ipright loads this file" → "Shipright loads this file").
+- README.md: garbled blockchain.md structure comment (Telegram/Discord fragment was merged in).
+- README.md: "5th boundary rule" mislabel on ai-projects.md (it's the LLM boundary, not Boundary 5).
+
 ## [0.7.9] — 2025-06 — Rate limit decision point
 ### Problem fixed
 Rate limits were mentioned in docs but never enforced as a decision point.
