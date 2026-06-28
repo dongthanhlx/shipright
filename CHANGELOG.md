@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.9.1] — 2026-06 — Go stack support
+### Added
+- `references/stacks/go.md` — Go is now a first-class stack alongside Node.js and Python.
+  Maps shipright's generic terms to Go idioms (package = module, exported identifiers = public API,
+  constructor funcs = DI) and leans on two Go features that enforce boundaries for you:
+  - **Boundary 1 is compile-time**: module internals under `internal/` cannot be imported from
+    outside — the Go compiler rejects it. Stronger than a lint or the v0.9 hook.
+  - **Boundary 5 is idiomatic**: `context.WithTimeout` threaded through every I/O call + an
+    `http.Client{Timeout}` (never `http.DefaultClient`).
+  Also: error taxonomy via sentinel + typed errors + `%w` wrapping, classified once at the HTTP
+  edge (declined = operational vs gateway-down = infrastructure); idempotency via pgx advisory lock
+  + `ON CONFLICT`; recommended tooling (pgx + sqlc, slog, chi/net-http, goose); `go test -race`
+  concurrency note; and a Boundary 2 grep guard (service importing pgx/database/sql).
+- Note in go.md: the v0.9 `boundary-guard.sh` hook targets TS/JS/Python conventions; Go gets
+  compile-time Boundary 1 from `internal/` instead.
+
+### Changed
+- SKILL.md reference list, README structure + roadmap updated (Go stack item completed).
+
 ## [0.9.0] — 2026-06 — Boundaries that block, not just advise
 ### Added — the flagship enforcement hook
 - `hooks/boundary-guard.sh` — a **PreToolUse hook** (matcher `Edit|Write`) that inspects the code
