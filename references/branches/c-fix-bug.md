@@ -81,6 +81,11 @@ If nothing → fixing a symptom. Find the root cause first.
 Fix root cause. Add test at both root cause location and symptom location.
 ```
 
+> Classify the error before deciding how to handle it (`references/error-handling.md`):
+> Operational (expected — return to caller, don't "fix") · Infrastructure (retry/circuit
+> breaker) · Programmer (real bug — fix the defect). Mixing these up is the #1 cause of
+> either swallowing real bugs or over-handling normal conditions.
+
 ---
 
 ## Step 5 — Fix and verify

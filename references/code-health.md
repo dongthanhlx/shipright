@@ -22,7 +22,7 @@ This is not theory. Every check is concrete, binary, and actionable.
 
 ## Uncle Bob — SOLID: where each principle is enforced
 
-### DIP — Dependency Inversion (enforced via 4 boundary rules — already in shipright)
+### DIP — Dependency Inversion (enforced via the boundary rules — already in shipright)
 Source code dependencies point INWARD only.
 Service depends on IRepository interface, never on concrete PostgresRepository.
 This is shipright's existing boundary rules. Nothing to add here.

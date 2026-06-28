@@ -23,11 +23,15 @@
 Recent deploy + symptoms match → rollback first
 Not sure about deploy → toggle feature flag OFF if available → then rollback
 Data corruption in progress → stop writes immediately (read-only mode)
-External dependency issue → check status page, activate circuit breaker
+External dependency issue → check status page, activate circuit breaker / shed load
 
 Rule: stopping damage from spreading is more important than finding root cause.
 Do NOT spend 30 minutes investigating while users keep getting hurt.
 ```
+
+> Most incidents are failure PROPAGATION through an integration point, not a logic bug.
+> If a slow/dead dependency is stalling the system → `references/resilience.md` for the
+> containment patterns to apply now (timeout, circuit breaker, bulkhead) and Boundary 5.
 
 ---
 
@@ -38,6 +42,11 @@ Read logs in order:
 1. Error logs → find first occurrence timestamp
 2. Pattern: all users? specific group? specific data shape?
 3. Access logs → traffic spike? unusual endpoint pattern?
+
+Classify the failure (decides the fix — `references/error-handling.md`):
+  Operational (expected: quota/429, not-found)  → degrade gracefully, not a code change
+  Infrastructure (timeout, conn refused)         → retry/circuit breaker, check the dependency
+  Programmer (null deref, logic bug)             → the deploy/code is the cause → rollback/fix
 
 Do NOT modify production code while investigating.
 Do NOT run ad-hoc queries on prod DB without a backup.
@@ -73,4 +82,16 @@ Write incident report:
 
 Add a test or alert so this is detected faster next time.
 Update CLAUDE.md tech debt log if a structural cause was found.
+```
+
+**Prevention — close the resilience gap, not just the bug:**
+```
+Ask: "which Nygard stability pattern would have CONTAINED this?"
+  Dependency stalled us         → timeout + circuit breaker was missing (Boundary 5)
+  One failure took down the rest → bulkhead was missing (shared pool)
+  Retries made it worse          → retry budget / backoff+jitter was missing
+  Duplicate processing on retry  → idempotency key was missing (DB/Redis)
+  Unbounded growth / OOM         → steady-state cap was missing
+Add the pattern + a fault-injection test that proves it → references/resilience.md.
+This is how an incident permanently raises the system's fault tolerance.
 ```

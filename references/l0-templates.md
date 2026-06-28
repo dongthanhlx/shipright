@@ -2,7 +2,7 @@
 
 Two versions: MVP (minimal) and Production (full).
 Use MVP for validate mode. Use Production for scale mode.
-The 3 boundary rules appear in BOTH — they are never optional.
+The boundary rules appear in BOTH — they are never optional.
 
 ---
 
@@ -25,7 +25,7 @@ Claude uses ONLY these terms — never invents generic alternatives.
 Signal that language is wrong: class named Manager, Helper, Processor, Utils.
 When that happens: stop, define the right domain term, rename.
 
-## The 3 boundaries — always enforced, even in MVP
+## The boundaries — always enforced, even in MVP
 
 1. Dependencies point inward only
    [ModuleA] never imports [ModuleB]'s internals.
@@ -46,6 +46,11 @@ When that happens: stop, define the right domain term, rename.
    Every third-party API has one Adapter (Normalizer).
    Raw API response NEVER enters service or domain logic.
    Service never knows which provider was called.
+
+5. Every integration point has a timeout + a deliberate fallback  [if external calls exist]
+   No outbound call (HTTP/DB/queue/RPC) waits forever.
+   Side effects are idempotent (key in DB/Redis, never in-memory).
+   Full resilience patterns deferred to HARDEN — see references/resilience.md.
 
 ## Stack
 [Runtime, database, test runner, key libs]

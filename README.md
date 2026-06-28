@@ -1,4 +1,4 @@
-# shipright v0.8.0
+# shipright v0.8.1
 
 > **Ship your MVP fast. Grow it right.**
 
@@ -163,6 +163,8 @@ shipright/
     performance.md            # Measure-first optimization ladder, N+1, mechanical sympathy, budgets (NEW v0.8)
     code-quality.md           # Evans + Uncle Bob + Fowler: full quality system
     code-health.md            # SOLID tactical + Ousterhout (deep modules, define errors out of existence)
+    domain-thinking.md        # Evans tactical: aggregate roots, invariants, domain events, "DDD or not?"
+    error-handling.md         # Error taxonomy, Result type, saga, race conditions, idempotency
     observability.md          # Correlation ID, logging, API tracing, SLO/error budget, DORA, retrofit
     scaling-guide.md          # Stage 1→2→3 + Strangler Fig templates
     third-party-apis.md       # Adapter pattern, 3-layer testing, resilience

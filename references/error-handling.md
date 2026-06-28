@@ -1,5 +1,10 @@
 # Error Handling — Taxonomy and Patterns
 
+> Companion to `references/resilience.md` (operation hemisphere): resilience.md covers the
+> Nygard stability patterns (timeout, circuit breaker, bulkhead); this file covers how to
+> CLASSIFY and SHAPE errors (taxonomy, Result type, saga, race conditions). Used by Branch C
+> (bug classification), Branch F (incident triage), and at L0 to define the error taxonomy.
+
 Sloppy error handling is the #1 cause of mystery bugs in production.
 Senior engineers categorize errors before deciding how to handle them.
 

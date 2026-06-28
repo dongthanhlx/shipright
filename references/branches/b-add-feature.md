@@ -80,6 +80,10 @@ TIER1-BLOCKER effort > 20% deadline → workaround + TODO[fix-before-scale], pro
 10+ files OR multiple devs        → Tier XL (system-level, days)
 ```
 
+> Executive check before sizing (`references/judgment.md`): does any part touch a ONE-WAY
+> door (public interface, data identity, money, persisted state)? That part gets full design
+> care regardless of tier. Two-way-door parts: simplest thing that works, don't gold-plate.
+
 **Tier S — Trivial (1 file, < 30 min)**
 ```
 Does change affect business logic?
@@ -180,6 +184,16 @@ npx tsc --noEmit 2>/dev/null || python -m mypy src/  # must pass
 - [ ] Feature Envy? (method uses another class's data more) → move it
 - [ ] Primitive Obsession? (string/int where Value Object belongs) → create type
 - [ ] Comment explaining WHAT? → rename instead
+
+**Resilience (Nygard — only if this feature adds an integration point):**
+- [ ] Boundary 5: new external call (HTTP/DB/queue/RPC) has a timeout + a defined fallback?
+- [ ] Side effect idempotent — safe on retry/double-submit, key in DB/Redis (never in-memory)?
+- [ ] HARDEN phase → `references/resilience.md` for circuit breaker / bulkhead
+
+**Performance (structural — cheap now, expensive later):**
+- [ ] No N+1 query (a loop issuing one query per item)? → batch / JOIN
+- [ ] Result sets bounded (LIMIT / paginate), not unbounded SELECT?
+- [ ] Any latency signal → `references/performance.md` (profile first, don't guess)
 
 **Violation found:** fix → add specific rule to CLAUDE.md (compound engineering)
 **Load** `references/code-quality.md` for fix guidance on specific violation.
