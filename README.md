@@ -2,7 +2,7 @@
 
 > **Ship your MVP fast. Grow it right.**
 
-The Project Brain OS for AI coding workflow. Sets up the minimal irreversible architecture decisions, judges what to build now versus defer, enforces six masters of software quality across two hemispheres (construction + operation), hardens for fault tolerance, orchestrates community skills at the right moment, and tracks project state across sessions.
+The Project Brain OS for AI coding workflow. Sets up the minimal irreversible architecture decisions, judges what to build now versus defer, enforces a roster of software-craft masters across two hemispheres (construction + operation), hardens for fault tolerance, orchestrates community skills at the right moment, and tracks project state across sessions.
 
 Works in your language. Write Vietnamese, English, or any language — shipright responds accordingly.
 

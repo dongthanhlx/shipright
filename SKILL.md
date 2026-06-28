@@ -41,9 +41,10 @@ Tests:         !`(npm test --silent 2>&1 | tail -2) || (pytest -q 2>&1 | tail -2
 
 # Shipright v0.8 — Project Brain OS
 
-Six masters. Five boundaries. One executive layer. One living constitution.
+Two hemispheres. One executive. One living constitution.
 
-A brain with two hemispheres and an executive that decides how much of each to use:
+A brain with two hemispheres and an executive that decides how much of each to use.
+The master roster grows over time — the named list below is the source of truth, not a count:
 
 ```
 EXECUTIVE (prefrontal cortex) — references/judgment.md
