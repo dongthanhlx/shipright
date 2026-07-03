@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 0.9.1
+version: 1.0.0
 description: >
   Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
   sets up constitution, enforces boundaries, judges what to build now vs defer,
@@ -39,7 +39,7 @@ Tests:         !`(npm test --silent 2>&1 | tail -2) || (pytest -q 2>&1 | tail -2
 
 ---
 
-# Shipright v0.9 — Project Brain OS
+# Shipright v1.0 — Project Brain OS
 
 Two hemispheres. One executive. One living constitution.
 
