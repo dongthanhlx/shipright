@@ -1,5 +1,31 @@
 # Changelog
 
+## [1.0.0] — 2026-06 — BrainOS, feature-complete
+First stable release. Every buildable roadmap item is done; shipright is a coherent, public-ready
+Project Brain OS. What "1.0" means here:
+
+- **A brain with two hemispheres + an executive.** Construction (Evans · Uncle Bob · Ousterhout ·
+  Fowler · Beck) and operation (Nygard resilience · SRE observability), governed by a judgment
+  layer that decides how much of each to apply by stage × risk × reversibility (v0.8.0).
+- **The pillars actually fire.** All six branches dispatch to judgment / resilience / performance /
+  error-taxonomy / Ousterhout at the right moments — not just documented, wired (v0.8.1).
+- **Coherent & self-protecting.** One lifecycle spine, trigger-based skill dispatch, a universally
+  relatable canonical example (orders-api), and CI that hard-fails on broken links / orphans (v0.8.2).
+- **Boundaries that block, not just advise.** An opt-in PreToolUse hook that stops the two worst
+  violations before they're written — fails open, self-tested (v0.9.0).
+- **Three first-class stacks.** Node.js, Python, and Go (Go gets compile-time Boundary 1 via
+  `internal/`) (v0.9.1).
+
+### Fixed
+- Roadmap: the "registry capability/signal → skill index" item was completed in v0.8.2 but left
+  unchecked — corrected.
+- Release hygiene: v0.8.0–v0.9.1 were version-bumped but never git-tagged, which mislead the
+  SessionStart update-checker (it compares against the latest tag). Tags backfilled and v1.0.0
+  tagged so the update notification works again.
+
+### Changed
+- Version → 1.0.0 across SKILL.md + README.
+
 ## [0.9.1] — 2026-06 — Go stack support
 ### Added
 - `references/stacks/go.md` — Go is now a first-class stack alongside Node.js and Python.
