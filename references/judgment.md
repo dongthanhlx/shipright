@@ -32,6 +32,18 @@ Treating a one-way door like a two-way door = architecture that breaks at scale.
 When unsure which kind a decision is, ask: *"If this is wrong, what does fixing it cost
 in 6 months — an afternoon, or a migration?"*
 
+**Temper this with evolutionary humility (you can't perfectly predict, and you WILL be wrong):**
+- **Bias toward reversibility.** Bezos: most decisions are two-way doors. A seam (repository behind
+  an interface, an Adapter/ACL, a module behind its index) TURNS a one-way door into a two-way one —
+  so the cheapest move is often "make it reversible", not "get it perfect". The boundaries are an
+  evolvability technique, not just a cleanliness one.
+- **For the genuinely irreversible, decide at the LAST RESPONSIBLE MOMENT** (Poppendieck) — "as long
+  as you can, but no longer". Delaying buys information that reduces the chance of being wrong; that
+  is not procrastination. "Decide early" is right only when the decision heavily constrains others.
+- **When a one-way-door decision turns out wrong** (the domain model often does): evolve it under
+  guard — don't freeze, don't big-bang rewrite. See `references/evolutionary-architecture.md` (fitness
+  functions + the recovery path). The seam you built to get it right is what lets you fix being wrong.
+
 ---
 
 ## 2. The MVP matrix — ship fast WITHOUT breaking architecture

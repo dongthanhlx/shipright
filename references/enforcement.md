@@ -96,5 +96,9 @@ This mirrors judgment.md — breaking a rule is fine *when you name why*; breaki
 - It is not a substitute for code review — it's a fast structural tripwire for the two violations
   that are cheapest to prevent and most expensive to unwind later.
 
+The guard is a *fitness function* (Ford/Parsons) — an automated integrity check of an architectural
+characteristic (here: no cross-module deep imports), just at edit-time instead of CI. The full set of
+shipright's fitness functions + how they let the architecture evolve safely: references/evolutionary-architecture.md.
+
 If you want broader static enforcement at CI time (not edit time), use dependency-cruiser
 (Node) or import-linter (Python) — see `references/scaling-guide.md` Stage 1, Step 3.

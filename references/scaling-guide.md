@@ -82,7 +82,8 @@ PRs that change internal logic only need standard review.
 When CLAUDE.md > 150 lines → see Branch D section "CLAUDE.md evolution".
 Path-scoped rules load only when Claude works in that directory.
 
-**Step 3: Architecture tests in CI**
+**Step 3: Architecture tests in CI** (these are *fitness functions* — automated architectural
+governance that lets the architecture evolve while staying healthy; see references/evolutionary-architecture.md)
 
 ```bash
 # Install dependency-cruiser (Node.js)
