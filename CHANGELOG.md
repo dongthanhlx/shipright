@@ -1,5 +1,39 @@
 # Changelog
 
+## [1.9.0] — 2026-07 — Testing strategy spine (anti-dogma)
+A foundational review found testing was all TACTICS, no STRATEGY: no test pyramid, no "what to test",
+no mockist/classicist guidance, no anti-brittleness rule — scattered across ~18 files — plus a
+dogmatic framing ("there is no 'skip tests for speed' mode"). The sharp finding: shipright was **more
+dogmatic about TDD than Kent Beck himself**, who wrote his Test Desiderata specifically to counter
+that dogma and concluded the answer is "it depends".
+
+### Added — `references/testing.md`
+The testing STRATEGY, grounded in the masters and their shared anti-dogma stance: **Kent Beck** (TDD +
+Test Desiderata as sliders, not laws), **Fowler** (Test Pyramid, *Mocks Aren't Stubs*, coverage-is-a-
+guide), **Cohn** (the Pyramid), **Kent C. Dodds** (the Testing Trophy), **DHH** (test-induced design
+damage), **Meszaros** (test smells). Key content:
+- The goal is **confidence + good design**, not a test-first ritual or a coverage number.
+- **The keystone — shipright's boundaries ARE the test strategy**: test BEHAVIOR through the public
+  interface (survives refactoring; kills brittleness), and mock ONLY at the seams (repository /
+  Adapter / external systems) — never internal collaborators (the over-mocking that causes DHH's
+  test-induced damage). The boundaries tell you exactly where to test and where to mock.
+- Shape: **pyramid by default, trophy when it fits** (both tools, not commandments) — put the test
+  where the risk lives.
+- Kent Beck's **Test Desiderata** as the "good test" checklist; what NOT to test; coverage as a guide.
+- A **map** unifying shipright's scattered testing tactics (RED interface tests, LSP contract tests,
+  consumer-driven contracts, characterization, fault-injection, property-based, eval-as-tests,
+  fixtures, bug-repro) as specialized applications of the same two rules.
+
+### Changed — de-dogmatized the TDD framing (SKILL.md)
+- Replaced "there is no 'skip tests for speed' mode" with Beck's own pragmatism: test-first is the
+  **strong default for logic** (design pressure + safety net + confidence), but a **tool, not a
+  religion** — the goal is confidence + design, not ritual or coverage. Honest narrow exceptions
+  (throwaway spike; genuinely trivial no-logic code); never skipped for money/side-effects.
+
+### Wired
+- SKILL.md reference list + registry trigger index (brittle/over-mocked/"what to test" → testing.md);
+  README structure + roadmap.
+
 ## [1.8.0] — 2026-07 — Team scale + sharpened MVP framing
 Two threads from a foundational review of "is MVP-first actually the right strategy?" and "how does
 shipright hold up when many devs each own a module?". The answer to both: shipright's *mechanism* is

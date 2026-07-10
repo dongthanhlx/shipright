@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 1.8.0
+version: 1.9.0
 description: >
   Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
   sets up constitution, enforces boundaries, judges what to build now vs defer,
@@ -39,7 +39,7 @@ Tests:         !`(npm test --silent 2>&1 | tail -2) || (pytest -q 2>&1 | tail -2
 
 ---
 
-# Shipright v1.8 — Project Brain OS
+# Shipright v1.9 — Project Brain OS
 
 Two hemispheres. One executive. One living constitution.
 
@@ -240,9 +240,13 @@ Load only the relevant entry, not the full file.
 - **Test runner configured** — Jest/pytest/Foundry/Anchor set up at L0, not later
 
 ### At L1 (skeleton) — test BEFORE implementation
-**Kent Beck's TDD rule: Red → Green → Refactor. Never Green → Red.**
-Write the failing test FIRST, then implement until it passes.
-This applies in MVP mode AND production mode. There is no "skip tests for speed" mode.
+**Kent Beck's TDD rule: Red → Green → Refactor.** Test-first is the strong default for any code
+with logic — it buys design pressure + a safety net + confidence, in MVP AND production alike.
+But hold it as Beck himself does: TDD is a tool, not a religion — the goal is **confidence + good
+design, not a test-first ritual or a coverage number**. The honest exceptions are narrow (a spike you
+throw away, then redo test-first; genuinely trivial config/copy with no logic). Never skip it for
+money/side-effects. Full strategy — the pyramid, testing through the public interface, mock only at
+the seams, Beck's Test Desiderata: `references/testing.md`.
 
 ```
 MVP skeleton test: 1 test that proves the skeleton works end-to-end
@@ -408,6 +412,7 @@ mistake. Full "when to break each rule" guidance: `references/judgment.md`.
 - `references/judgment.md` — EXECUTIVE layer: one-way/two-way doors, MVP matrix, when to break each rule
 - `references/code-quality.md`
 - `references/code-health.md` — SOLID tactical enforcement + Ousterhout (deep modules) — construction quality
+- `references/testing.md` — testing STRATEGY (Beck/Fowler/Cohn/Dodds/DHH): pyramid, test-through-the-public-interface, mock-only-at-seams, Test Desiderata (mechanics → addyosmani tdd)
 - `references/domain-thinking.md` — Evans tactical: aggregate roots, invariants, domain events, "DDD or not?" decision
 - `references/error-handling.md` — error taxonomy (operational/infra/programmer), Result type, saga, race conditions, idempotency
 - `references/resilience.md` — RIGHT hemisphere: Nygard 8 stability patterns, Boundary 5, fault-injection tests
