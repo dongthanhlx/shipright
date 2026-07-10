@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 1.1.0
+version: 1.2.0
 description: >
   Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
   sets up constitution, enforces boundaries, judges what to build now vs defer,
@@ -39,7 +39,7 @@ Tests:         !`(npm test --silent 2>&1 | tail -2) || (pytest -q 2>&1 | tail -2
 
 ---
 
-# Shipright v1.1 — Project Brain OS
+# Shipright v1.2 — Project Brain OS
 
 Two hemispheres. One executive. One living constitution.
 
@@ -406,6 +406,7 @@ mistake. Full "when to break each rule" guidance: `references/judgment.md`.
 - `references/stacks/ai-projects.md` — AI entry point + the LLM boundary (Boundary 4 for AI)
 - `references/stacks/ai-rag.md` — RAG deep dive: eval loop, vector DB, metrics
 - `references/stacks/mcp.md` — Model Context Protocol: server = adapter/ACL, tool = interface, security (lethal trifecta), resilience
+- `references/stacks/ai-agent.md` — agents & multi-agent: workflow-vs-agent, 5 patterns, state machines, resilience, trajectory eval
 - `references/stacks/chatbot-platforms.md`
 - `references/stacks/blockchain.md` — EVM/Solana/TON/SUI/TRON: smart contract security, chain-specific patterns, audit gate
 

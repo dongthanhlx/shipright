@@ -455,6 +455,25 @@ not a "we need more people" problem. Treat it as an architecture signal.
 
 ---
 
+## AI agent & LLM tracing — the trajectory is the Correlation ID
+
+For AI/agent projects, extend the same idea: an agent run is a request, each step is a sub-span.
+Without this you cannot debug a bad answer or a runaway cost. See `references/stacks/ai-agent.md`
+and `references/stacks/mcp.md` for the architecture; this is the observability layer.
+
+```
+Per run:   runId (correlation id) + the full trajectory — steps, decisions, tool calls, stop reason.
+Per step:  { runId, step, tool, args (sanitized — no secrets/PII), duration, ok/error, tokens, cost_usd }.
+Per LLM call: model + input/output tokens + cost_usd + latency (LLM cost tracking, ai-projects.md).
+Alert on:  cost/run over budget · step-count spikes (looping) · tool-error-rate · guardrail trips.
+Tooling:   LangSmith / Arize Phoenix / OpenTelemetry GenAI semantic conventions — one trace per run.
+```
+
+Non-determinism note: log enough to REPLAY a run (inputs + seed/params + tool results), because you
+can't reproduce a probabilistic failure from a stack trace alone.
+
+---
+
 ## Add to CLAUDE.md when setting up observability
 
 ```markdown
