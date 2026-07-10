@@ -136,11 +136,32 @@ One feature at a time. Implement → test GREEN → boundary check → commit �
 you don't know which feature broke what. One feature per commit makes
 every failure immediately diagnosable.
 
-**Inside-out order** (always follow this):
-1. Normalizer (if source-specific transform) — pure function, easiest to test
-2. Repository — SQL queries
-3. Service — business logic using repository
-4. Handler — HTTP layer (often trivial once service works)
+### Three axes — keep them separate (they are NOT the same choice)
+
+"Outside-in" and "inside-out" name two *different* decisions; conflating them is a common muddle.
+Masters: Freeman & Pryce (GOOS — outside-in / London school), Cockburn (walking skeleton),
+Hunt & Thomas (tracer bullet), Beck (classicist). shipright's stance is a deliberate synthesis:
+
+```
+1. What DRIVES the design → OUTSIDE-IN (default). Start each feature from its behavior at the
+   boundary (an acceptance / walking-skeleton test that says what the feature does end-to-end),
+   then TDD inward — GOOS's "double loop": an outer acceptance test + inner unit tests. The
+   behavior drives; you discover the interfaces you need. (This is what L2's "Outside-In TDD" means.)
+
+2. How you SLICE → VERTICAL, always. Build one thin feature end-to-end (the walking skeleton is the
+   first slice), crossing all layers. NEVER horizontal — do not build all repositories, then all
+   services (that defers integration to a big-bang and hides the real risks). One vertical slice, shipped.
+
+3. What order you IMPLEMENT the pieces within a slice → a CONVENIENCE, not a law. Usually the
+   domain/inner pieces first because they have no dependencies and are easiest to test with real
+   objects (a classicist convenience — Beck):
+     Normalizer/domain (pure, easiest) → Repository → Service → Handler (often trivial once service works).
+   Do whatever's convenient for THIS slice — this order is a default, not "always follow this".
+```
+
+Mocking discipline (reconciles with references/testing.md): drive outside-in, but mock ONLY at the
+seams (repository / Adapter / external), never internal collaborators. This is the middle ground —
+GOOS's outside-in *driving* without GOOS's over-mocking. Pure mockist over-couples tests to structure.
 
 **Time estimate**: 30–90 minutes per feature.
 

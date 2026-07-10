@@ -1,5 +1,29 @@
 # Changelog
 
+## [1.10.0] — 2026-07 — Build loop disentangled (outside-in vs inside-out)
+A review of the L1→L3 build mechanics found a real internal contradiction: shipright said both
+"Outside-In TDD" and "implement inside-out (always follow this)" — in adjacent lines — undistinguished,
+and dogmatic ("always"). After v1.9 (testing.md says "test outside-in"), the "inside-out always" in
+levels.md was inconsistent with shipright's own newer guidance.
+
+"Outside-in" and "inside-out" name two *different* decisions. Disentangled into three separate axes,
+grounded in the masters: **Freeman & Pryce (GOOS — outside-in / London school)**, **Alistair Cockburn**
+(walking skeleton), **Hunt & Thomas** (tracer bullet), **Kent Beck** (classicist).
+
+### Changed — levels.md L3 + Branch A/B + SKILL.md
+- **1. What DRIVES the design → OUTSIDE-IN (default):** start each feature from its behavior at the
+  boundary (an acceptance / walking-skeleton test), then TDD inward (GOOS's double loop). The behavior
+  drives; interfaces are discovered. This is what L2's "Outside-In TDD" already meant.
+- **2. How you SLICE → VERTICAL, always:** one thin feature end-to-end (the walking skeleton is the
+  first slice). Named the horizontal-layer anti-pattern (building all repositories, then all services,
+  defers integration to a big-bang and hides risk).
+- **3. What order you IMPLEMENT within a slice → a CONVENIENCE, not a law:** domain-first
+  (repository → service → handler) because inner pieces have no dependencies and are easiest to test.
+  De-dogmatized: replaced "always follow this" — this is a default order, not a rule.
+- **Reconciled with `testing.md` (v1.9):** shipright's stance stated explicitly as a deliberate
+  synthesis — drive outside-in (GOOS) but mock ONLY at the seams (classicist), never internal
+  collaborators. Outside-in *driving* without GOOS's over-mocking; pure mockist over-couples tests to structure.
+
 ## [1.9.0] — 2026-07 — Testing strategy spine (anti-dogma)
 A foundational review found testing was all TACTICS, no STRATEGY: no test pyramid, no "what to test",
 no mockist/classicist guidance, no anti-brittleness rule — scattered across ~18 files — plus a
