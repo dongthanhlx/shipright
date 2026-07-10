@@ -1,5 +1,36 @@
 # Changelog
 
+## [1.12.0] — 2026-07 — Evolutionary architecture (you WILL be wrong)
+A review of how shipright handles CHANGE and being WRONG found the core one-way-door thesis was
+over-confident about *prediction*: it assumes you can reliably classify what's irreversible and "get
+it right up front". The masters of evolutionary architecture challenge exactly this — you can't
+predict well, and even carefully-chosen irreversible decisions (the domain model) turn out wrong.
+shipright already had the *mechanism* (arch tests in CI, the boundary-guard hook, Strangler Fig,
+expand-contract) but never *named* it — the canonical frame (fitness functions) was absent.
+
+Grounded in **Ford, Parsons & Kua** (*Building Evolutionary Architectures* — "guided, incremental
+change"; fitness functions), **Bezos** (most decisions are two-way doors), **the Poppendiecks** (the
+last responsible moment), **Fowler** (evolutionary design), **Conway**.
+
+### Added — `references/evolutionary-architecture.md`
+- **Tempers the one-way-door thesis** (does not replace it): bias toward REVERSIBILITY (a seam turns
+  a one-way door into a two-way one — the boundaries are an evolvability technique); for the genuinely
+  irreversible, decide at the **LAST RESPONSIBLE MOMENT** (delay to gather information, not procrastinate);
+  design for evolvability as a first-class quality.
+- **Names shipright's existing fitness functions** and generalizes them: boundary-guard (coupling),
+  arch tests / dependency-cruiser (dependency direction/layering), the quality gate, performance
+  budgets, SLOs, fault-injection, contract tests — plus the ones to add (cyclic-dep, coupling limits).
+  With categories (atomic/holistic, triggered/continual) and the 3-step mechanism (identify dimension
+  → define fitness function → automate in the pipeline). "Automated software governance."
+- **The recovery path — "a settled decision turned out wrong. Now what?"**: evolve under guard —
+  expand-contract (interfaces), Strangler Fig (modules), characterization tests (domain model), with
+  the fitness functions kept green. The seam you built to get it right is what lets you fix being wrong.
+
+### Changed
+- judgment.md §1: reversibility tempered with evolutionary humility (bias reversible, last responsible
+  moment, the recovery path). scaling-guide (arch tests = fitness functions) + enforcement.md
+  (boundary-guard = a fitness function) cross-linked. SKILL.md reference list + registry trigger.
+
 ## [1.11.0] — 2026-07 — The discipline of stopping (Definition of Done + "good enough")
 The executive layer (`judgment.md`) was half-complete: it decided *what to build / defer* but never
 *when a thing is DONE*. After many versions of deepening quality, shipright had a strong "do it right"

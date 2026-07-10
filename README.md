@@ -1,4 +1,4 @@
-# shipright v1.11.0
+# shipright v1.12.0
 
 > **Ship your MVP fast. Grow it right.**
 
@@ -208,6 +208,7 @@ shipright/
     observability.md          # Correlation ID, logging, API tracing, SLO/error budget, DORA, retrofit
     scaling-guide.md          # Stage 1→2→3 + Strangler Fig templates
     team-scale.md             # multi-dev/parallel-module: boundary = team API, cognitive load, contract tests (signal-driven)
+    evolutionary-architecture.md # when you were WRONG: fitness functions, last responsible moment, the recovery path (Ford/Parsons)
     third-party-apis.md       # Adapter pattern, 3-layer testing, resilience
     ui-design.md              # taste-skill: page type → correct skill → dials
     l0-templates.md           # CLAUDE.md + ARCHITECTURE.md templates + state section
@@ -268,6 +269,7 @@ shipright/
 - [x] **v1.9.0: testing strategy spine (Beck Test Desiderata / Fowler pyramid & mocks / Cohn / Dodds trophy / DHH damage) — anti-dogma; boundaries ARE the test strategy (test through the public interface, mock only at seams); de-dogmatized the TDD framing**
 - [x] **v1.10.0: build-loop disentangled (GOOS/Cockburn) — fixed the adjacent outside-in/inside-out contradiction into three separate axes: DRIVE outside-in · SLICE vertical · IMPLEMENT domain-first for convenience (not "always"); reconciled with testing.md**
 - [x] **v1.11.0: the discipline of STOPPING — completes the executive layer (judgment.md) with Definition-of-Done + good-enough (Hunt & Thomas / Shape Up scope-hammering / Pareto): cut SCOPE not QUALITY, appetite as a fixed budget, ship-then-feedback; a second executive question ("good enough, or gold-plating?")**
+- [x] **v1.12.0: evolutionary architecture — tempers the one-way-door thesis (Ford/Parsons/Bezos/Poppendieck): bias toward reversibility, last responsible moment, and NAMES shipright's existing fitness functions (boundary-guard, arch tests, budgets, SLOs) + the recovery path for when a settled decision was wrong**
 - [ ] references/registry.md community contributions (ongoing)
 - [x] **v0.9: PreToolUse boundary-enforcement hook (blocks service→db + deep cross-module imports; opt-in, fails open, self-test)**
 
