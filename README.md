@@ -1,4 +1,4 @@
-# shipright v1.10.0
+# shipright v1.11.0
 
 > **Ship your MVP fast. Grow it right.**
 
@@ -267,6 +267,7 @@ shipright/
 - [x] **v1.8.0: team scale — the module boundary as a team API (Conway/Parnas/Evans/Team Topologies/DORA): cognitive load, inverse Conway at L0, context maps, consumer-driven contract tests; signal-driven (solo skips) + sharpened MVP framing (Validation vs Foundation, Fowler payoff line, Ousterhout local-complexity guard)**
 - [x] **v1.9.0: testing strategy spine (Beck Test Desiderata / Fowler pyramid & mocks / Cohn / Dodds trophy / DHH damage) — anti-dogma; boundaries ARE the test strategy (test through the public interface, mock only at seams); de-dogmatized the TDD framing**
 - [x] **v1.10.0: build-loop disentangled (GOOS/Cockburn) — fixed the adjacent outside-in/inside-out contradiction into three separate axes: DRIVE outside-in · SLICE vertical · IMPLEMENT domain-first for convenience (not "always"); reconciled with testing.md**
+- [x] **v1.11.0: the discipline of STOPPING — completes the executive layer (judgment.md) with Definition-of-Done + good-enough (Hunt & Thomas / Shape Up scope-hammering / Pareto): cut SCOPE not QUALITY, appetite as a fixed budget, ship-then-feedback; a second executive question ("good enough, or gold-plating?")**
 - [ ] references/registry.md community contributions (ongoing)
 - [x] **v0.9: PreToolUse boundary-enforcement hook (blocks service→db + deep cross-module imports; opt-in, fails open, self-test)**
 

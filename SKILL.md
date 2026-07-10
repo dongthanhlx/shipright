@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 1.10.0
+version: 1.11.0
 description: >
   Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
   sets up constitution, enforces boundaries, judges what to build now vs defer,
@@ -39,7 +39,7 @@ Tests:         !`(npm test --silent 2>&1 | tail -2) || (pytest -q 2>&1 | tail -2
 
 ---
 
-# Shipright v1.10 — Project Brain OS
+# Shipright v1.11 — Project Brain OS
 
 Two hemispheres. One executive. One living constitution.
 
@@ -104,17 +104,21 @@ boundaries that block, not just advise. Opt-in, fails open. See `references/enfo
 ## The executive question — ask before every non-trivial decision
 
 ```
-"Is this a one-way door, and is the need real today?"
-
+Before you BUILD it:  "Is this a one-way door, and is the need real today?"
   One-way + real      → do it right, now (domain model, boundaries, data identity, money units)
   One-way + not yet   → design the seam so it stays reversible, defer the rest
   Two-way + real      → simplest thing that works, move on (cache, log format, retry count)
   Two-way + not yet   → don't build it. Write a debt signal and ship.
+
+Before you keep POLISHING it:  "Is this good enough for the appetite — or am I gold-plating?"
+  Job done + core works → SHIP, get feedback. Cut SCOPE to nice-to-have; never cut the quality FLOOR
+  (boundaries, one-way doors, the quality gate). Ship a smaller COMPLETE thing, not a bigger broken one.
 ```
 
-This defeats both failure modes: over-engineering (treating a two-way door as one-way) and
-architecture rot (treating a one-way door as two-way). Full matrix + "when to break each rule":
-`references/judgment.md`. Load it at L0 and at every "should I add X?" moment.
+This defeats both failure modes: over-engineering (treating a two-way door as one-way, or polishing
+past "good enough") and architecture rot (treating a one-way door as two-way, or cutting the quality
+floor to ship). Full matrix + the discipline of stopping + "when to break each rule":
+`references/judgment.md`. Load it at L0 and at every "should I add X?" / "am I done?" moment.
 
 ---
 

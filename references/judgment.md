@@ -121,6 +121,55 @@ because retrofitting is the expensive path. (Domain model, boundaries, data iden
 
 ---
 
+## 3b. The discipline of STOPPING — Definition of Done + "good enough"
+
+The executive layer must decide not just *what to build* but *when a thing is DONE*. Knowing when
+good-enough is good enough — and shipping — is the most senior discipline of all, and the natural
+counterweight to everything else in this file. Masters: **Hunt & Thomas** (*The Pragmatic Programmer*
+— "Good-Enough Software"), **Ryan Singer** (*Shape Up* — appetite, scope hammering), **Pareto** (80/20),
+**Kent Beck** (make-it-work → make-it-right → make-it-fast), the Poppendiecks (gold-plating = waste).
+
+```
+"Done" = good enough for its purpose and stakes — NOT perfect. Decide the quality bar UP FRONT,
+with the user (it's a requirements decision — Hunt & Thomas), so "good enough" is an explicit target,
+not an excuse. "Good" is relative: better than what they have now, not an imaginary ideal.
+```
+
+**The keystone — cut SCOPE, not QUALITY** (this is what keeps "good enough" from becoming "sloppy"):
+```
+The quality FLOOR is never hammered:  the 5 boundaries · the one-way doors · the quality gate ·
+                                      test-through-the-public-interface. These hold, always.
+The VARIABLE is scope:                features, edge cases, polish, nice-to-haves. HAMMER these to
+                                      fit the appetite. Ship a smaller COMPLETE thing, never a larger
+                                      half-broken one (Shape Up + the McBreen guard).
+```
+This is Shape Up's *scope hammering* — and shipright already has the structure for it: the boundaries
+and one-way doors ARE the floor; everything else is hammerable. Naming it completes the discipline.
+
+**Appetite is a fixed budget** (Shape Up): *"appetite starts with a number and ends with a design."*
+When the budget is spent, mark the rest nice-to-have and ship — don't blow the budget to gold-plate.
+Done = the core journey works + the appetite is spent, NOT "every feature is built".
+
+**Stop at the right point — via feedback, not feel.** Hunt & Thomas: stopping TOO EARLY (misses the
+need) is actually *more common* than gold-plating — and both are corrected the same way: **real user
+feedback** (the SHIP GATE). Ship to learn; don't polish in the dark.
+
+**The stopping tests — ask before the next hour of work:**
+```
+□ Does this next hour add CONFIDENCE or VALUE — or only POLISH? (Pareto: the last 20% costs the most.)
+□ Is the JOB done (the one from intake) — or am I building past it?
+□ Am I gold-plating — covering cases no real user has, "just in case"? (YAGNI / waste — §3.)
+□ Would a real user call this "a clear improvement over what they have"? If yes → ship, then iterate.
+```
+
+shipright already stops in many places — name them as this one discipline: **L4 is signal-driven**
+(don't optimize without data), the **tech-debt log with triggers** is a *deliberate* stop ("we stop
+here on purpose, revisit on [trigger]" — not a failure), **rule-of-three** stops premature abstraction,
+the **SHIP GATE** is the done-check, and **Beck's sequence** stops most work after "right" (make-it-fast
+only on an L4 signal). The floor holds; the scope flexes; you ship.
+
+---
+
 ## 4. When to BREAK shipright's own rules
 
 Rules are defaults, not laws. Each has a legitimate exception. Naming the exception
@@ -190,9 +239,15 @@ operation hemisphere, `references/code-health.md` for construction (Bob × Ouste
 
 Before any non-trivial decision, ask:
 
-> **"Is this a one-way door, and is the need real today?"**
+> **Before you build it:** "Is this a one-way door, and is the need real today?"
 >
 > One-way + real → do it right, now.
 > One-way + not yet → design the seam so it stays reversible, defer the rest.
 > Two-way + real → do the simplest thing that works, move on.
 > Two-way + not yet → don't build it. Write it down as a debt signal and ship.
+>
+> **Before you keep polishing it:** "Is this good enough for the appetite — or am I gold-plating?"
+>
+> Job done + core works → ship it, get feedback (the floor held; hammer the rest to nice-to-have).
+> Not yet good enough → cut SCOPE to reach done, never cut the quality floor.
+> Still polishing past the job → stop. The last 20% costs the most and no user asked for it.

@@ -249,10 +249,11 @@ Fix on the user's correction. A constitution the user didn't confirm won't be tr
                      domain-first for convenience (repository → service → handler) — levels.md L3
    Tests: enough to prove skeleton works. Not edge cases.
 
-3. SHIP GATE:
+3. SHIP GATE (the discipline of stopping — judgment.md §3b):
    "Can a real user complete [the one journey] right now?"
-   YES → deploy, put in front of real users
-   NO  → skeleton not done, no new features
+   YES → deploy, put in front of real users. Don't gold-plate first — the last 20% costs the most
+         and no user has asked for it. Cut remaining scope to nice-to-have; the quality floor stays.
+   NO  → not done. Cut SCOPE to reach the journey, never cut the quality floor. Then ship + learn.
 
 4. Update Shipright state in CLAUDE.md:
    Level: L1 (skeleton) or L3 (skeleton+validate)

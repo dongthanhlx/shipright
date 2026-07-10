@@ -1,5 +1,34 @@
 # Changelog
 
+## [1.11.0] — 2026-07 — The discipline of stopping (Definition of Done + "good enough")
+The executive layer (`judgment.md`) was half-complete: it decided *what to build / defer* but never
+*when a thing is DONE*. After many versions of deepening quality, shipright had a strong "do it right"
+apparatus and no explicit "stop / good-enough / ship" discipline — ironically risking over-refinement
+of the very thing that warns against over-refinement. Knowing when good-enough is good enough is the
+most senior discipline of all; this adds it.
+
+Grounded in **Hunt & Thomas** (*The Pragmatic Programmer* — "Good-Enough Software": quality is a
+requirements decision; don't spoil a good program by over-refinement; stopping too early is more
+common than gold-plating — fix both with feedback), **Ryan Singer** (*Shape Up* — appetite as a
+fixed budget, **scope hammering**, "cutting scope is NOT lowering quality"), **Pareto** (the last 20%
+costs the most), **Kent Beck** (make-it-work → right → fast), the **Poppendiecks** (gold-plating = waste).
+
+### Changed — `judgment.md` §3b "The discipline of STOPPING"
+- **Done = good enough for purpose + stakes, not perfect** — decided up front with the user.
+- **The keystone — cut SCOPE, not QUALITY**: the quality FLOOR (the 5 boundaries, one-way doors, the
+  quality gate, test-through-the-public-interface) is never hammered; scope/features/polish are the
+  variable. Ship a smaller COMPLETE thing, not a larger half-broken one (the guard against "good
+  enough" becoming "sloppy"). shipright already had this STRUCTURE — this names it.
+- **Appetite as a fixed budget** (Shape Up); done = core journey works + appetite spent, not all-features-built.
+- **Stop via feedback, not feel** (ship gate); the stopping tests (confidence-vs-polish, job-done, gold-plating).
+- Named shipright's existing stop-mechanisms as one discipline: L4-signal-driven, tech-debt-log-with-
+  triggers (a deliberate stop, not a failure), rule-of-three, the SHIP GATE, Beck's sequence.
+
+### Changed — a second executive question (SKILL.md + judgment.md closing)
+- Alongside "before you BUILD it: one-way door?" now "**before you keep POLISHING it: good enough
+  for the appetite, or gold-plating?**" — the executive layer now governs both advancing and stopping.
+- Branch A SHIP GATE wired to the stopping discipline (cut scope to reach done; don't gold-plate; ship + learn).
+
 ## [1.10.0] — 2026-07 — Build loop disentangled (outside-in vs inside-out)
 A review of the L1→L3 build mechanics found a real internal contradiction: shipright said both
 "Outside-In TDD" and "implement inside-out (always follow this)" — in adjacent lines — undistinguished,
