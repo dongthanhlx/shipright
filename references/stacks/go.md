@@ -137,6 +137,39 @@ Go makes concurrency easy and data races easy too. Two rules:
 
 ---
 
+## Security — top Go pitfalls (see references/security.md for the spine)
+
+Go is memory-safe and its stdlib defaults are good — but two footguns are easy to hit:
+
+```
+A05 Injection
+  ✗ text/template rendering HTML → XSS (text/template does NOT escape)
+  ✓ html/template — it auto-escapes contextually (HTML/JS/URL). Use it for anything a browser renders.
+  ✗ fmt.Sprintf("... WHERE id = %s", id) into a query → SQLi
+  ✓ db.QueryContext(ctx, "... WHERE id = $1", id)   // parameterized / sqlc-generated
+  ✗ exec.Command("sh", "-c", userInput) → command injection
+  ✓ exec.CommandContext(ctx, "convert", userFile)   // no shell, args separated
+
+A01 Broken Access Control
+  ✓ Authorize in the service, every request, deny-by-default. Middleware authenticates; the domain authorizes.
+
+Other
+  ✓ Secrets from env/secret store — never in code or logs (slog: don't log the struct with the token).
+  ✓ http.Server: set ReadHeaderTimeout (Slowloris/DoS); validate + bound request bodies.
+  ✓ Passwords: golang.org/x/crypto/bcrypt or argon2 — never a bare hash.
+
+A03 Supply chain
+  ✓ commit go.sum; run `govulncheck ./...` in CI (official Go vuln scanner); minimal deps.
+```
+
+Boundary check:
+```bash
+grep -rEn "text/template" internal/ && echo "review: use html/template for browser output (XSS)"
+grep -rEn "fmt\.Sprintf.*(SELECT|INSERT|UPDATE|DELETE)|exec\.Command\(\"sh\"" internal/ && echo "review: injection surface"
+```
+
+---
+
 ## Ubiquitous Language for this stack
 
 Define domain terms in CLAUDE.md BEFORE naming any package, type, or function.

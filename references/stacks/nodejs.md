@@ -86,6 +86,48 @@ npx madge --circular --extensions ts src/
 
 ---
 
+## Security — top Node.js pitfalls (see references/security.md for the spine)
+
+The mistakes Claude makes most in Node/TS, with the safe pattern. Grounded in OWASP + the OWASP
+Node.js Security Cheat Sheet.
+
+```
+A05 Injection
+  ✗ child_process.exec(`convert ${userFile}`)        → command injection
+  ✓ execFile('convert', [userFile])                   // args array, no shell
+  ✗ db.query(`SELECT * FROM u WHERE id = ${id}`)      → SQLi
+  ✓ db.query('SELECT * FROM u WHERE id = $1', [id])   // parameterized, always
+  ✗ eval(x) / new Function(x) on any input; res.send(userHtml) unescaped (XSS)
+
+A01 Broken Access Control (the #1 real breach)
+  ✓ Authorize in the SERVICE, on every call, deny-by-default. Never trust a client-sent role/id.
+  ✗ handler checks nothing and passes req.body.userId straight through (IDOR).
+
+A07 Auth
+  ✓ verify JWT with an explicit algorithm allow-list — reject alg:"none". Rate-limit login.
+  ✓ argon2/bcrypt for passwords; httpOnly+secure+sameSite cookies.
+
+A10 SSRF (outbound from an adapter)
+  ✗ axios.get(userSuppliedUrl) → SSRF into internal network
+  ✓ allow-list host/scheme before fetching; block private IP ranges. (Boundary 4 is where this lives.)
+
+Other Node-specific
+  ✓ Guard prototype pollution: reject __proto__/constructor keys when merging untrusted objects.
+  ✓ helmet() for security headers; validate every request body with zod at the handler boundary.
+  ✓ Secrets from env only — never in code, logs, or error messages.
+
+A03 Supply chain
+  ✓ commit package-lock.json; `npm audit --audit-level=high` in CI; review postinstall scripts.
+```
+
+Boundary check:
+```bash
+grep -rEn "child_process|exec\(|eval\(|new Function" src/modules/ && echo "review: injection surface"
+grep -rEn "\$\{[^}]+\}.*(SELECT|INSERT|UPDATE|DELETE)" src/ && echo "review: string-built SQL"
+```
+
+---
+
 ## Ubiquitous Language for this stack
 
 Define domain terms in CLAUDE.md BEFORE naming any class/function.

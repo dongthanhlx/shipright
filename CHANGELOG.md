@@ -1,5 +1,40 @@
 # Changelog
 
+## [1.3.0] — 2026-07 — Security spine + per-stack security depth
+A review found the security coverage lopsided: blockchain / MCP / chatbot were strong, but the most
+common backend stacks (Node.js, Python, Go) had almost none — just a boundary grep — and there was
+no shared security foundation. This closes that gap, grounded in the field's masters.
+
+Masters: **Saltzer & Schroeder** (the 8 design principles, 1975), **OWASP** (Top 10 2025, API
+Security Top 10, Cheat Sheets), **Adam Shostack** (threat modeling). AI security stays anchored in
+**Simon Willison + OWASP LLM Top 10** (mcp.md / ai-agent.md), smart contracts in Trail of Bits /
+OpenZeppelin (blockchain.md).
+
+### Added
+- `references/security.md` — the **architectural security spine**, deliberately NOT a re-implementation
+  of the `security-and-hardening` skill: it owns WHERE security lives and WHY (principles + which
+  layer/boundary stops which threat) and dispatches implementation depth to the skill. Contains the
+  8 Saltzer & Schroeder principles, Shostack's 4-question threat model, the **OWASP Top 10 2025 →
+  shipright layer map** (showing the boundaries already buy A04/A05/A10 structurally), the always-on
+  controls (secrets, authz-in-service, input validation, supply chain, fail-safe), a per-language
+  pitfall table, and an honest "beyond shipright → graduate" list.
+
+### Changed — per-stack security depth (was thin → concrete)
+- `nodejs.md`, `python.md`, `go.md`: new **Security** section each — the language-specific mistakes
+  Claude actually makes, with the safe pattern and a grep guard (command/SQL injection, insecure
+  deserialization [pickle/yaml], `text/template` XSS in Go, SSRF, JWT alg confusion, secrets,
+  supply-chain scanners: npm audit / pip-audit + Bandit / govulncheck).
+- `browser-extension.md`: new **MV3 threat model** — content script trusts a hostile DOM, message
+  sender validation, innerHTML XSS, chrome.storage is not encrypted, no secrets in the extension,
+  least-privilege permissions, MV3 remote-code ban.
+- `ai-rag.md`: new **RAG-specific security** — indirect prompt injection via retrieved documents,
+  authz-scoped retrieval (multi-tenant), PII/secrets in the vector store, data poisoning, grounding.
+
+### Wired to fire (not just documented)
+- Branch A intake: new Q5d triggers the L0 threat model for auth/payments/PII/untrusted-input flows.
+- Branch B quality gate: new Security block (authz-in-service, parameterized input, no leaked secrets).
+- registry trigger index + SKILL.md reference list + README updated.
+
 ## [1.2.0] — 2026-07 — Agents & multi-agent depth
 Raises agent guidance from a ~300-token registry entry to a full stack file, grounded in the field's
 masters: **Anthropic — Building Effective Agents** (workflow vs agent, the 5 composable patterns,

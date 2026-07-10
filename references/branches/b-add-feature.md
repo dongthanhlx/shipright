@@ -195,6 +195,12 @@ npx tsc --noEmit 2>/dev/null || python -m mypy src/  # must pass
 - [ ] Result sets bounded (LIMIT / paginate), not unbounded SELECT?
 - [ ] Any latency signal → `references/performance.md` (profile first, don't guess)
 
+**Security (if this feature touches auth / data / untrusted input — `references/security.md`):**
+- [ ] AuthZ enforced in the SERVICE, deny-by-default? (A01 — the #1 real breach)
+- [ ] All input validated at the boundary; queries parameterized (no string-built SQL/HTML/shell)? (A05)
+- [ ] No secret in code, logs, or error messages? (A04/A09)
+- [ ] auth/payments/untrusted-input present → activate security-and-hardening skill
+
 **Violation found:** fix → add specific rule to CLAUDE.md (compound engineering)
 **Load** `references/code-quality.md` for fix guidance on specific violation.
 

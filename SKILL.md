@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 1.2.0
+version: 1.3.0
 description: >
   Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
   sets up constitution, enforces boundaries, judges what to build now vs defer,
@@ -39,7 +39,7 @@ Tests:         !`(npm test --silent 2>&1 | tail -2) || (pytest -q 2>&1 | tail -2
 
 ---
 
-# Shipright v1.2 — Project Brain OS
+# Shipright v1.3 — Project Brain OS
 
 Two hemispheres. One executive. One living constitution.
 
@@ -396,6 +396,7 @@ mistake. Full "when to break each rule" guidance: `references/judgment.md`.
 - `references/debug-intermittent.md` — intermittent / production-only / resource-leak bugs
 - `references/boundaries.md` — 5 boundary rules with code examples
 - `references/enforcement.md` — optional PreToolUse hook that BLOCKS boundary violations (install, bypass, limits)
+- `references/security.md` — the architectural security spine: Saltzer & Schroeder principles, OWASP 2025 → layer map, threat modeling, per-language pitfalls (dispatches depth to security-and-hardening)
 - `references/prompts.md` — copy-paste Claude Code prompts
 
 ### Stack files (load on project type — slim, defer to community skills)
