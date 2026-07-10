@@ -149,9 +149,11 @@ PHASE: before merge
 
 **Extend existing module:**
 ```
-[Tier M+] Write test (RED) before code — Outside-In TDD
-Interface emerges from what test needs to call.
-Implement inside-out: repository → service → handler
+[Tier M+] DRIVE outside-in: write the RED test from the behavior first — the interface emerges
+  from what the test needs to call (GOOS "interface discovery").
+SLICE vertical: one feature end-to-end, not a horizontal layer.
+IMPLEMENT the pieces domain-first for convenience: repository → service → handler
+  (a default order, not a law — see levels.md L3 "three axes").
 ```
 
 **New module:**

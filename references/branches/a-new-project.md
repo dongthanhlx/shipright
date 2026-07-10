@@ -245,7 +245,8 @@ Fix on the user's correction. A constitution the user didn't confirm won't be tr
 1. Walking skeleton = the one user journey (Step 2 output)
 
 2. [addyosmani installed] → activate incremental-implementation + test-driven-development
-   [not installed] → implement inside-out: repository → service → handler
+   [not installed] → drive outside-in from the journey's behavior, one vertical slice; implement
+                     domain-first for convenience (repository → service → handler) — levels.md L3
    Tests: enough to prove skeleton works. Not edge cases.
 
 3. SHIP GATE:

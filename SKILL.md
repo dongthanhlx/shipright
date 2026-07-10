@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 1.9.0
+version: 1.10.0
 description: >
   Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
   sets up constitution, enforces boundaries, judges what to build now vs defer,
@@ -39,7 +39,7 @@ Tests:         !`(npm test --silent 2>&1 | tail -2) || (pytest -q 2>&1 | tail -2
 
 ---
 
-# Shipright v1.9 — Project Brain OS
+# Shipright v1.10 — Project Brain OS
 
 Two hemispheres. One executive. One living constitution.
 
@@ -147,7 +147,8 @@ skill/spec-driven = YES  → activate /spec for Tier L/XL BEFORE implementation 
 skill/spec-driven = NO   → guide spec writing manually (write acceptance criteria as markdown)
 
 skill/incremental = YES  → activate for Tier M+ features with multiple files
-skill/incremental = NO   → implement inside-out manually (repository → service → handler)
+skill/incremental = NO   → drive outside-in from behavior, slice vertical, implement domain-first
+                           for convenience (repository → service → handler) — levels.md L3 "three axes"
 
 skill/tdd = YES          → activate for all feature implementation (all tiers with logic)
 skill/tdd = NO           → write RED test manually first, then implement
