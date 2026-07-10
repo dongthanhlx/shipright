@@ -1,4 +1,4 @@
-# shipright v1.3.0
+# shipright v1.4.0
 
 > **Ship your MVP fast. Grow it right.**
 
@@ -258,6 +258,7 @@ shipright/
 - [x] **v1.1.0: MCP stack (server=adapter/ACL, tool=interface contract, lethal-trifecta security, Boundary-5 resilience)**
 - [x] **v1.2.0: agents & multi-agent stack (workflow-vs-agent judgment, Anthropic/Ng patterns, LangGraph state machines, trajectory eval + tracing)**
 - [x] **v1.3.0: security spine (Saltzer&Schroeder + OWASP 2025→layer map + Shostack threat modeling) + per-stack security depth (Node/Python/Go/extension/RAG)**
+- [x] **v1.4.0: chatbot AI threat model (prompt-injection done right, abuse/cost control, moderation, isolation) + smart-contract defense patterns (CEI/reentrancy, access control, EIP-712 replay, upgradeable) + invariant/fuzz testing**
 - [ ] references/registry.md community contributions (ongoing)
 - [x] **v0.9: PreToolUse boundary-enforcement hook (blocks service→db + deep cross-module imports; opt-in, fails open, self-test)**
 

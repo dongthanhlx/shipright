@@ -228,6 +228,62 @@ No AI tool replaces human audit. No Claude Code session replaces Slither + Found
    Check: manual review of proxy pattern implementation
 ```
 
+### Defense patterns (code) — the ones Claude must get exactly right
+
+> Don't roll your own — use OpenZeppelin's audited implementations (ReentrancyGuard, AccessControl,
+> ECDSA, upgradeable proxies). Masters: Trail of Bits (building-secure-contracts), OpenZeppelin,
+> ConsenSys best practices, the SWC registry.
+
+```solidity
+// 1. Reentrancy → Checks-Effects-Interactions + ReentrancyGuard
+function withdraw(uint amount) external nonReentrant {          // guard (OZ ReentrancyGuard)
+    require(balances[msg.sender] >= amount, "insufficient");    // CHECKS
+    balances[msg.sender] -= amount;                             // EFFECTS (state BEFORE the call)
+    (bool ok,) = msg.sender.call{value: amount}("");            // INTERACTIONS (external call last)
+    require(ok, "transfer failed");
+}
+// ✗ the classic bug: external call BEFORE updating balances → attacker re-enters and drains.
+
+// 2. Access control → explicit, on every state-changing function (OZ AccessControl/Ownable)
+function setFee(uint fee) external onlyRole(ADMIN_ROLE) { ... } // never leave it unguarded ($1.6B lost 2025)
+
+// 3. Auth → msg.sender, NEVER tx.origin
+require(msg.sender == owner, "not owner");                      // tx.origin is phishable — never use for auth
+
+// 4. Signature replay → EIP-712 typed data + a per-signer nonce
+bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(TYPEHASH, to, amount, nonces[signer]++)));
+require(ECDSA.recover(digest, sig) == signer, "bad sig");       // nonce++ makes each sig single-use
+// Include chainId + contract address in the domain separator → no cross-chain / cross-contract replay.
+
+// 5. Upgradeable proxy → initializer (not constructor), no storage-layout changes, OZ UUPS/Transparent
+function initialize(...) external initializer { ... }           // constructors don't run behind a proxy
+```
+
+Oracle/flash-loan (from the list above): use Chainlink/Pyth + TWAP, validate within-block invariants,
+never price off a single spot AMM reserve. Front-running: slippage + deadline params, commit-reveal.
+
+### Invariant & property-based testing (beyond unit tests — Trail of Bits standard)
+
+Unit tests check examples; invariant tests check properties across thousands of fuzzed sequences —
+this is how you catch the exploit you didn't think of. Required for anything holding real funds.
+
+```solidity
+// Foundry invariant test — a property that must hold no matter what sequence of calls runs
+contract VaultInvariants is StdInvariant, Test {
+    function setUp() public { targetContract(address(vault)); }
+    // The vault can never owe more than it holds:
+    function invariant_solvency() public { assertGe(address(vault).balance, vault.totalDeposits()); }
+    // Accounting integrity: sum of balances == recorded total:
+    function invariant_accounting() public { assertEq(vault.sumBalances(), vault.totalDeposits()); }
+}
+```
+```bash
+forge test                       # unit + invariant tests
+forge test --fuzz-runs 10000     # deeper fuzzing on parameterized tests
+echidna VaultInvariants.sol      # Echidna — property fuzzer (Trail of Bits), finds edge sequences
+```
+Fork-test against mainnet state (`forge test --fork-url $RPC`) for integrations (oracles, DEXes, tokens).
+
 ### Mandatory security tools (run before EVERY testnet deploy)
 
 ```bash
