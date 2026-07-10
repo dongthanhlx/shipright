@@ -4,6 +4,23 @@ Two versions: MVP (minimal) and Production (full).
 Use MVP for validate mode. Use Production for scale mode.
 The boundary rules appear in BOTH — they are never optional.
 
+> **CLAUDE.md is a lean, distilled contract — not a spec dump.** It is loaded into context at the
+> start of EVERY session, so how it's written decides how reliably Claude follows it (Anthropic's
+> guidance). shipright's rules:
+> - **Keep the root under 200 lines** — MVP ~50–60. "Longer files reduce adherence." Load-bearing
+>   rules (boundaries, Ubiquitous Language) must not be diluted by conditional deep sections.
+> - **Distill, don't fill** — the content comes from the discovery conversation (the job, the
+>   one-way doors, the real risk), not from mechanically filling `[placeholders]`.
+> - **`@import` for deep/optional conventions** — put observability / rate-limit / AI conventions
+>   in their own files and `@import` them only when the feature exists. Don't inline them into MVP.
+> - **CLAUDE.md = durable rules you write; auto memory = incidental learnings Claude writes itself**
+>   (`~/.claude/projects/<project>/memory/`). Don't cram every learning into CLAUDE.md — keep it the
+>   constitution; let auto memory hold build commands, debugging insights, discovered preferences.
+> - **CLAUDE.md guides; a PreToolUse hook enforces** — the boundaries here are context, not a hard
+>   gate. `hooks/boundary-guard.sh` (references/enforcement.md) is the enforcement layer.
+> - **AGENTS.md interop**: if the repo already has an AGENTS.md (Cursor/Codex/other agents), make
+>   CLAUDE.md `@AGENTS.md` at the top and add Claude-specific rules below — one source, both tools.
+
 ---
 
 ## CLAUDE.md — MVP version
@@ -55,51 +72,17 @@ When that happens: stop, define the right domain term, rename.
 ## Stack
 [Runtime, database, test runner, key libs]
 
-## External API integrations  [fill if applicable]
-| Provider | Purpose | Limit | Scope | Implementation |
-|---|---|---|---|---|
-| [name] | [what for] | [N/window] | [per-key/IP] | [quota-tracker/retry/bottleneck] |
-
-Rate limit policy: check before call, record after success, respect Retry-After on 429.
-
-Rate limit rules:
-- Check quota BEFORE every call — never after
-- On 429: respect Retry-After header, never retry immediately
-- Alert: TODO[[provider]-quota>80%]: [action]
-- On exhaustion: degrade gracefully, never crash
-
-Fixtures: `tests/fixtures/[provider]-*.json`
-Bruno collection: `api-exploration/[provider]/`
-Rate limit setup: `references/third-party-apis.md § Rate limit setup`
-
-## Observability conventions
-Correlation ID: every HTTP request and cron job runs inside RequestContext.run()
-requestId flows through all log lines automatically.
-
-Log levels:
-- ERROR: infrastructure failures → needs human attention
-- WARN:  degraded behavior, fallback used, quota low → monitor
-- INFO:  operation lifecycle, key state changes
-- DEBUG: development only, never production
-
-Third-party API logs:
-- Adapters log: callId, provider, operation, duration, itemsReturned
-- Adapters NEVER log: API keys, full response body, user PII
-- Normalizers log WARN on schema validation failure (API changed signal)
-
-Read: `references/observability.md` for full patterns.
-
 ## Environment variables
 [VAR_NAME] # description
 
-## AI/LLM conventions  [add only if project uses LLMs]
-LLM calls: only in llm/ or ai/ module — never in service or handler layers
-Prompts: files in prompts/ directory — never inline strings in code
-LLM responses: always pass through ResponseAdapter before entering domain logic
-Tests: assert structure/constraints, not exact string output (LLMs are non-deterministic)
-Cost: every LLM call logs model + input_tokens + output_tokens + cost_usd
-Evaluation: run eval suite before merging any retrieval or prompt changes
-See: references/stacks/ai-projects.md for full AI project patterns
+## Conventions  [import only what applies — keep the root lean]
+# Deep conventions live in their own files and are pulled in with @import ONLY when the feature
+# exists. This keeps the always-loaded root small (adherence) and MVP-honest (defer until needed).
+@.claude/conventions/observability.md   # if async flows / external calls — Correlation ID + log rules
+@.claude/conventions/external-apis.md    # if third-party APIs — rate-limit policy + fixtures + adapter
+@.claude/conventions/ai.md               # if LLMs — LLM boundary, prompts-as-files, eval, cost
+# (generate each file from references/observability.md / third-party-apis.md / stacks/ai-projects.md.
+#  Omit the import entirely if the feature isn't in scope — don't inline these into the MVP root.)
 
 ## Tech debt log (MVP shortcuts — with triggers)
 | Shortcut | Trigger to fix |
@@ -176,6 +159,10 @@ Must NOT depend on: [explicit list]
 [Include the indexes you know you'll need]
 
 ## ADR (1 entry minimum — the hardest decision)
+
+> ADR = Architecture Decision Record, Michael Nygard's format (2011) — already a shipright master
+> (resilience). An ADR captures the WHY of a one-way-door decision so a future session (or Branch E
+> resume) understands the reasoning, not just the outcome. Format below is Nygard's, trimmed.
 
 ### ADR-001: [The decision you almost got wrong]
 Decision: [what]

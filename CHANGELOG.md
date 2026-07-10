@@ -1,5 +1,45 @@
 # Changelog
 
+## [1.7.0] — 2026-07 — Constitution as a lean, distilled, confirmed contract
+A review of how shipright generates CLAUDE.md / ARCHITECTURE.md, checked against Anthropic's own
+CLAUDE.md guidance, found the L0 templates had drifted from best practice: the MVP CLAUDE.md inlined
+deep conventions (observability, rate-limit, AI) — risking >200 lines and diluting the load-bearing
+rules; two divergent MVP templates existed (Branch A inline vs l0-templates); the `## Project`
+section was a mechanical Input→Process→Output line instead of the job surfaced in discovery; and the
+constitution was generated without a confirmation step.
+
+Grounded in **Anthropic's CLAUDE.md guidance** (keep under 200 lines for adherence; `@import` for
+organization; auto memory for incidental learnings; CLAUDE.md is context, a PreToolUse hook is
+enforcement) and **Michael Nygard** (the ADR format, already a shipright master).
+
+### Changed — `references/l0-templates.md`
+- New principle header: CLAUDE.md is a lean, distilled contract — **keep the root <200 lines**
+  (MVP ~50–60); **distill from discovery, don't fill placeholders**; **`@import` deep/optional
+  conventions** (don't inline); **CLAUDE.md = durable rules, auto memory = incidental learnings**;
+  **CLAUDE.md guides, the boundary-guard hook enforces**; **`@AGENTS.md` interop**.
+- MVP CLAUDE.md **leaned**: observability / external-API / AI conventions moved OUT of the inlined
+  template into an `@import` block that pulls them in only when the feature exists.
+- ADR sections credited to **Nygard's format** (captures the WHY of a one-way-door decision).
+
+### Changed — Branch A (generation)
+- `## Project` now distills the **job** (what the user is really hiring this to do, for whom,
+  success) from discovery — not a mechanical I/O line.
+- New **"Confirm before proceeding"** step: play the distilled constitution back for correction
+  before building (a constitution the user didn't confirm won't be honored) — consistent with the
+  v1.5/v1.6 conversational philosophy.
+- Points to l0-templates.md as the single source (distillation guidance + lean/`@import` structure).
+
+### Changed — modernized compound engineering (SKILL.md)
+- Split the "every mistake → a rule" loop by durability: **durable architectural rules → CLAUDE.md /
+  `.claude/rules/`**; **incidental learnings (build commands, debugging insights, preferences) → Claude
+  Code's native auto memory** (`~/.claude/projects/<project>/memory/`). CLAUDE.md gets smarter
+  without getting fatter.
+
+### Added — `/init` awareness (Branch E)
+- For an existing codebase with no constitution, start from Claude Code's native `/init` (it analyzes
+  the code) and refine with shipright's lean-constitution rules — the code is the source of truth,
+  not a from-scratch discovery (which is for new projects).
+
 ## [1.6.0] — 2026-07 — Conversational intake across all branches
 v1.5.0 fixed Branch A, but the same "form / menu-quiz" anti-pattern lived in the other branches:
 Branch B asked "what does it do?" though CLAUDE.md exists and "new module or extend?" (shipright's

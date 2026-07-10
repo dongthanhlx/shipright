@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 1.6.0
+version: 1.7.0
 description: >
   Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
   sets up constitution, enforces boundaries, judges what to build now vs defer,
@@ -39,7 +39,7 @@ Tests:         !`(npm test --silent 2>&1 | tail -2) || (pytest -q 2>&1 | tail -2
 
 ---
 
-# Shipright v1.6 — Project Brain OS
+# Shipright v1.7 — Project Brain OS
 
 Two hemispheres. One executive. One living constitution.
 
@@ -268,8 +268,13 @@ Fowler:  Feature Envy? Primitive Obsession? Comment explaining WHAT?
 Violation found → fix before committing + add rule to CLAUDE.md (compound engineering)
 
 ### Compound engineering (ongoing)
-Every AI mistake → specific rule added to CLAUDE.md or `.claude/rules/[module].md`
-CLAUDE.md gets smarter every session. AI makes the same mistake twice: rare.
+Every repeated AI mistake → a rule that prevents it next time. But split by durability:
+- **Durable architectural rule** (a boundary, a naming law, a real convention) → CLAUDE.md or
+  `.claude/rules/[module].md`. This is the constitution — keep it lean and load-bearing.
+- **Incidental learning** (a build command, a debugging insight, a discovered preference) → leave it
+  to Claude Code's native **auto memory** (`~/.claude/projects/<project>/memory/`), which Claude
+  writes itself. Don't cram these into CLAUDE.md — that bloats it and reduces adherence.
+CLAUDE.md gets smarter every session, without getting fatter. AI makes the same mistake twice: rare.
 
 ---
 
