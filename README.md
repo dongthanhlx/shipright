@@ -1,4 +1,4 @@
-# shipright v1.8.0
+# shipright v1.9.0
 
 > **Ship your MVP fast. Grow it right.**
 
@@ -202,6 +202,7 @@ shipright/
     performance.md            # Measure-first optimization ladder, N+1, mechanical sympathy, budgets (NEW v0.8)
     code-quality.md           # Evans + Uncle Bob + Fowler: full quality system
     code-health.md            # SOLID tactical + Ousterhout (deep modules, define errors out of existence)
+    testing.md                # testing STRATEGY: pyramid, test-through-public-interface, mock-only-at-seams, Test Desiderata
     domain-thinking.md        # Evans tactical: aggregate roots, invariants, domain events, "DDD or not?"
     error-handling.md         # Error taxonomy, Result type, saga, race conditions, idempotency
     observability.md          # Correlation ID, logging, API tracing, SLO/error budget, DORA, retrofit
@@ -264,6 +265,7 @@ shipright/
 - [x] **v1.6.0: conversational intake across ALL branches — shared "How shipright asks" principle in SKILL.md (read/infer before asking; diagnose-then-confirm, not menu-quiz); B/C/D reworked, F kept as deliberate speed exception**
 - [x] **v1.7.0: constitution as a lean, distilled, confirmed contract (aligned to Anthropic's CLAUDE.md guidance: <200 lines, @import for deep conventions, auto-memory split, distill-from-discovery, generate→confirm, Nygard-format ADRs, /init for existing code)**
 - [x] **v1.8.0: team scale — the module boundary as a team API (Conway/Parnas/Evans/Team Topologies/DORA): cognitive load, inverse Conway at L0, context maps, consumer-driven contract tests; signal-driven (solo skips) + sharpened MVP framing (Validation vs Foundation, Fowler payoff line, Ousterhout local-complexity guard)**
+- [x] **v1.9.0: testing strategy spine (Beck Test Desiderata / Fowler pyramid & mocks / Cohn / Dodds trophy / DHH damage) — anti-dogma; boundaries ARE the test strategy (test through the public interface, mock only at seams); de-dogmatized the TDD framing**
 - [ ] references/registry.md community contributions (ongoing)
 - [x] **v0.9: PreToolUse boundary-enforcement hook (blocks service→db + deep cross-module imports; opt-in, fails open, self-test)**
 

@@ -13,7 +13,8 @@ the default heuristic (a payment MVP needs security on day one; a read-only Grow
 | Trigger / signal happening now | Activate | Where |
 |---|---|---|
 | Any bug / unexpected behavior | debugging-and-error-recovery | addyosmani |
-| Writing logic or changing behavior | test-driven-development | addyosmani |
+| Writing logic or changing behavior | test-driven-development (+ references/testing.md strategy) | addyosmani |
+| Tests feel brittle / over-mocked / "what should I test?" | (shipright built-in) | references/testing.md |
 | Feature touches 2+ files | incremental-implementation | addyosmani |
 | Before merging Tier M+ | code-review-and-quality | addyosmani |
 | Tier L/XL with unclear requirements | spec-driven-development | addyosmani |
