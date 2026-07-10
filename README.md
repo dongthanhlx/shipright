@@ -1,4 +1,4 @@
-# shipright v1.5.0
+# shipright v1.6.0
 
 > **Ship your MVP fast. Grow it right.**
 
@@ -260,6 +260,7 @@ shipright/
 - [x] **v1.3.0: security spine (Saltzer&Schroeder + OWASP 2025→layer map + Shostack threat modeling) + per-stack security depth (Node/Python/Go/extension/RAG)**
 - [x] **v1.4.0: chatbot AI threat model (prompt-injection done right, abuse/cost control, moderation, isolation) + smart-contract defense patterns (CEI/reentrancy, access control, EIP-712 replay, upgradeable) + invariant/fuzz testing**
 - [x] **v1.5.0: intake reimagined — adaptive intent discovery (Mom Test / JTBD / Shape Up / interview-me) replaces the mechanical questionnaire; understand-before-advising, playback step, shipright carries technical judgment; still MVP-first**
+- [x] **v1.6.0: conversational intake across ALL branches — shared "How shipright asks" principle in SKILL.md (read/infer before asking; diagnose-then-confirm, not menu-quiz); B/C/D reworked, F kept as deliberate speed exception**
 - [ ] references/registry.md community contributions (ongoing)
 - [x] **v0.9: PreToolUse boundary-enforcement hook (blocks service→db + deep cross-module imports; opt-in, fails open, self-test)**
 

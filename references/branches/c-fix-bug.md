@@ -5,18 +5,23 @@
 
 ---
 
-## Step 0 — Classify bug type first
+## Step 0 — Understand the bug (ask what only the user knows)
 
+Let the user describe it first — don't front-load a classification menu. Ask for the facts only
+they have:
 ```
-"How does the bug occur?
- [A] Every time — reproduces consistently
- [B] Intermittently — no clear trigger
- [C] Production only — not visible locally
- [D] After running for a while — suspected memory/resource leak"
+"Describe the bug: steps to reproduce, what actually happens, what you expected."
+"Error message / stack trace, if any?"
+"Did it start after a recent deploy or change?"
 ```
 
-→ [A]: flow below
-→ [B][C][D]: load `references/debug-intermittent.md`
+Then shipright INFERS the type from the description (don't quiz — diagnose):
+```
+reproduces every time                → the flow below
+intermittent / production-only / grows over time (memory/resource leak)
+                                     → load references/debug-intermittent.md
+```
+Play it back if unsure: "This sounds production-only — visible in prod but not locally, right?"
 
 **[if addyosmani debugging-and-error-recovery installed]** → activate for all bug types.
 Their 5-step (reproduce → localize → reduce → fix → guard) is more thorough than this built-in flow.
@@ -24,17 +29,7 @@ This built-in is the fallback when addyosmani is not installed.
 
 ---
 
-## Step 1 — Understand precisely
-
-```
-Q1: "Steps to reproduce + actual result + expected result"
-Q2: "Error message / stack trace if available"
-Q3: "Did this appear after a recent deploy or change?"
-```
-
----
-
-## Step 2 — Reproduce with failing test FIRST
+## Step 1 — Reproduce with a failing test FIRST
 
 ```
 Write a failing test before touching any code.
@@ -47,7 +42,7 @@ Find a way to reproduce, or document exact manual steps.
 
 ---
 
-## Step 3 — Locate (strategy, not random reading)
+## Step 2 — Locate (strategy, not random reading)
 
 ```
 Bug appeared after recent deploy → git bisect:
@@ -70,7 +65,7 @@ That's where to fix — not where the exception is thrown.
 
 ---
 
-## Step 4 — Root cause, not symptom
+## Step 3 — Root cause, not symptom
 
 ```
 Before fixing, ask: "Is this the root cause or a symptom?"
@@ -88,7 +83,7 @@ Fix root cause. Add test at both root cause location and symptom location.
 
 ---
 
-## Step 5 — Fix and verify
+## Step 4 — Fix and verify
 
 ```
 Fix in the correct layer (service bug → fix service, not handler).

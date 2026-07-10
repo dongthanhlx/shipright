@@ -1,5 +1,31 @@
 # Changelog
 
+## [1.6.0] — 2026-07 — Conversational intake across all branches
+v1.5.0 fixed Branch A, but the same "form / menu-quiz" anti-pattern lived in the other branches:
+Branch B asked "what does it do?" though CLAUDE.md exists and "new module or extend?" (shipright's
+call); Branch C front-loaded a bug-type menu before hearing the bug; Branch D — worst — asked the
+user to classify their own Fowler smell from a 7-item menu. Ironically Branch E (resume) was already
+the correct model (read state → confirm lightly). Rather than patch each branch forever, this makes
+the fix structural.
+
+### Added — a shared intake principle (SKILL.md, always-loaded)
+- **"How shipright asks — all branches"**: (1) read/infer before you ask — anything derivable from
+  CLAUDE.md, the codebase, git, or the user's words; (2) ask only what ONLY the user knows — never
+  make them do a technical classification that is shipright's job; (3) diagnose, then CONFIRM with
+  evidence — don't menu-quiz; (4) open questions over menus, except where speed matters; (5)
+  calibrate depth to stakes. Every branch (and every future branch) inherits it.
+
+### Changed — applied per branch
+- **Branch B**: reads CLAUDE.md instead of asking "what does it do?"; asks only the feature intent
+  (the job); PROPOSES new-module-vs-extend after the codebase report instead of asking it.
+- **Branch C**: the user describes the bug first (repro/actual/expected/error/recent-change);
+  shipright INFERS the type (every-time vs intermittent/prod-only/leak) from the description instead
+  of front-loading a menu. Steps renumbered (0–4).
+- **Branch D**: the user names the measurable PAIN (open); shipright READS the code and DIAGNOSES the
+  Fowler smell (or the Ousterhout opposite) with evidence, then confirms — no more "which smell? [A–G]".
+- **Branch F**: kept its structured triage checklist, now marked as a deliberate exception (speed
+  under incident pressure beats open conversation).
+
 ## [1.5.0] — 2026-07 — Intake reimagined (conversation, not questionnaire)
 The Branch A intake was mechanical: a fixed Q1→Q7 form that forced an "MVP vs production" binary
 before understanding anything, quizzed the user on decisions that are shipright's job ("need
