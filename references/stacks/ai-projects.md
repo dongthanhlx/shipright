@@ -6,19 +6,24 @@
 > - ai-agent → registry entry: ai-agent
 > - LLM integration only → use web-api entry + rules below
 
-## The 5th boundary rule (all AI projects)
+## The LLM boundary (all AI projects) — Boundary 4 applied to AI
+
+> This is not a new numbered boundary. It is **Boundary 4** (no raw external response passes the
+> Adapter layer) specialized for LLMs — plus **Boundary 5** (timeout + fallback), because an LLM
+> API is an integration point too. Don't call it "Boundary 5" — that number is failure isolation.
 
 ```
-Boundary 5: All LLM calls in dedicated llm/ or ai/ module ONLY
-  Never in service, handler, repository, or adapter layers.
+The LLM boundary: All LLM calls in a dedicated llm/ or ai/ module ONLY
+  Never in service, handler, repository, or generic adapter layers.
   Prompt templates are files in prompts/ directory — never inline strings.
   LLM module returns typed domain objects — never raw LLM response strings.
   ResponseAdapter (ACL) translates between probabilistic LLM output and deterministic domain.
+  Boundary 5 also applies: every LLM/tool call has a timeout + a fallback (resilience.md).
 ```
 
-This IS Eric Evans's Anti-Corruption Layer applied to LLMs.
-Evans (2026): "When calling an LLM, we bridge between deterministic and probabilistic
-systems — an ACL is appropriate here."
+This IS Eric Evans's Anti-Corruption Layer applied to LLMs — the bridge between a deterministic
+domain and a probabilistic system. The same ACL thinking governs MCP servers and agent tools
+(references/stacks/mcp.md): each is an adapter for a capability, not a raw pipe into your domain.
 
 ## Non-determinism policy (add to CLAUDE.md)
 

@@ -1,5 +1,30 @@
 # Changelog
 
+## [1.1.0] — 2026-07 — MCP support + AI-boundary fix
+Grounds the AI hemisphere in the field's masters — the MCP spec, Anthropic's *Building Effective
+Agents* (simplicity: workflow before agent), and the security school (Simon Willison's "lethal
+trifecta" + OWASP LLM Top 10). The unifying idea: AI isn't a special island — the same boundaries,
+judgment, and resilience hold; the failure modes are just probabilistic, plus one new threat class
+(prompt injection).
+
+### Added
+- `references/stacks/mcp.md` — Model Context Protocol as a first-class stack. Accurate to the spec
+  (host/client/server, tools/resources/prompts, stdio vs Streamable HTTP, JSON-RPC lifecycle) and
+  framed through shipright's lens: **an MCP server is an Adapter/ACL for a capability; a tool is an
+  interface contract (the Agent-Computer Interface)**. Covers when NOT to build a server (judgment —
+  a prompt or plain function usually wins), building one behind shipright boundaries, a full
+  **security** section (lethal trifecta, prompt injection = untrusted content, least privilege /
+  excessive agency, consent, OAuth, confused-deputy), **resilience** (Boundary 5 for tool calls:
+  timeouts, idempotency, capped loops, tool-errors-as-data), trajectory observability, and testing
+  (MCP Inspector + contract + injection tests).
+- registry.md: new `mcp-server` project-type entry (SDKs, transport decision, CLAUDE.md rules).
+
+### Fixed — Boundary-5 naming collision
+- `ai-projects.md` and the `rag-pipeline` registry entry called the LLM-ACL rule "Boundary 5",
+  which since v0.8 means failure isolation (timeout + fallback). Reframed correctly: the LLM rule is
+  **Boundary 4 (Anti-Corruption Layer) applied to AI**, and Boundary 5 (timeout) *also* applies to
+  every LLM/tool call. Renamed the registry keys (`llm-boundary`, `llm-boundary-b`, `llm-timeout`).
+
 ## [1.0.0] — 2026-06 — BrainOS, feature-complete
 First stable release. Every buildable roadmap item is done; shipright is a coherent, public-ready
 Project Brain OS. What "1.0" means here:

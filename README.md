@@ -1,4 +1,4 @@
-# shipright v1.0.0
+# shipright v1.1.0
 
 > **Ship your MVP fast. Grow it right.**
 
@@ -219,8 +219,9 @@ shipright/
       nodejs.md
       python.md
       go.md                   # packages + internal/ (compile-time Boundary 1), context timeouts, pgx/sqlc
-      ai-projects.md          # AI entry point + LLM boundary rule
+      ai-projects.md          # AI entry point + the LLM boundary (Boundary 4 for AI)
       ai-rag.md               # RAG deep dive: eval loop, vector DB, metrics
+      mcp.md                  # Model Context Protocol: server=adapter/ACL, tool=interface, security, resilience
       chatbot-platforms.md    # Telegram/Discord: adapter, state, security
       blockchain.md           # EVM/Solana/TON/SUI: security, audit gate, chain patterns
       browser-extension.md    # MV3: manifest, components, chrome.* APIs
@@ -252,6 +253,7 @@ shipright/
 - [x] **v0.8: Trigger-based skill dispatch + SLO/error budget/DORA**
 - [x] **v0.9.1: Go stack file (packages + internal/ compile-time boundaries, context timeouts, pgx/sqlc, error taxonomy)**
 - [x] **v0.8.2: registry capability/signal → skill trigger index**
+- [x] **v1.1.0: MCP stack (server=adapter/ACL, tool=interface contract, lethal-trifecta security, Boundary-5 resilience)**
 - [ ] references/registry.md community contributions (ongoing)
 - [x] **v0.9: PreToolUse boundary-enforcement hook (blocks service→db + deep cross-module imports; opt-in, fails open, self-test)**
 
