@@ -1,4 +1,4 @@
-# shipright v1.1.0
+# shipright v1.2.0
 
 > **Ship your MVP fast. Grow it right.**
 
@@ -222,6 +222,7 @@ shipright/
       ai-projects.md          # AI entry point + the LLM boundary (Boundary 4 for AI)
       ai-rag.md               # RAG deep dive: eval loop, vector DB, metrics
       mcp.md                  # Model Context Protocol: server=adapter/ACL, tool=interface, security, resilience
+      ai-agent.md             # agents & multi-agent: workflow-vs-agent, 5 patterns, state machines, eval
       chatbot-platforms.md    # Telegram/Discord: adapter, state, security
       blockchain.md           # EVM/Solana/TON/SUI: security, audit gate, chain patterns
       browser-extension.md    # MV3: manifest, components, chrome.* APIs
@@ -254,6 +255,7 @@ shipright/
 - [x] **v0.9.1: Go stack file (packages + internal/ compile-time boundaries, context timeouts, pgx/sqlc, error taxonomy)**
 - [x] **v0.8.2: registry capability/signal → skill trigger index**
 - [x] **v1.1.0: MCP stack (server=adapter/ACL, tool=interface contract, lethal-trifecta security, Boundary-5 resilience)**
+- [x] **v1.2.0: agents & multi-agent stack (workflow-vs-agent judgment, Anthropic/Ng patterns, LangGraph state machines, trajectory eval + tracing)**
 - [ ] references/registry.md community contributions (ongoing)
 - [x] **v0.9: PreToolUse boundary-enforcement hook (blocks service→db + deep cross-module imports; opt-in, fails open, self-test)**
 

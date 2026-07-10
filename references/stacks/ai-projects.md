@@ -3,7 +3,7 @@
 > Load `references/registry.md` for your specific type:
 > - rag-pipeline → registry entry: rag-pipeline
 > - chatbot → registry entry: chatbot-telegram-discord
-> - ai-agent → registry entry: ai-agent
+> - ai-agent / multi-agent → references/stacks/ai-agent.md (+ registry entry: ai-agent)
 > - LLM integration only → use web-api entry + rules below
 
 ## The LLM boundary (all AI projects) — Boundary 4 applied to AI
@@ -61,5 +61,8 @@ For RAG-specific patterns (chunking, vector DB, RAGAS metrics):
 For Telegram/Discord chatbot patterns (Platform Adapter, conversation state):
 → `references/stacks/chatbot-platforms.md`
 
-For agent patterns (tool calling, trajectory evaluation):
-→ references/registry.md — ai-agent entry
+For agent + multi-agent patterns (workflow-vs-agent, the 5 patterns, state machines, eval, resilience):
+→ references/stacks/ai-agent.md
+
+For exposing tools/data to AI hosts via Model Context Protocol:
+→ references/stacks/mcp.md

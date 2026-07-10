@@ -1,5 +1,32 @@
 # Changelog
 
+## [1.2.0] — 2026-07 — Agents & multi-agent depth
+Raises agent guidance from a ~300-token registry entry to a full stack file, grounded in the field's
+masters: **Anthropic — Building Effective Agents** (workflow vs agent, the 5 composable patterns,
+simplicity), **Andrew Ng** (reflection · tool use · planning · multi-agent), **Harrison Chase /
+LangGraph** (agents as controllable, persisted state machines with human-in-the-loop), and the
+**eval school — Chip Huyen · Hamel Husain · Shreya Shankar** (trajectory evaluation, error analysis).
+
+### Added
+- `references/stacks/ai-agent.md` — full agent & multi-agent guide, shipright-native:
+  - **Decision 0 — workflow or agent?** (Anthropic simplicity = judgment.md: don't build an agent
+    when a workflow suffices; single agent before multi-agent).
+  - The **5 workflow patterns** (prompt chaining, routing, parallelization [sectioning/voting],
+    orchestrator-workers, evaluator-optimizer) and **Ng's 4 agentic patterns** mapped onto them.
+  - The autonomous agent as a **controllable state machine** — explicit persisted state, deterministic
+    stop conditions, human-in-the-loop checkpoints, replayable runs.
+  - **When multi-agent actually helps** (and when it's over-engineering) + topologies + handoffs as
+    typed interface contracts.
+  - Boundaries for agents, **resilience** (compounding errors: cap iterations/cost/depth, timeouts,
+    idempotent tools, no-progress detector), guardrails/security (untrusted content, least privilege,
+    lethal trifecta), **evaluation** (trajectory-level, eval flywheel), and a framework decision.
+- `observability.md`: **AI agent & LLM tracing** section — runId + trajectory as the Correlation ID
+  of an agent; per-step tokens/cost; alert on runaway cost/looping; replay for non-deterministic bugs.
+
+### Changed
+- `ai-projects.md` and the `ai-agent` registry entry now point to the new stack file (was: registry
+  entry only). SKILL.md reference list, README structure + roadmap updated.
+
 ## [1.1.0] — 2026-07 — MCP support + AI-boundary fix
 Grounds the AI hemisphere in the field's masters — the MCP spec, Anthropic's *Building Effective
 Agents* (simplicity: workflow before agent), and the security school (Simon Willison's "lethal

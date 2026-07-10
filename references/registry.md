@@ -210,6 +210,9 @@ install:
 
 tested-with: LangGraph 0.2+, AutoGen 0.4+
 
+load: references/stacks/ai-agent.md — full guide (workflow-vs-agent, the 5 patterns, agent as a
+      controllable state machine, when multi-agent helps, resilience, guardrails, trajectory eval)
+
 framework-decision:
   single-agent: LangChain + tool calling
   multi-agent: LangGraph (state machines) or AutoGen (conversational)
