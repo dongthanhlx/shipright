@@ -16,112 +16,105 @@ If no state → proceed to Step 1.
 
 ---
 
-## Step 1 — Mode decision
-
-```
-"Validating an idea (ship fast, real users ASAP)?
- Or building a production-ready solution (team, timeline, requirements clear)?"
-
-[A] Validate (MVP mode) — days, not weeks
-[B] Production mode — planned sprints, full architecture
-```
-
-> Whichever mode: spend the "do-it-right" budget only on ONE-WAY DOORS (domain model,
-> boundaries, data identity, money units) and hack the rest. This is how an MVP ships fast
-> WITHOUT breaking architecture later. Full guidance: `references/judgment.md` (the MVP matrix).
+> Intake is a CONVERSATION, not a form. Understand the idea before advising mechanics; carry the
+> technical judgment yourself (never quiz the user on decisions that are shipright's job); reflect
+> understanding back before building. Masters: Rob Fitzpatrick (*The Mom Test* — ask about their
+> problem, not your solution; open, non-leading questions), Clayton Christensen (Jobs To Be Done),
+> Eric Evans (the early talk is domain discovery, not a quiz), Ryan Singer (Shape Up — appetite),
+> and the `interview-me` philosophy (one real question at a time until ~95% sure of intent).
+>
+> **This serves MVP-first, not against it.** Deep UNDERSTANDING (converges fast) ≠ deep BUILD
+> (still deferred) ≠ long CONVERSATION (kept short for MVP). You can't cut to the true MVP core
+> without understanding the real job — that is the whole point. The output is always an MVP scope.
 
 ---
 
-## Step 2 — Intake (one question at a time)
+## Step 1 — Understand the idea and the job (mostly listen)
+
+Do NOT open with "MVP or production?" or "what stack?". Open with the problem. Ask ONE real
+question at a time; the next depends on the last. Adapt. Stop when ~95% sure you understand intent.
 
 ```
-Q1: "Project name?"
+Open (pick the natural one, in the user's words — not a script):
+  "Tell me what you're trying to build — and what's the problem it solves for you?"
 
-Q2: "One sentence: '[Who] struggles with [what]'"
+Then dig, adaptively, toward these (shipright's INTERNAL checklist — not a battery to fire):
+  • Job to be done (Christensen): what is the user really hiring this to do? Dig ONE level under
+    the stated ask — people ask for a solution ("a dashboard") when the job is different ("know X
+    to decide Y"). Separate the request from the need.
+  • Who it's for, and why now.
+  • What success/"done" looks like — in their terms, concretely (a story, not an opinion).
+  • Appetite / stakes (Shape Up): how much is this worth — a weekend throwaway, or a bet? This
+    sets both the MODE and how deep to dig. It is inferred here, never asked as a cold binary.
 
-Q2b: "3–5 key terms your domain experts use?"
-     → These become the Ubiquitous Language in CLAUDE.md
-     → Claude uses ONLY these terms for class/method/variable names
-     → Example: not 'User' but 'Subscriber'; not 'Item' but 'FeedArticle'
-     → For the domain MODEL (which terms are aggregate roots vs value objects, what
-       invariants must never break, "is this even a DDD project?"): references/domain-thinking.md
+Mom Test discipline:
+  • Ask about their world and problem, not your solution. Open questions, never leading ones.
+    ✗ "You need observability from day one, right?"   ✗ "Should this be multi-tenant?"
+    ✓ "Walk me through how someone uses this end to end."   ✓ "What happens today without it?"
+  • Get specifics and stories, not hypotheticals.
 
-Q3: "Existing solution? Why build new?"
-
-Q4: "How does it run?
-     [A] HTTP API  [B] Cron/scheduled  [C] CLI  [D] Background worker  [E] Mix"
-
-Q4b: "Uses LLMs or AI models?
-     → YES: load references/registry.md — find rag-pipeline, chatbot-telegram-discord,
-             or ai-agent entry. Load that entry only (~300 tokens)."
-
-Q5 (MVP): "What must a user DO in version 1? One journey: '[User] does [X] to [achieve Y]'"
-Q5 (Production): "Data profile: volume? read/write ratio? multi-tenant?"
-
-Q5b: "Does the project integrate any third-party APIs?
-     (e.g. RapidAPI, Stripe, Twilio, YouTube, OpenAI, SearchAPI, blockchain RPC...)
-     → If YES: BEFORE writing any integration code, do Layer 1 Exploration:
-
-     Phase A — Read docs first (before any API call):
-       Create: api-exploration/[provider]/API-NOTES.md
-       Document: auth method, every param (name/location/type/required/default/notes),
-       what each key param does, response shape, error codes, rate limits.
-       Question to answer: "What params control what I need? What are valid values?"
-
-     Phase B — Setup Bruno + build request from docs knowledge:
-       mkdir -p api-exploration/[provider-name]
-       (Bruno: https://usebruno.com — local, git-friendly)
-       Build request with REALISTIC test values from docs understanding.
-       Not placeholder strings — actual values that test your use case.
-
-     Phase C — Call sandbox, compare docs vs reality:
-       Scenarios: happy path, missing optional params, each error case, rate limit
-       Save responses: tests/fixtures/[provider]-success.json
-                       tests/fixtures/[provider]-minimal.json
-                       tests/fixtures/[provider]-error-[code].json
-                       tests/fixtures/[provider]-rate-limit.json
-       Note discrepancies: fields in response not in docs, type mismatches
-
-     Phase D — Update API-NOTES.md with "Reality vs Docs" findings:
-       Undocumented fields, wrong types, truly optional vs documented-optional
-
-     Phase E — THEN write Adapter using fixtures as source of truth:
-       Adapter normalizes raw response → domain type
-       Unit tests use fixtures (no real API calls, runs offline)
-
-     Load: references/third-party-apis.md for full Layer 1→2→3 strategy"
-
-Q5c: "Need observability from day one?
-     → Recommended for all projects with external APIs or async flows
-     → YES: Correlation ID setup in references/observability.md"
-
-Q5d: "Does this handle auth, payments, PII, or untrusted input?
-     → YES: run the L0 threat model (Shostack's 4 questions) — references/security.md.
-             Record the threats + controls in ARCHITECTURE.md. Insecure Design (A06) is the
-             cheapest vuln to fix at L0 and the most expensive later. Activate security-and-hardening."
-
-Q6: "Stack? (Node.js/TS, Python, Go, undecided?)"
-    → Load matching stack file for concrete prompts
-
-Q7: "Most important constraint? (deadline, team size, must-have integration)"
+Calibrate depth to stakes:
+  • Clear, low-stakes idea → 1–2 questions, then move. Don't interrogate a weekend script.
+  • Vague or high-stakes → dig. If the idea is genuinely fuzzy and interview-me / idea-refine is
+    installed → dispatch to it; otherwise do the discovery here.
 ```
 
-After Q7 — synthesize with judgment, not just echo:
+---
+
+## Step 2 — Play it back, then decide the technical shape
+
+### Phase 2a — Reflect and pressure-test (build shared understanding BEFORE any mechanics)
 ```
-Project: [name] | Stack: [stack] | Mode: MVP/Production
-Problem: [one sentence]
-Domain terms: [list from Q2b — these go in CLAUDE.md]
+Play your hypothesis back in THE USER'S language, and invite correction:
+  "Here's what I think you're really building and why: [job] for [who], and success is [X].
+   The one thing that has to work is [core]. Where am I wrong?"
 
-[MVP] Walking skeleton = "[user journey from Q5]"
-      Everything else → backlog
+Surface the 1–2 assumptions or risks that actually matter (not a checklist — the real ones).
+Only proceed once the mental model is confirmed. This reflection is the net that catches a
+misread idea before it becomes wrong code.
+```
 
-[Production] Irreversible (one-way-door) decisions to get right upfront:
-             core domain model, module boundaries, dependency direction,
-             data identity, money units, where state lives (judgment.md)
+### Phase 2b — shipright decides the shape (state assumptions, don't quiz)
+Now settle mechanics — but shipright DECIDES and states assumptions the user can veto. Only ask
+the few things that are genuinely the user's to answer (a hard deadline, a required integration).
+```
+Mode (inferred from appetite/stakes — do NOT ask a cold binary):
+  small appetite / validating → MVP mode. "I'll treat this as an MVP: ship the one journey,
+  defer the rest. Say so if you actually have fixed scope + a team + a timeline (production mode)."
 
-Risk I see: [specific]
-Recommendation: [scope cut if deadline tight]
+Ubiquitous Language (Evans — extract from how they talk, don't quiz "give me 3–5 terms"):
+  Pull the domain terms out of the conversation and confirm them back: "You call these X, Y, Z —
+  I'll use exactly those in the code, not generic names." (Model depth: references/domain-thinking.md)
 
+Stack (recommend, with a one-line why; only ask if it's a real user preference/constraint):
+  "For this shape I'd use [stack] because [reason]. OK, or do you have a preference/constraint?"
+  → Load the matching stack file for concrete prompts.
+
+What's in scope — INFER from what you learned, and state it as an assumption to veto:
+  • Third-party APIs implied? → "This needs [provider]. Before writing integration code I'll do
+    Layer 1 exploration (read docs → Bruno → call sandbox → save fixtures → then Adapter).
+    references/third-party-apis.md." (Trigger it — don't ask "do you use any APIs?")
+  • AI/LLM implied? → load the matching registry entry (rag-pipeline / chatbot / ai-agent).
+  • Auth / payments / PII / untrusted input surfaced? → "This handles [X], so I'll run the L0
+    threat model (Shostack's 4 questions, references/security.md) and activate security-and-hardening.
+    Insecure Design is cheapest to fix now." (Triggered by what you learned — not a cold quiz.)
+  • Observability: shipright's call, not the user's. MVP → Correlation ID only; more on signal.
+    Don't ask "need observability?" — decide it.
+```
+
+### Step 2 output — synthesize into an MVP scope (this is the MVP-first anchor)
+```
+[job] for [who]; success = [X].  Domain terms: [from the conversation].
+Stack: [recommended] | Mode: MVP (or production, if they said so).
+
+[MVP]  Walking skeleton = the ONE journey: "[user] does [X] to get [Y]".
+       Get-right-now (one-way doors, judgment.md): core domain model, boundaries, data identity,
+       money units, where state lives.
+       Everything else → backlog (revisit at VALIDATE/HARDEN/SCALE — the lifecycle spine).
+
+[Production] The irreversible decisions to nail upfront (same one-way-door list, fuller).
+
+Risk I see: [the real one]. Recommendation: [cut scope if appetite < scope].
 Ready to generate CLAUDE.md and ARCHITECTURE.md?
 ```
 
@@ -159,12 +152,12 @@ If skills required are not installed → mention once:
 # CLAUDE.md — [project-name] (MVP v0.1)
 
 ## Project
-[One sentence from Q2]
+[the problem, one sentence — from discovery]
 
 ## Ubiquitous Language
 | Term | Meaning | Not |
 |---|---|---|
-| [from Q2b] | [definition] | [generic alias to avoid] |
+| [domain term from the conversation] | [definition] | [generic alias to avoid] |
 
 ## The 5 boundaries (non-negotiable)
 1. Dependencies inward only: [specific banned import for this project]
@@ -223,14 +216,14 @@ Skills active: [installed skills]
 ### MVP mode → Walking Skeleton
 
 ```
-1. Walking skeleton = the one user journey from Q5
+1. Walking skeleton = the one user journey (Step 2 output)
 
 2. [addyosmani installed] → activate incremental-implementation + test-driven-development
    [not installed] → implement inside-out: repository → service → handler
    Tests: enough to prove skeleton works. Not edge cases.
 
 3. SHIP GATE:
-   "Can a real user complete [journey from Q5] right now?"
+   "Can a real user complete [the one journey] right now?"
    YES → deploy, put in front of real users
    NO  → skeleton not done, no new features
 

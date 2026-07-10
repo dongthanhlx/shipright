@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 1.4.0
+version: 1.5.0
 description: >
   Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
   sets up constitution, enforces boundaries, judges what to build now vs defer,
@@ -39,7 +39,7 @@ Tests:         !`(npm test --silent 2>&1 | tail -2) || (pytest -q 2>&1 | tail -2
 
 ---
 
-# Shipright v1.4 — Project Brain OS
+# Shipright v1.5 — Project Brain OS
 
 Two hemispheres. One executive. One living constitution.
 
@@ -338,7 +338,8 @@ AI ecosystem owns (install by project type):
   Agent evaluation:  DeepEval / Confident-AI
 
 SKIP (shipright already covers):
-  interview-me, idea-refine → Branch A intake
+  interview-me, idea-refine → Branch A does intent discovery natively; DISPATCH to these when the
+                              idea is genuinely vague and they're installed (trigger, don't blanket-skip)
   frontend-ui-engineering  → taste-skill
   performance-optimization → L4 signal-driven
 ```

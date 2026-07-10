@@ -22,7 +22,7 @@ whenever a doc says "L2" / "Stage 1" / "Traction" / "Growth" — translate to a 
 ---
 
 **Ubiquitous Language precedes every L0:**
-  Q2b in Branch A intake: "What terms do domain experts use?"
+  The Ubiquitous Language step in Branch A intake: extract the terms domain experts actually use
   Claude uses these terms for ALL class, method, and variable names in the project.
   Generic names (Manager, Handler, Utils) = Ubiquitous Language not yet defined.
 **Extract Ubiquitous Language first** — before L0 constitution generation.

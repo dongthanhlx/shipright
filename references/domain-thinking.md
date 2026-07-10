@@ -1,7 +1,7 @@
 # Domain Thinking — Before You Name a Module
 
 > Evans tactical companion to `references/code-quality.md` (strategic DDD) and Branch A intake
-> (Q2b Ubiquitous Language). The "DDD or not?" decision in Step 4 is itself a judgment call —
+> (the Ubiquitous Language step). The "DDD or not?" decision is itself a judgment call —
 > see `references/judgment.md` (don't apply DDD machinery to a CRUD app or a glue script).
 
 The biggest mistake in early architecture: naming modules after technical layers

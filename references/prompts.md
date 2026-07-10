@@ -24,7 +24,7 @@ Third-party APIs: [list or none]
 
 Generate:
 1. CLAUDE.md — include:
-   - Ubiquitous Language table (3-5 domain terms from Q2b)
+   - Ubiquitous Language table (3-5 domain terms extracted during intake)
    - The boundary rules specific to this project with banned examples
    - Clean Code rules (functions max 20 lines, no AND/OR names)
    - Tech stack
