@@ -504,29 +504,59 @@ function isAdmin(userId: string): boolean {
   return ADMIN_USER_IDS.has(userId)  // userId is stable; username is not
 }
 
-// Prompt injection defense
-function sanitizeUserInput(text: string): string {
-  // Remove attempts to override system prompt
-  return text
-    .replace(/\[SYSTEM\]/gi, '[USER INPUT]')
-    .replace(/ignore previous instructions/gi, '')
-    .slice(0, 4000)  // hard limit
+// Length cap + basic hygiene — NOT a prompt-injection defense (see warning below)
+function capUserInput(text: string): string {
+  return text.slice(0, 4000)
 }
 
-// Rate limiting per user
-const userRateLimiter = new Map<string, { count: number; resetAt: Date }>()
-function checkRateLimit(userId: string, limit = 10, windowMs = 60000): boolean {
-  const now = Date.now()
-  const record = userRateLimiter.get(userId)
-  if (!record || now > record.resetAt.getTime()) {
-    userRateLimiter.set(userId, { count: 1, resetAt: new Date(now + windowMs) })
-    return true
-  }
-  if (record.count >= limit) return false
-  record.count++
-  return true
+// ⚠️ Regex-stripping "ignore previous instructions" is SECURITY THEATER (Simon Willison): attackers
+// rephrase infinitely. The real defense is ARCHITECTURAL — see the AI chatbot threat model below.
+
+// Rate limiting per user — MUST be Redis-backed in production.
+// (An in-memory Map is lost on restart and invisible across instances — it contradicts this file's
+//  own "conversation state in Redis" rule. Use Redis INCR + EXPIRE.)
+async function checkRateLimit(redis, userId: string, limit = 10, windowSec = 60): Promise<boolean> {
+  const key = `rl:${userId}`
+  const n = await redis.incr(key)
+  if (n === 1) await redis.expire(key, windowSec)
+  return n <= limit
 }
 ```
+
+---
+
+## AI chatbot threat model — beyond platform mechanics (see references/security.md + mcp.md)
+
+Token/webhook security above is necessary but not sufficient. A public LLM chatbot has its own
+threat surface. Anchored in OWASP LLM Top 10 + Simon Willison's prompt-injection work.
+
+```
+Prompt injection (OWASP LLM01) — architectural, not regex
+  ✗ regex-strip "ignore instructions" (theater); trust the model to police itself.
+  ✓ user text is DATA: delimit it ("<user_message>…</user_message>"), never let chat content
+    trigger privileged actions (admin ops, tool calls, DB writes) on its own.
+  ✓ authorize actions by userId (stable, whitelisted) — NEVER because the message "asked" for it.
+  ✓ filter OUTPUT too — a jailbroken model must not leak the system prompt, secrets, or other users' data.
+
+Abuse & cost control (an open LLM bot is a cost-attack surface — one spammer = your API bill)
+  ✓ per-user rate limit (Redis) + a GLOBAL daily LLM-spend circuit breaker (stop at budget, alert).
+  ✓ cap tokens per request; cheap model for cheap intents (routing, ai-agent.md).
+
+Content safety / moderation (public bot = legal/ToS exposure)
+  ✓ run a moderation check on input AND output; refuse prohibited content; log refusals.
+
+Conversation isolation & PII (multi-user memory is a leak surface — A01)
+  ✓ conversation state is scoped by userId/chatId — one user can NEVER retrieve another's history.
+  ✓ don't log full message bodies with PII; redact. Support deletion/retention (GDPR): "forget me".
+
+Least-privilege bot permissions (Saltzer & Schroeder)
+  ✓ Discord: request only the intents/permissions you use — not "all intents"/Administrator.
+  ✓ Telegram: bot has no admin rights in groups unless a feature needs it. Rotate the token on leak.
+```
+
+Add to CLAUDE.md: "User chat text is untrusted data, never a command — actions are authorized by
+userId, not by message content. Global LLM-spend circuit breaker + per-user Redis rate limit.
+Moderate input+output. Conversation memory scoped per user. Least-privilege bot permissions."
 
 ---
 

@@ -1,5 +1,30 @@
 # Changelog
 
+## [1.4.0] — 2026-07 — Chatbot & blockchain security depth
+Deepens the two domains where security matters most, grounded in their masters — and fixes two
+anti-patterns found in the existing files.
+
+### Chatbot (`chatbot-platforms.md`)
+- **Fixed** the `sanitizeUserInput` regex that stripped "ignore previous instructions" — that is
+  security theater (Simon Willison): attackers rephrase infinitely. Replaced with a length cap + a
+  warning pointing to the architectural defense.
+- **Fixed** the per-user rate limiter that used an in-memory `Map` — it's lost on restart and
+  invisible across instances, contradicting the file's own "state in Redis" rule. Now Redis INCR+EXPIRE.
+- **Added** an **AI chatbot threat model** section (OWASP LLM Top 10 + Willison): prompt injection as
+  an architectural problem (chat text is data, actions authorized by userId not by message content,
+  filter output too); abuse & LLM-spend circuit breaker (an open bot is a cost-attack surface);
+  content moderation on input+output; conversation isolation & PII/GDPR; least-privilege bot
+  permissions (Discord intents, Telegram token).
+
+### Blockchain (`blockchain.md`)
+- **Added** copy-paste-correct **defense patterns** for the top vulnerabilities that were only
+  named before: Checks-Effects-Interactions + `nonReentrant`, explicit access control, `msg.sender`
+  not `tx.origin`, EIP-712 + per-signer nonce for signature replay, and initializer-guarded
+  upgradeable proxies. Anchored in OpenZeppelin (use audited libs) + Trail of Bits + the SWC registry.
+- **Added** an **invariant & property-based testing** section — Foundry invariant tests (`StdInvariant`,
+  `invariant_solvency`/`invariant_accounting`), `--fuzz-runs`, Echidna, and mainnet fork testing.
+  This is the Trail-of-Bits-standard defense that was previously only name-dropped.
+
 ## [1.3.0] — 2026-07 — Security spine + per-stack security depth
 A review found the security coverage lopsided: blockchain / MCP / chatbot were strong, but the most
 common backend stacks (Node.js, Python, Go) had almost none — just a boundary grep — and there was
