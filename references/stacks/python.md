@@ -61,6 +61,46 @@ src/modules/orders/
 
 ---
 
+## Security — top Python pitfalls (see references/security.md for the spine)
+
+The mistakes Claude makes most in Python, with the safe pattern. Grounded in OWASP + Bandit's rules.
+
+```
+A05 Injection
+  ✗ session.execute(text(f"SELECT * FROM u WHERE id = {id}"))   → SQLi
+  ✓ session.execute(text("SELECT * FROM u WHERE id = :id"), {"id": id})   // bind params
+    (or use the SQLAlchemy ORM / typed query — never f-string SQL)
+  ✗ subprocess.run(cmd, shell=True) with input; os.system(...)  → command injection
+  ✓ subprocess.run(["convert", user_file], shell=False)          // args list, no shell
+
+A08 Insecure deserialization (RCE)
+  ✗ pickle.loads(untrusted) ; yaml.load(untrusted)               → arbitrary code execution
+  ✓ never unpickle untrusted data; yaml.safe_load(...) only; prefer JSON/pydantic for input.
+
+A01 Broken Access Control
+  ✓ Authorize in the SERVICE, every request, deny-by-default. FastAPI Depends() for the auth
+    principal, but the AUTHZ decision belongs in the domain — not just a route decorator.
+
+A05 Template / SSRF
+  ✗ Jinja2 with autoescape disabled → XSS.   ✓ keep autoescape ON.
+  ✗ httpx.get(user_url) → SSRF.   ✓ allow-list host/scheme; block private ranges (Boundary 4).
+
+Other
+  ✓ Passwords: argon2/bcrypt (passlib) — never sha256/plain.
+  ✓ Secrets via pydantic BaseSettings from env — never hardcoded; never logged (structlog processors).
+  ✓ Validate every request body with a Pydantic model at the router boundary.
+
+A03 Supply chain
+  ✓ pin (requirements.txt hashes / uv.lock); `pip-audit` + `bandit -r src/` in CI.
+```
+
+Boundary check:
+```bash
+grep -rEn "shell=True|os\.system|pickle\.loads|yaml\.load\(|text\(f\"" src/ && echo "review: injection/deser surface"
+```
+
+---
+
 ## Ubiquitous Language for this stack
 
 Define domain terms in CLAUDE.md BEFORE naming any class/function.

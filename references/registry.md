@@ -17,7 +17,7 @@ the default heuristic (a payment MVP needs security on day one; a read-only Grow
 | Feature touches 2+ files | incremental-implementation | addyosmani |
 | Before merging Tier M+ | code-review-and-quality | addyosmani |
 | Tier L/XL with unclear requirements | spec-driven-development | addyosmani |
-| Auth / payments / untrusted input appears | security-and-hardening | addyosmani |
+| Auth / payments / untrusted input appears | security-and-hardening (+ references/security.md spine) | addyosmani |
 | Prod behavior invisible ("can't tell what happened") | observability-and-instrumentation | addyosmani |
 | A dependency can take the system down | (shipright built-in) | references/resilience.md |
 | p95 latency / DB CPU over target | (shipright built-in) | references/performance.md |

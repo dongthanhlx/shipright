@@ -199,6 +199,43 @@ describe('background message handler', () => {
 
 ---
 
+## Security — the MV3 threat model (see references/security.md for the spine)
+
+An extension runs with the user's authority inside pages it doesn't control. Its threat model is
+specific — least privilege (Saltzer & Schroeder) is the whole game here.
+
+```
+Content script runs in a HOSTILE page
+  ✗ trust scraped DOM values as safe / eval page-provided data / build queries from them
+  ✓ treat everything read from the page as untrusted input. Sanitize before use or storage.
+
+Message passing is an entry point (other pages/extensions can message you)
+  ✗ chrome.runtime.onMessage handler that acts on any message
+  ✓ validate sender: check sender.id (your extension), sender.origin/url against an allow-list
+    before doing anything privileged. Keep externally_connectable narrow or absent.
+
+XSS in popup / options / injected UI
+  ✗ el.innerHTML = untrustedData  → XSS in an extension = access to your privileged APIs
+  ✓ el.textContent = data; build DOM nodes; MV3 CSP already forbids inline scripts — don't relax it.
+
+Secrets do not belong in an extension
+  ✗ API keys/tokens in the bundle or in chrome.storage → it ships to users; storage is NOT encrypted
+  ✓ put secrets behind YOUR backend; the extension calls your backend, which holds the key.
+
+Least privilege (Chrome will also reject over-broad extensions)
+  ✓ activeTab over <all_urls>; request host_permissions only for domains you actually call.
+  ✓ web_accessible_resources: expose the minimum — each entry is reachable by web pages.
+
+Remote code is banned in MV3 — keep it that way
+  ✗ fetch a script/string and eval it, or load remote JS  → policy violation + RCE risk
+  ✓ all executable code ships in the package and is reviewed.
+```
+
+Add to CLAUDE.md: "Validate message sender before privileged actions. No secrets in the extension —
+call a backend. No innerHTML with untrusted data. host_permissions = only domains actually used."
+
+---
+
 ## Recommended tooling (2026)
 
 ```

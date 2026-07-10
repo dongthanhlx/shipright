@@ -1,4 +1,4 @@
-# shipright v1.2.0
+# shipright v1.3.0
 
 > **Ship your MVP fast. Grow it right.**
 
@@ -212,6 +212,7 @@ shipright/
     levels.md                 # Lifecycle spine + L0→L4, gates, Conway's Law, graduate checklist
     boundaries.md             # 5 boundary rules with code examples
     enforcement.md            # the PreToolUse boundary-guard hook: install, bypass, guarantees, limits
+    security.md               # architectural security spine: Saltzer&Schroeder + OWASP 2025→layer map + per-language pitfalls
     requirement-drift.md      # Expand-Contract + 3 architecture scenarios
     debug-intermittent.md     # Intermittent / production-only / resource leak bugs
     prompts.md                # Copy-paste Claude Code prompts
@@ -256,6 +257,7 @@ shipright/
 - [x] **v0.8.2: registry capability/signal → skill trigger index**
 - [x] **v1.1.0: MCP stack (server=adapter/ACL, tool=interface contract, lethal-trifecta security, Boundary-5 resilience)**
 - [x] **v1.2.0: agents & multi-agent stack (workflow-vs-agent judgment, Anthropic/Ng patterns, LangGraph state machines, trajectory eval + tracing)**
+- [x] **v1.3.0: security spine (Saltzer&Schroeder + OWASP 2025→layer map + Shostack threat modeling) + per-stack security depth (Node/Python/Go/extension/RAG)**
 - [ ] references/registry.md community contributions (ongoing)
 - [x] **v0.9: PreToolUse boundary-enforcement hook (blocks service→db + deep cross-module imports; opt-in, fails open, self-test)**
 

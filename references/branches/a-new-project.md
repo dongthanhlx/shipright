@@ -95,6 +95,11 @@ Q5c: "Need observability from day one?
      → Recommended for all projects with external APIs or async flows
      → YES: Correlation ID setup in references/observability.md"
 
+Q5d: "Does this handle auth, payments, PII, or untrusted input?
+     → YES: run the L0 threat model (Shostack's 4 questions) — references/security.md.
+             Record the threats + controls in ARCHITECTURE.md. Insecure Design (A06) is the
+             cheapest vuln to fix at L0 and the most expensive later. Activate security-and-hardening."
+
 Q6: "Stack? (Node.js/TS, Python, Go, undecided?)"
     → Load matching stack file for concrete prompts
 
