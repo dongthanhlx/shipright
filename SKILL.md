@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 1.5.0
+version: 1.6.0
 description: >
   Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
   sets up constitution, enforces boundaries, judges what to build now vs defer,
@@ -39,7 +39,7 @@ Tests:         !`(npm test --silent 2>&1 | tail -2) || (pytest -q 2>&1 | tail -2
 
 ---
 
-# Shipright v1.5 — Project Brain OS
+# Shipright v1.6 — Project Brain OS
 
 Two hemispheres. One executive. One living constitution.
 
@@ -198,6 +198,26 @@ Load ONE file. Do not load others until needed.
 | D | `references/branches/d-refactor.md` | ~900 |
 | E | `references/branches/e-resume.md` | ~500 |
 | F | `references/branches/f-incident.md` | ~500 |
+
+---
+
+## How shipright asks — all branches
+
+Intake in every branch is a conversation, not a form. shipright carries the technical judgment
+and talks like a veteran, not a questionnaire. (Full intent-discovery flow: Branch A. Model branch: E.)
+
+```
+1. Read/infer BEFORE you ask — anything derivable from CLAUDE.md, the codebase, git, or the user's
+   own words, DETERMINE it. Don't ask for what you can read.
+2. Ask only what ONLY the user knows — the real pain, business intent, bug repro steps, priorities,
+   constraints. NEVER make the user do a technical classification that is shipright's job
+   (which code smell, which module, new-vs-extend, bug class, stack).
+3. Diagnose, then CONFIRM — don't menu-quiz. State the diagnosis with its evidence
+   ("I read X, Y, Z → this is Feature Envy") and invite correction. (Branch A's playback, generalized.)
+4. Open questions over menus — except where speed matters (Branch F incident triage) or the option
+   set is genuinely the user's stable choice.
+5. Calibrate depth to stakes (references/judgment.md): trivial → 1–2 questions; high-stakes → dig.
+```
 
 ---
 

@@ -6,39 +6,32 @@
 
 ---
 
-## Step 1 — Define the pain (reject vague goals)
+## Step 1 — The user names the PAIN; shipright diagnoses the SMELL
+
+Ask only what the user knows — the real, measurable pain — and where it hurts. Do NOT ask them to
+classify their own code smell from a menu: that is shipright's diagnostic job (read the code).
 
 ```
-Q1: "What specifically is causing pain, measurably?
-     [A] Adding feature X takes [N days] — should take [M hours]
-     [B] Bug takes [N hours] to find because code is complex
-     [C] Test suite takes [N minutes] — too slow for CI
-     [D] Performance: [metric] = [value], target = [target]
-     [E] Preparing for: larger team / data volume / service extraction"
-
-Q2: "Which specific module or file is the problem?"
-
-Q3: "Which Fowler smell best describes it?
-     [A] Long Method — functions > 20 lines, hard to understand
-     [B] Feature Envy — code belongs in a different class
-     [C] Primitive Obsession — using string/int where domain type belongs
-     [D] Divergent Change — one class changes for many reasons (SRP violation)
-     [E] Shotgun Surgery — one change requires edits in many files
-     [F] Data Clumps — same fields always appear together, need a class
-     [G] Comments explaining WHAT — rename instead"
+Ask the user (open — the pain only they experience):
+  "What's the real, measurable pain — and where does it hurt most?"
+    e.g. adding feature X takes [N days] (should be hours) · a bug takes [N hrs] to find ·
+         test suite too slow for CI · perf: [metric]=[value], target=[target] ·
+         preparing for: larger team / data volume / service extraction.
+  → If the answer is "the code looks messy" / "I want to restructure" with no measurable pain:
+    redirect. "Refactor without measurable pain rarely pays. Use it a few more days, note the
+    real friction." (Refactoring for aesthetics alone is over-engineering — judgment.md.)
 ```
 
-Identifying the specific smell is the DONE condition for naming what to fix.
-Load `references/code-quality.md` Fowler section for specific refactoring move.
-
-> Watch the OPPOSITE smell too (Ousterhout, `references/code-health.md`): over-extraction —
-> many shallow 5-line methods / one-implementation interfaces that fragment a single idea and
-> widen the interface more than they shrink the body. The fix there is INLINE, not extract.
-> Refactoring toward "deeper modules with smaller interfaces" is as valid as splitting.
-
-If the answer is "the code looks messy" or "I want to restructure":
-→ Redirect: "Refactor without measurable pain rarely delivers value.
-   Use the codebase for a few more days, note the real friction points."
+Then shipright READS that code and DIAGNOSES the smell — then confirms (don't menu-quiz):
+```
+"I read [file/module]. The smell is [Long Method / Feature Envy / Primitive Obsession /
+ Divergent Change / Shotgun Surgery / Data Clumps / WHAT-comments] — evidence: [what you saw].
+ Or the OPPOSITE (Ousterhout, code-health.md): over-extraction — many shallow methods /
+ one-implementation interfaces that fragment one idea; the fix there is INLINE, not extract.
+ Agree with the diagnosis?"
+```
+Naming the specific smell (with evidence, confirmed) is the DONE condition for what to fix.
+Load `references/code-quality.md` Fowler section for the specific refactoring move.
 
 ---
 

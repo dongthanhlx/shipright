@@ -8,6 +8,9 @@
 
 ## Step 1 — Triage (2 minutes max)
 
+> Deliberate exception to "How shipright asks" (SKILL.md): under incident pressure, a fast
+> structured checklist beats an open conversation. Speed > rapport here.
+
 ```
 □ Severity: how many users/requests affected? (real number)
 □ Blast radius: spreading or stable?

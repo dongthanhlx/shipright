@@ -12,18 +12,19 @@ If Shipright state exists in CLAUDE.md:
 "Last session: [Level], [module], next: [action]. Work on that, or a new feature?"
 ```
 
-If no state → intake:
+If no state → the project already exists: READ CLAUDE.md + ARCHITECTURE.md first (don't ask "what
+does it do?" — read it). Then ask only what you can't read:
 ```
-Q1: "Project name and one sentence: what does it do?"
-Q2: "Feature: 'User can [do what] to [achieve what]'"
-Q3: "New module needed, or extend existing?"
+Ask the user (the intent only they know):
+  "What should a user be able to do after this feature — and why does it matter?" (the job)
+  → Dig one level if the ask is a solution ("add a dashboard") rather than a need ("see X to decide Y").
 
-Q3b (if adding third-party API integration):
-  "Has this API been explored yet? Do fixtures exist in tests/fixtures/?"
-  → NO fixtures: do Layer 1 Exploration FIRST (before writing Adapter)
-     Bruno → call sandbox → save real responses → then write Adapter
-  → YES fixtures: proceed with implementation using existing fixtures
-  → Load: references/third-party-apis.md§Layer-1 for exploration steps
+DO NOT ask "new module or extend existing?" — that is shipright's call. Decide it AFTER the
+codebase report (Step 1) and PROPOSE it: "I'll extend [module] / add module [X] because […] — ok?"
+
+Third-party API in scope? → shipright detects it from the feature, doesn't quiz. If it needs one:
+  check tests/fixtures/ — no fixtures → do Layer 1 exploration FIRST (docs → Bruno → sandbox →
+  save fixtures → then Adapter). references/third-party-apis.md §Layer-1.
 ```
 
 If project type unknown → check registry for matching entry, load it.
@@ -48,6 +49,10 @@ Feature touches: [which modules affected]
 
 Domain term drift = immediate fix before new feature.
 Generic `OrderManager` when `FulfillmentPolicy` exists in Ubiquitous Language → rename.
+
+From the report, PROPOSE the placement (don't ask the user to decide it):
+"This feature belongs in [extend module X / a new module Y] because [evidence from the report].
+ It touches [modules]. Agree, or did I misread the structure?" → proceed on confirmation.
 
 ---
 
