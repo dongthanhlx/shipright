@@ -1,5 +1,40 @@
 # Changelog
 
+## [1.5.0] — 2026-07 — Intake reimagined (conversation, not questionnaire)
+The Branch A intake was mechanical: a fixed Q1→Q7 form that forced an "MVP vs production" binary
+before understanding anything, quizzed the user on decisions that are shipright's job ("need
+observability from day one?", "data profile: volume/read-write/multi-tenant?"), gave the actual
+problem one sentence while spending seven questions on mechanics, and never played understanding
+back mid-flow. It extracted what shipright needed to fill its templates instead of understanding
+what the user meant.
+
+Reframed as **adaptive intent discovery**, grounded in the masters of discovery: **Rob Fitzpatrick**
+(*The Mom Test* — ask about their problem, not your solution; open, non-leading questions),
+**Clayton Christensen** (Jobs To Be Done), **Eric Evans** (the early talk is domain discovery, not a
+quiz), **Ryan Singer** (Shape Up — appetite sets the mode), and the **interview-me** philosophy (one
+real question at a time until ~95% sure of intent).
+
+### Changed — Branch A Steps 1–2 (`a-new-project.md`)
+- **Step 1 — understand the idea and the job** (mostly listen): open with the problem, not
+  mode/stack; one adaptive question at a time; reach the job-to-be-done (dig one level under the
+  stated ask), who/why-now, what success looks like, and the appetite/stakes. Calibrate depth to
+  stakes (trivial → 1–2 questions). Dispatch to interview-me/idea-refine if the idea is genuinely
+  vague and they're installed.
+- **Step 2a — play it back**: reflect the hypothesis in the user's own words and invite correction
+  BEFORE any mechanics — the net that catches a misread idea before it becomes wrong code.
+- **Step 2b — shipright decides the shape**: mode is INFERRED from appetite (not a cold binary);
+  stack is recommended with a reason; observability is shipright's call; API exploration / security
+  threat model / AI registry are TRIGGERED by what shipright learned — not asked as a cold quiz.
+  Only genuinely user-answerable, load-bearing questions are asked (hard deadline, required integration).
+- **Output is always an explicit MVP scope** (walking skeleton = one journey + one-way-doors-now +
+  backlog) — the redesign serves MVP-first: you can't cut to the true core without understanding
+  the real job. Understanding deepens (fast); build stays deferred; the conversation stays short for MVP.
+
+### Also
+- Ecosystem dispatch: interview-me/idea-refine are no longer blanket-skipped — Branch A does intent
+  discovery natively and dispatches to them on the "vague idea" trigger.
+- Removed stale Q-number references across levels.md, prompts.md, domain-thinking.md.
+
 ## [1.4.0] — 2026-07 — Chatbot & blockchain security depth
 Deepens the two domains where security matters most, grounded in their masters — and fixes two
 anti-patterns found in the existing files.
