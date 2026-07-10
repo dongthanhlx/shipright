@@ -39,7 +39,10 @@ git branch -a            # which branch? WIP branches?
 ```
 
 Read CLAUDE.md + ARCHITECTURE.md fully.
-If neither exists → use Branch A Production mode to reconstruct.
+If neither exists → the code already exists, so start from what the code says: run Claude Code's
+native `/init` (it analyzes the codebase and drafts a CLAUDE.md), THEN refine it with shipright's
+lean-constitution rules (l0-templates.md) — boundaries, Ubiquitous Language, the one-way doors.
+(Branch A's discovery is for NEW projects with no code; here the code is the source of truth.)
 
 ---
 

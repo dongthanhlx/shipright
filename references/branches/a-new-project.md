@@ -145,6 +145,11 @@ If skills required are not installed → mention once:
 
 ## Step 4 — Generate constitution
 
+> DISTILL the constitution from the discovery — don't fill a template mechanically. The job, the
+> one-way doors, and the real risk you surfaced in Steps 1–2 ARE the content. Keep the root lean
+> (~50–60 lines MVP, <200 always): load-bearing rules only; deep conventions go to @import files.
+> Full structure, the @import pattern, Nygard-format ADRs, and auto-memory split: `references/l0-templates.md`.
+
 ### CLAUDE.md (always generated, content varies by mode)
 
 **MVP version (~60 lines):**
@@ -152,7 +157,8 @@ If skills required are not installed → mention once:
 # CLAUDE.md — [project-name] (MVP v0.1)
 
 ## Project
-[the problem, one sentence — from discovery]
+[the JOB — what the user is really hiring this to do, for whom, and what success looks like.
+ Distilled from discovery (Step 1), not a mechanical Input→Process→Output line.]
 
 ## Ubiquitous Language
 | Term | Meaning | Not |
@@ -208,6 +214,15 @@ Skills active: [installed skills]
 - 1 ADR for hardest decision
 
 **Production version:** Full per `references/l0-templates.md`
+
+### Confirm before proceeding (the constitution is what Claude follows every session)
+```
+Play the distilled constitution back — don't just generate and move on:
+"This is the constitution I'll follow every session: [job] · Ubiquitous Language [terms] ·
+ boundaries [the project-specific banned imports] · the one-way doors I'm nailing now: [list].
+ The one risk I see is [X]. Anything wrong or missing before we build?"
+Fix on the user's correction. A constitution the user didn't confirm won't be trusted or honored.
+```
 
 ---
 
