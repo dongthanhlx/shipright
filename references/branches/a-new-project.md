@@ -46,6 +46,9 @@ Then dig, adaptively, toward these (shipright's INTERNAL checklist — not a bat
   • What success/"done" looks like — in their terms, concretely (a story, not an opinion).
   • Appetite / stakes (Shape Up): how much is this worth — a weekend throwaway, or a bet? This
     sets both the MODE and how deep to dig. It is inferred here, never asked as a cold binary.
+  • Who's building it — solo, or a team where people own different parts? (This one you ASK — only
+    the user knows.) It routes the shape: solo → keep it lean; multi-dev → the module boundaries
+    become team APIs and get designed to match the team from day one (Conway). See Step 2b.
 
 Mom Test discipline:
   • Ask about their world and problem, not your solution. Open questions, never leading ones.
@@ -78,9 +81,17 @@ misread idea before it becomes wrong code.
 Now settle mechanics — but shipright DECIDES and states assumptions the user can veto. Only ask
 the few things that are genuinely the user's to answer (a hard deadline, a required integration).
 ```
-Mode (inferred from appetite/stakes — do NOT ask a cold binary):
-  small appetite / validating → MVP mode. "I'll treat this as an MVP: ship the one journey,
-  defer the rest. Say so if you actually have fixed scope + a team + a timeline (production mode)."
+Mode (inferred from appetite/stakes — do NOT ask a cold binary; see references/judgment.md §2):
+  validating an unproven idea → VALIDATION (throwaway-OK, minimum to learn — Ries).
+  known direction, will grow → FOUNDATION: the thinnest slice with the load-bearing architecture
+  right (Cockburn's walking skeleton done right — thin ≠ tactical). Most projects are Foundation.
+  "I'll ship the one journey and defer the rest, with the irreversible decisions right from day one."
+
+Team shape (from Step 1 — SIGNAL-DRIVEN; skip entirely if solo):
+  Multi-dev (people own different modules)? → the module boundaries are now TEAM APIs. Design them
+  to match the intended team (inverse Conway), assign one owner per module, size each to one owner's
+  cognitive load, and set up cross-module contract tests. Load references/team-scale.md and record a
+  module-ownership table in ARCHITECTURE.md at L0. (Solo → none of this; the boundaries already serve you.)
 
 Ubiquitous Language (Evans — extract from how they talk, don't quiz "give me 3–5 terms"):
   Pull the domain terms out of the conversation and confirm them back: "You call these X, Y, Z —

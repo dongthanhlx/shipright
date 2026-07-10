@@ -1,5 +1,38 @@
 # Changelog
 
+## [1.8.0] — 2026-07 — Team scale + sharpened MVP framing
+Two threads from a foundational review of "is MVP-first actually the right strategy?" and "how does
+shipright hold up when many devs each own a module?". The answer to both: shipright's *mechanism* is
+sound (strategic-on-the-irreversible), but its *framing* under-served it. Same primitive, better story.
+
+### Added — `references/team-scale.md` (signal-driven; solo projects skip it)
+When multiple developers each own module(s), a boundary stops being "clean architecture" and becomes
+the **coordination protocol between people**. Anchored in **Conway** (systems mirror the org),
+**Parnas** (information hiding → independent development), **Eric Evans** (Context Mapping), **Skelton
+& Pais — Team Topologies** (team API, cognitive load, inverse Conway maneuver), **DORA** (loosely
+coupled = the top delivery-performance predictor). Covers: the module boundary AS the team API;
+inverse Conway at L0 (design boundaries to match the team); **cognitive load** as the real
+module-sizing criterion; context maps; **consumer-driven contract tests** between teams; parallel-work
+mechanics (trunk-based, feature flags, boundary-guard as the team-seam enforcer); and when NOT to
+extract to services. **One spine, not two systems** — solo and team draw boundaries identically; the
+team layer is additive and loads only on the multi-dev signal.
+
+### Changed — sharpened the MVP-first framing (`judgment.md`)
+- Distinguished the two real modes the masters split on: **VALIDATION** (Eric Ries — a throwaway-OK
+  learning vehicle) vs **FOUNDATION** (most projects — Alistair Cockburn's *walking skeleton done
+  right*: thinnest slice, load-bearing architecture correct; thin ≠ tactical).
+- **Fowler's Design Stamina Hypothesis**: the design-payoff line arrives "in weeks, not months" — for
+  anything that lasts, strategic-on-the-irreversible ships you *sooner*. "MVP-first" is a speed
+  consequence, read as "strategic where irreversible, tactical only where genuinely reversible AND cheap".
+- **Ousterhout guard**: boundaries stop STRUCTURAL rot, not LOCAL complexity — keep the strategic-
+  programming habit (deep modules, define errors out of existence) even in the "hack the rest" column.
+
+### Wired
+- Branch A intake: one team-context question (who's building it — the user knows) routes solo vs
+  multi-dev; multi-dev → inverse Conway + module-ownership table at L0. Mode reframed to Validation/Foundation.
+- boundaries.md reframed (boundary = team API at scale); registry trigger index + SKILL.md reference
+  list + scaling-guide cross-link.
+
 ## [1.7.0] — 2026-07 — Constitution as a lean, distilled, confirmed contract
 A review of how shipright generates CLAUDE.md / ARCHITECTURE.md, checked against Anthropic's own
 CLAUDE.md guidance, found the L0 templates had drifted from best practice: the MVP CLAUDE.md inlined

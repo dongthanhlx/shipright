@@ -61,6 +61,36 @@ The two right-hand columns are your entire MVP discipline. Hack the rest freely.
 An MVP missing a circuit breaker does NOT break architecture (cheap to add).
 An MVP leaking raw API responses into the service layer DOES (touches everything to fix).
 
+### "MVP-first" is a speed *consequence*, not a licence to be sloppy — two real modes
+
+The masters are split on MVP-first for a reason: it depends on which mode you're in. Distinguish them.
+
+```
+VALIDATION mode (Eric Ries) — you don't yet know if anyone wants this.
+  The MVP is a LEARNING vehicle, expected to be thrown away. Minimum to test the hypothesis.
+  Here, trading design for speed is correct — you may delete it next week.
+
+FOUNDATION mode (most projects) — the direction is known; this will live and grow.
+  This is NOT "hack an MVP". It is Alistair Cockburn's *walking skeleton done right*: the thinnest
+  slice that runs end-to-end, with the load-bearing architecture correct. Thin ≠ tactical.
+```
+
+**Why Foundation is not "ship dirty" (Fowler's Design Stamina Hypothesis):** the "design payoff
+line" — where good design overtakes no-design on *cumulative delivered features* — arrives "in weeks,
+not months". Above it, skipping design ships you *later*, not sooner. So for anything that lasts,
+strategic-on-the-irreversible is the *faster* path, not a tax. shipright's mechanism is strategic;
+its "MVP-first" name oversells the speed story — read it as *"strategic where it's irreversible,
+tactical only where it's genuinely reversible AND cheap."*
+
+### The Ousterhout guard — boundaries stop STRUCTURAL rot, not LOCAL complexity
+
+Getting the one-way doors right is necessary, not sufficient. A 200-line tangled service that
+respects every boundary is still a mess — the "tactical tornado" ships fast and leaves a wake
+(Ousterhout). Complexity accumulates from many small tactical choices, none individually wrong.
+So even in the "hack the rest" column, keep the *strategic-programming* habit: deep modules, clear
+names, define errors out of existence (references/code-health.md). "Working code isn't enough."
+This is a continuous ~10–15% investment, not a phase — it is what keeps the payoff line in your favor.
+
 **Why the boundaries are non-negotiable even at MVP:** they sit in the top-right quadrant —
 cheap to follow (just import discipline), permanent if violated. That is the rare
 combination that makes them worth enforcing when nothing else is.

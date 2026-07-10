@@ -1,4 +1,4 @@
-# shipright v1.7.0
+# shipright v1.8.0
 
 > **Ship your MVP fast. Grow it right.**
 
@@ -206,6 +206,7 @@ shipright/
     error-handling.md         # Error taxonomy, Result type, saga, race conditions, idempotency
     observability.md          # Correlation ID, logging, API tracing, SLO/error budget, DORA, retrofit
     scaling-guide.md          # Stage 1→2→3 + Strangler Fig templates
+    team-scale.md             # multi-dev/parallel-module: boundary = team API, cognitive load, contract tests (signal-driven)
     third-party-apis.md       # Adapter pattern, 3-layer testing, resilience
     ui-design.md              # taste-skill: page type → correct skill → dials
     l0-templates.md           # CLAUDE.md + ARCHITECTURE.md templates + state section
@@ -262,6 +263,7 @@ shipright/
 - [x] **v1.5.0: intake reimagined — adaptive intent discovery (Mom Test / JTBD / Shape Up / interview-me) replaces the mechanical questionnaire; understand-before-advising, playback step, shipright carries technical judgment; still MVP-first**
 - [x] **v1.6.0: conversational intake across ALL branches — shared "How shipright asks" principle in SKILL.md (read/infer before asking; diagnose-then-confirm, not menu-quiz); B/C/D reworked, F kept as deliberate speed exception**
 - [x] **v1.7.0: constitution as a lean, distilled, confirmed contract (aligned to Anthropic's CLAUDE.md guidance: <200 lines, @import for deep conventions, auto-memory split, distill-from-discovery, generate→confirm, Nygard-format ADRs, /init for existing code)**
+- [x] **v1.8.0: team scale — the module boundary as a team API (Conway/Parnas/Evans/Team Topologies/DORA): cognitive load, inverse Conway at L0, context maps, consumer-driven contract tests; signal-driven (solo skips) + sharpened MVP framing (Validation vs Foundation, Fowler payoff line, Ousterhout local-complexity guard)**
 - [ ] references/registry.md community contributions (ongoing)
 - [x] **v0.9: PreToolUse boundary-enforcement hook (blocks service→db + deep cross-module imports; opt-in, fails open, self-test)**
 

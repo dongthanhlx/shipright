@@ -20,6 +20,7 @@ the default heuristic (a payment MVP needs security on day one; a read-only Grow
 | Auth / payments / untrusted input appears | security-and-hardening (+ references/security.md spine) | addyosmani |
 | Prod behavior invisible ("can't tell what happened") | observability-and-instrumentation | addyosmani |
 | A dependency can take the system down | (shipright built-in) | references/resilience.md |
+| Multiple devs, each owning module(s), in parallel | (shipright built-in) | references/team-scale.md |
 | p95 latency / DB CPU over target | (shipright built-in) | references/performance.md |
 | Building a user-facing UI page | taste-skill (per page type) | references/ui-design.md |
 | Dashboard / admin / data-heavy UI | vercel-labs/agent-skills | vercel-labs |

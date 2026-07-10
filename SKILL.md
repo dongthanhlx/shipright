@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 1.7.0
+version: 1.8.0
 description: >
   Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
   sets up constitution, enforces boundaries, judges what to build now vs defer,
@@ -39,7 +39,7 @@ Tests:         !`(npm test --silent 2>&1 | tail -2) || (pytest -q 2>&1 | tail -2
 
 ---
 
-# Shipright v1.7 — Project Brain OS
+# Shipright v1.8 — Project Brain OS
 
 Two hemispheres. One executive. One living constitution.
 
@@ -414,6 +414,7 @@ mistake. Full "when to break each rule" guidance: `references/judgment.md`.
 - `references/performance.md` — measure-first optimization ladder, N+1, mechanical sympathy, budgets
 - `references/observability.md` — Correlation ID, logging, tracing, SLO/error budget, retrofit
 - `references/scaling-guide.md` — Stage 1→2→3 playbook + Strangler Fig templates
+- `references/team-scale.md` — multi-dev/parallel-module: boundary = team API (Conway/Parnas/Evans/Team Topologies), cognitive load, contract tests (signal-driven; solo skips)
 - `references/third-party-apis.md` — Adapter pattern, 3-layer testing, resilience
 - `references/ui-design.md` — taste-skill: page type → correct skill → dials
 - `references/l0-templates.md` — CLAUDE.md + ARCHITECTURE.md templates

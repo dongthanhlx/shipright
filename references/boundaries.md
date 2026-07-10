@@ -8,6 +8,11 @@
 These are the rules that matter for long-term maintainability and fault tolerance.
 Everything else is preference. These are not.
 
+> **Solo and team use the same boundaries — differently.** For one developer, a boundary keeps your
+> future self sane. When multiple devs each own modules, the *same* boundary becomes the **team API**
+> — the contract they build against — and boundary-guard.sh becomes the team-seam enforcer. That
+> layer is signal-driven: `references/team-scale.md` (load only when it's actually multi-dev).
+
 Violating any of these makes the codebase progressively harder to change,
 test, and eventually split into services. They're cheap to follow. Expensive to fix.
 

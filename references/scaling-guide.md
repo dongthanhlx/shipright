@@ -1,5 +1,10 @@
 # Scaling Guide — When and How to Grow Architecture
 
+> Companion: `references/team-scale.md` covers the *team* side — the module boundary as a team API,
+> cognitive load, context maps, and cross-module contract tests for parallel developers. This file
+> covers the *architecture-growth* side (Stage 1→2→3, extraction). They share the module-ownership
+> matrix; load team-scale.md the moment more than one person owns modules.
+
 ## Ubiquitous Language at scale
 
 When team grows, Ubiquitous Language consistency becomes critical.
