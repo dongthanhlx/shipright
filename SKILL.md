@@ -34,7 +34,7 @@ skill/review:      !`test -f ~/.claude/skills/agent-skills/skills/code-review-an
 skill/debug:       !`test -f ~/.claude/skills/agent-skills/skills/debugging-and-error-recovery/SKILL.md || test -f .claude/skills/agent-skills/skills/debugging-and-error-recovery/SKILL.md && echo YES || echo NO`
 skill/security:    !`test -f ~/.claude/skills/agent-skills/skills/security-and-hardening/SKILL.md || test -f .claude/skills/agent-skills/skills/security-and-hardening/SKILL.md && echo YES || echo NO`
 skill/taste:       !`test -f ~/.claude/skills/taste-skill/SKILL.md || test -f .claude/skills/taste-skill/SKILL.md && echo YES || echo NO`
-Tests:         !`(npm test --silent 2>&1 | tail -2) || (pytest -q 2>&1 | tail -2) || echo "no test runner"`
+Tests:         !`if [ -f package.json ] && grep -q '"test":' package.json; then echo "npm test"; elif [ -f pytest.ini ] || [ -f pyproject.toml ] || [ -d tests ]; then echo "pytest"; else echo "none detected"; fi`
 ```
 
 ---

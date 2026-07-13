@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased]
+### Fixed
+- **Working-context `Tests:` injection no longer runs the test suite.** It executed `npm test`/`pytest`
+  silently at every session start (before the model reasons, under the broad Bash grant) — slow,
+  side-effecting (a suite can truncate a dev DB / spawn servers), and could **hang** the session on
+  watch-mode/dev-server test scripts (no timeout — shipright breaking its own Boundary 5 in its own
+  bootstrap). The `|| pytest || echo` fallback was also dead: piping to `tail` made the pipeline always
+  exit 0, so it never fell through. Replaced with cheap, no-side-effect **runner detection**
+  (`npm test` / `pytest` / `none detected`) via `test`/`grep` only.
+
 ## [1.17.0] — 2026-07 — Runtime evals: does the knowledge FIRE at the right moment?
 Sixteen versions verified the **artifact** — files exist, are linked, are consistent (CI greps). But
 the real worry was the **runtime**: shipright *writes and understands* well, yet does the knowledge
