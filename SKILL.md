@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 1.12.0
+version: 1.14.0
 description: >
   Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
   sets up constitution, enforces boundaries, judges what to build now vs defer,
@@ -39,7 +39,7 @@ Tests:         !`(npm test --silent 2>&1 | tail -2) || (pytest -q 2>&1 | tail -2
 
 ---
 
-# Shipright v1.12 — Project Brain OS
+# Shipright v1.14 — Project Brain OS
 
 Two hemispheres. One executive. One living constitution.
 
@@ -441,6 +441,7 @@ mistake. Full "when to break each rule" guidance: `references/judgment.md`.
 - `references/stacks/nodejs.md`
 - `references/stacks/python.md`
 - `references/stacks/go.md` — packages + internal/ (compile-time Boundary 1), context timeouts (Boundary 5), pgx/sqlc, error taxonomy
+- `references/stacks/php.md` — PHP 8.3+: PHPStan-as-compiler, Deptrac boundary fitness function, Doctrine/Eloquent, exception taxonomy, PHP security footguns (unserialize/mass-assignment/type-juggling)
 - `references/stacks/browser-extension.md`
 - `references/stacks/ai-projects.md` — AI entry point + the LLM boundary (Boundary 4 for AI)
 - `references/stacks/ai-rag.md` — RAG deep dive: eval loop, vector DB, metrics

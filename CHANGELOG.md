@@ -1,5 +1,42 @@
 # Changelog
 
+## [1.14.0] — 2026-07 — Framework guidance for the backend stacks
+Framework suggestion was inconsistent: the AI/chatbot/blockchain stacks had full "framework decision"
+trees, but the general backend stacks either assumed one (python.md was titled "Python + FastAPI") or
+listed two without a decision (php.md "Symfony or Laravel"; nodejs "express/fastify"). This makes it
+consistent — and states the principle that makes the choice low-stakes.
+
+### Changed — nodejs.md, python.md, go.md, php.md
+- Each gains a **"Framework — pick a default, keep it at the edge"** block: a recommended default
+  with a one-line reason + when to pick an alternative.
+  - Node: **Fastify** (default) · NestJS (structure/DI) · Express (ecosystem) · Hono (edge).
+  - Python: **FastAPI** (default) · Django (batteries-included) · Flask/Litestar (micro). python.md no
+    longer *assumes* FastAPI — it recommends it (title + framework block reframed).
+  - Go: **net/http + chi** (default) · Gin/Echo (batteries) · avoid heavy frameworks.
+  - PHP: **Laravel** (default: DX/ecosystem) · Symfony (stricter architecture/DDD) · Slim/Mezzio (micro).
+- **The shipright-native principle** (why the choice is low-stakes): the domain/service/repository
+  never import the framework, so it's confined to the edge (handler/controller + infrastructure) and
+  stays a **two-way door — swappable**. Choosing "wrong" is cheap to fix (judgment.md +
+  evolutionary-architecture.md). A domain entity that subclasses the ORM model, or a service that
+  imports the framework, is a Boundary-2/4 violation that welds you to it. Recommend, don't agonize.
+
+## [1.13.0] — 2026-07 — PHP stack
+### Added
+- `references/stacks/php.md` — PHP (8.3+) is now a first-class stack alongside Node.js, Python, and Go.
+  Maps shipright's generic terms to modern PHP idioms and leans on the tools that give PHP its rigor:
+  - **PHPStan/Psalm at max level = the "does it compile" gate** (PHP has no compiler; static analysis is it).
+  - **Deptrac** as a **boundary fitness function** (evolutionary-architecture.md) — enforces module layers
+    in CI, since PHP has no compiler-enforced `internal/` like Go.
+  - Exception taxonomy (domain 4xx vs infrastructure 5xx; Result-value for expected branches, not exceptions —
+    Ousterhout), idempotency (pgx advisory lock + `ON CONFLICT`, money via brick/money — never float),
+    Doctrine/Eloquent + PDO prepared statements, Guzzle-with-timeout, Monolog, constructor-injection DI.
+  - A **Security** section for the PHP-specific footguns that cause most real breaches: `unserialize()`
+    object injection (RCE), mass assignment (`->all()` → privilege escalation), `==` type juggling → auth
+    bypass (use `hash_equals` + `===` + `strict_types=1`), SQLi/XSS, `composer audit` supply chain.
+
+### Changed
+- SKILL.md reference list + README structure + roadmap.
+
 ## [1.12.0] — 2026-07 — Evolutionary architecture (you WILL be wrong)
 A review of how shipright handles CHANGE and being WRONG found the core one-way-door thesis was
 over-confident about *prediction*: it assumes you can reliably classify what's irreversible and "get

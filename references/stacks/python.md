@@ -1,4 +1,4 @@
-# Stack Reference: Python + FastAPI
+# Stack Reference: Python (FastAPI recommended — see Framework)
 
 ## Mapping: generic → Python specific
 ```
@@ -14,6 +14,18 @@ structured logging      → structlog
 env validation          → pydantic BaseSettings
 scheduler               → APScheduler or celery beat
 ```
+
+## Framework — pick a default, keep it at the edge
+
+Recommend, don't assume. The domain/service/repository never import the framework → it stays a
+TWO-WAY door (swappable — judgment.md + references/evolutionary-architecture.md).
+```
+Default: FastAPI — async, typed, DI via Depends, OpenAPI free. Best for APIs (this file's examples use it).
+Django — batteries-included (admin, ORM, auth, migrations); content/CRUD-heavy apps or fast internal tools.
+Flask / Litestar — micro / full control (Litestar = modern, typed, DI — a strong FastAPI alternative).
+```
+Keep it at the router layer; services/repositories are framework-free. A domain that imports FastAPI,
+or a model that subclasses `django.db.models.Model`, is a Boundary-2/4 violation that welds you to the framework.
 
 ## Project init prompt
 ```
