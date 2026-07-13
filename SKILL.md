@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 1.15.0
+version: 1.16.0
 description: >
   Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
   sets up constitution, enforces boundaries, judges what to build now vs defer,
@@ -39,32 +39,18 @@ Tests:         !`(npm test --silent 2>&1 | tail -2) || (pytest -q 2>&1 | tail -2
 
 ---
 
-# Shipright v1.15 — Project Brain OS
+# Shipright v1.16 — Project Brain OS
 
-Two hemispheres. One executive. One living constitution.
-
-A brain with two hemispheres and an executive that decides how much of each to use.
-The master roster grows over time — the named list below is the source of truth, not a count:
+An executive layer over two hemispheres. The executive decides how much of each hemisphere to
+apply, by stage × risk × reversibility (construction is ON from day one — the irreversible quadrant;
+operation turns on by signal). The roster grows — the reference files are the source of truth, not a count.
 
 ```
-EXECUTIVE (prefrontal cortex) — references/judgment.md
-  Bezos:  one-way vs two-way doors — get irreversible decisions right, move fast on the rest
-  "Senior judgment = knowing when NOT to apply a pattern."
-
-LEFT HEMISPHERE — construction (right structure, right model, kept clean)
-  Eric Evans:    Model the right domain (Ubiquitous Language, Bounded Contexts, Aggregates)
-  Uncle Bob:     Structure it correctly (SOLID, Clean Code, 20-line functions)
-  John Ousterhout: Deep modules, define errors out of existence (counterweight to Uncle Bob)
-  Fowler:        Keep it clean as it evolves (smell detection, compound engineering)
-  Kent Beck:     Prove it (TDD: Red → Green → Refactor)
-
-RIGHT HEMISPHERE — operation (survives failure, stays fast, stays observable)
-  Michael Nygard: Survive failure (timeouts, circuit breakers, bulkheads — resilience.md)
-  SRE / Majors:   Stay observable + measured (SLO, error budget — observability.md)
+EXECUTIVE  — Bezos (one-way/two-way doors) + the discipline of stopping   → references/judgment.md
+CONSTRUCTION (day one) — Evans · Uncle Bob · Ousterhout · Fowler · Kent Beck
+             → code-quality.md · code-health.md · testing.md
+OPERATION (on signal)  — Nygard (resilience.md) · SRE/Majors (observability.md)
 ```
-
-The executive sets the **dial** on each hemisphere by lifecycle phase (see spine below):
-construction is ON from day one (it's the irreversible quadrant); operation turns on by signal.
 
 ---
 
@@ -122,19 +108,11 @@ floor to ship). Full matrix + the discipline of stopping + "when to break each r
 
 ---
 
-## Lifecycle spine — one model, four phases
+## Lifecycle spine — SEED → VALIDATE → HARDEN → SCALE
 
-Shipright's older vocabularies (L0–L4, Stage 1–3, MVP/Production, Traction/Growth/Scale) all
-map onto one spine. Each phase declares which masters are active and the resilience dial level.
-
-| Phase | aka | Levels / Stage | Construction dial | Operation dial |
-|---|---|---|---|---|
-| **SEED** | MVP | L0–L1 | boundaries + naming + core domain model | OFF — except one-way-door items (idempotency, money units, state location) |
-| **VALIDATE** | Traction | L2–L3 | + TDD + quality gate | MINIMAL — timeouts + Correlation ID |
-| **HARDEN** | Growth | L4 · Stage 1–2 | + Fowler refactoring | FULL Nygard + SLO/error budget (on signal) |
-| **SCALE** | Scale | Stage 3 | + Ousterhout deep modules | + bulkheads, backpressure, Strangler Fig |
-
-Detail: `references/levels.md` (spine + L0–L4 gates), `references/judgment.md` (the dial logic).
+One model; the older vocabularies (L0–L4, Stage 1–3, MVP/Production, Traction/Growth/Scale) map onto
+it. Construction ramps up early (irreversible quadrant); operation turns on by signal. Full phase
+table + which masters/dial per phase: `references/levels.md` + `references/judgment.md`.
 
 ---
 
@@ -146,32 +124,18 @@ Project state section in CLAUDE.md shows where things left off last session.
 
 **Check 2: Read granular skill detection above, then adapt precisely**
 
-```
-skill/spec-driven = YES  → activate /spec for Tier L/XL BEFORE implementation starts
-skill/spec-driven = NO   → guide spec writing manually (write acceptance criteria as markdown)
+| skill (detected above) | if YES → activate | if NO → shipright's built-in fallback |
+|---|---|---|
+| spec-driven | Tier L/XL, before implementation | write acceptance criteria as markdown |
+| incremental | Tier M+ multi-file features | outside-in drive, vertical slice (levels.md L3) |
+| tdd | any feature with logic | RED test manually first |
+| review | before merge on Tier M+ | manual quality gate (code-quality.md) |
+| debug | all bugs (Branch C) | Branch C 5-step flow |
+| security | auth/payments/untrusted input appears | manual OWASP (security.md; not enough for contracts) |
+| taste | UI pages | describe direction manually (ui-design.md) |
 
-skill/incremental = YES  → activate for Tier M+ features with multiple files
-skill/incremental = NO   → drive outside-in from behavior, slice vertical, implement domain-first
-                           for convenience (repository → service → handler) — levels.md L3 "three axes"
-
-skill/tdd = YES          → activate for all feature implementation (all tiers with logic)
-skill/tdd = NO           → write RED test manually first, then implement
-
-skill/review = YES       → activate BEFORE every merge/commit on Tier M+
-skill/review = NO        → run quality gate checklist manually (code-quality.md)
-
-skill/debug = YES        → activate for ALL bug classifications (Branch C)
-skill/debug = NO         → follow Branch C 5-step flow manually
-
-skill/security = YES     → activate before production deploy / growth stage
-skill/security = NO      → manual OWASP checklist (note: not sufficient for smart contracts)
-
-skill/taste = YES        → activate for UI pages — read ui-design.md for correct variant
-skill/taste = NO         → describe design direction manually, reference ui-design.md dials
-```
-
-When skill = NO: always say "X not installed — using shipright's built-in guidance instead."
-Never pretend skill is available when it's not. Never skip the step entirely.
+When a skill = NO: say "X not installed — using shipright's built-in guidance instead." Never pretend
+it's available; never skip the step.
 
 **Check 3: Note missing skills**
 If registry entry requires a skill not installed → mention once at session start:
@@ -236,54 +200,21 @@ Load only the relevant entry, not the full file.
 
 ---
 
-## Quality system — construction hemisphere, enforced throughout
+## Quality system — construction hemisphere
 
-### At L0 (constitution)
-- Evans: Ubiquitous Language in CLAUDE.md (domain terms Claude must use)
-- Evans: Domain types in ARCHITECTURE.md (Entity vs Value Object vs Service)
-- Uncle Bob: Clean Code rules in CLAUDE.md (function max 20 lines, no AND/OR names)
-- **Test runner configured** — Jest/pytest/Foundry/Anchor set up at L0, not later
+Enforced across the lifecycle; the detail lives in the refs (load on demand):
+- **L0** — Ubiquitous Language + domain types in CLAUDE.md/ARCHITECTURE.md (Evans); Clean Code rules;
+  test runner set up now. → `references/code-quality.md`, `references/l0-templates.md`.
+- **L1–L3** — **test-first is the default for logic** (goal = confidence + design, not ritual or a
+  coverage number; narrow honest exceptions; never for money). Pyramid, test-through-the-public-
+  interface, mock only at the seams: `references/testing.md`. Build order (drive outside-in · slice
+  vertical · implement domain-first): `references/levels.md` L3.
+- **Before every commit — the quality gate**: tests? names from Ubiquitous Language? function > 20
+  lines? Feature Envy / Primitive Obsession? Full gate: `references/code-quality.md` + `code-health.md`.
 
-### At L1 (skeleton) — test BEFORE implementation
-**Kent Beck's TDD rule: Red → Green → Refactor.** Test-first is the strong default for any code
-with logic — it buys design pressure + a safety net + confidence, in MVP AND production alike.
-But hold it as Beck himself does: TDD is a tool, not a religion — the goal is **confidence + good
-design, not a test-first ritual or a coverage number**. The honest exceptions are narrow (a spike you
-throw away, then redo test-first; genuinely trivial config/copy with no logic). Never skip it for
-money/side-effects. Full strategy — the pyramid, testing through the public interface, mock only at
-the seams, Beck's Test Desiderata: `references/testing.md`.
-
-```
-MVP skeleton test: 1 test that proves the skeleton works end-to-end
-  → test FAILS (nothing implemented) → implement → test PASSES → commit
-
-Production L2 tests: all interface contracts as RED tests
-  → tests FAIL → implement → tests PASS → commit
-```
-
-Uncle Bob: "The only way to go fast is to go well."
-Fowler: "Any fool can write code that a computer can understand.
-         Good programmers write code that humans can understand."
-Test-first makes code understandable because it was designed to be tested.
-
-### At L3 (before every commit)
-Load `references/code-quality.md` for full gate. Quick version:
-```
-Tests:   New code has tests? Tests written BEFORE implementation?
-DDD:     Names from Ubiquitous Language? Value Objects immutable?
-SOLID:   Function > 20 lines? AND/OR in name? New type modified existing switch?
-Fowler:  Feature Envy? Primitive Obsession? Comment explaining WHAT?
-```
-Violation found → fix before committing + add rule to CLAUDE.md (compound engineering)
-
-### Compound engineering (ongoing)
-Every repeated AI mistake → a rule that prevents it next time. But split by durability:
-- **Durable architectural rule** (a boundary, a naming law, a real convention) → CLAUDE.md or
-  `.claude/rules/[module].md`. This is the constitution — keep it lean and load-bearing.
-- **Incidental learning** (a build command, a debugging insight, a discovered preference) → leave it
-  to Claude Code's native **auto memory** (`~/.claude/projects/<project>/memory/`), which Claude
-  writes itself. Don't cram these into CLAUDE.md — that bloats it and reduces adherence.
-CLAUDE.md gets smarter every session, without getting fatter. AI makes the same mistake twice: rare.
+**Compound engineering**: a repeated mistake → a rule that prevents it. Durable architectural rule →
+CLAUDE.md / `.claude/rules/`; incidental learning (build cmd, debug insight) → Claude Code's native
+auto memory. Keep CLAUDE.md the lean constitution, not a dumping ground.
 
 ---
 
@@ -329,74 +260,29 @@ Never add L4 work proactively. Only when production gives a measurable signal.
 
 ## Ecosystem dispatch — shipright is the conductor
 
-Shipright owns WHEN and WHAT. Community skills own HOW. Two hard rules:
+Shipright owns WHEN/WHAT (constitution · 5 boundaries + quality gate + executive layer · lifecycle ·
+routing · irreversible decisions). Community skills own HOW. Two hard rules:
 1. Never self-execute work a dedicated skill already covers.
-2. Never load a skill you'd duplicate, and never load heavy skills a small project doesn't
-   need yet — every loaded skill spends context budget and dilutes reasoning. Few skills
-   when small is a correctness concern, not minimalism.
+2. Never load a skill you'd duplicate, or a heavy skill a small project doesn't need yet — every
+   loaded skill spends context budget and dilutes reasoning (few-skills-when-small = correctness).
 
-```
-Shipright owns:
-  Constitution (CLAUDE.md + ARCHITECTURE.md)
-  5 boundary rules + quality gate + the executive/judgment layer
-  Lifecycle spine + project state + routing
-  Registry-based skill suggestions (by trigger)
-  Irreversible (one-way-door) architecture decisions
+**Dispatch by TRIGGER, not stage label** (a payment MVP needs security day one; a read-only app may
+never). The full capability/signal → skill table (addyosmani, taste-skill, AI-eval) is the **trigger
+index in `references/registry.md`** — load it after routing. Default ladder if no trigger fires:
+SEED=debug · VALIDATE=+tdd/incremental/review · HARDEN=+spec/security/observability · SCALE=+specialized.
 
-Dispatch by TRIGGER, not by stage label. Stage is only the default heuristic; the trigger
-is the truth. A payment MVP needs security on day one; a read-only Growth app may never.
-
-addyosmani/agent-skills — activate by trigger (detection checks each skill individually):
-  debugging-and-error-recovery   ← any bug. Most valuable from day one — install at SEED.
-  test-driven-development        ← any logic/behavior change (all phases).
-  incremental-implementation     ← any feature touching 2+ files.
-  code-review-and-quality        ← before any merge on Tier M+.
-  spec-driven-development        ← before a Tier L/XL feature with unclear requirements.
-  security-and-hardening         ← the MOMENT auth / payments / untrusted input appears
-                                    (regardless of phase — not "at Growth").
-  observability-and-instrumentation ← when prod behavior becomes invisible (HARDEN signal).
-  Default ladder if no specific trigger: SEED=debug · VALIDATE=+tdd/incremental/review ·
-  HARDEN=+spec/security/observability · SCALE=+specialized.
-  Note: agent-skills folder ≠ all 24 skills installed. Detection checks individual skills.
-
-taste-skill owns (install by page type):
-  Landing/portfolio: design-taste-frontend
-  Product UI:        minimalist-skill
-  Premium/calm:      soft-skill
-  Redesign:          redesign-skill FIRST, then above
-  Dashboard/admin:   NOT taste-skill → vercel-labs/agent-skills
-
-AI ecosystem owns (install by project type):
-  RAG evaluation:    RAGAS + LangSmith / Arize Phoenix
-  LLM observability: datadog-labs/dd-llmo-eval-bootstrap
-  Agent evaluation:  DeepEval / Confident-AI
-
-SKIP (shipright already covers):
-  interview-me, idea-refine → Branch A does intent discovery natively; DISPATCH to these when the
-                              idea is genuinely vague and they're installed (trigger, don't blanket-skip)
-  frontend-ui-engineering  → taste-skill
-  performance-optimization → L4 signal-driven
-```
-
-**For AI/RAG/chatbot projects:**
-addyosmani covers infrastructure code (adapters, handlers, CI/CD, code review).
-Shipright AI files cover AI-specific code (evaluation loop, LLM boundaries, conversation state).
-Use both — they don't overlap.
+**SKIP (shipright already covers):** interview-me / idea-refine → Branch A intent discovery (dispatch
+only when the idea is genuinely vague + installed); frontend-ui-engineering → taste-skill; performance-
+optimization → L4 signal-driven. For AI/RAG: addyosmani covers infra code, shipright AI files cover
+AI-specific code (eval loop, LLM boundaries) — use both, no overlap.
 
 ---
 
 ## When workflow is not appropriate
 
-```
-Throwaway prototype, < 1 week lifespan?    → skip everything, hack freely
-Script / CLI, < 200 lines, no domain?      → flat functions, no layers
-Solo, < 3 domain entities, read-only data? → simple modules, no DI
-Otherwise                                   → use shipright
-```
-
-Senior judgment = knowing when NOT to apply a pattern. Applying the full tree to a 50-line
-script is the same failure as skipping it on a payment system — opposite directions, same
-mistake. Full "when to break each rule" guidance: `references/judgment.md`.
+Throwaway/<1wk · script <200 lines no domain · solo <3 entities read-only → skip the machinery, hack
+freely (flat functions, no layers/DI). Otherwise use shipright. Senior judgment = knowing when NOT to
+apply a pattern (over-applying to a 50-line script = under-applying on a payment system). `judgment.md` §5.
 
 ---
 
