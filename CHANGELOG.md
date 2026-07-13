@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.17.1] — 2026-07 — Trigger-coverage guard: the v1.17 finding, now permanent CI
+v1.17 found the "we were wrong / requirements changed / MCP" family DARK by hand-dogfooding. This turns
+that finding into a **hard-fail CI check** so it can never silently regress.
+
+### Added
+- **`validate.yml`: must-fire trigger-coverage check.** For each ref in EVALS.md's ` ```must-fire ` block,
+  its basename must appear in the **trigger zone** = SKILL.md *above* the "Reference files" index **+** all
+  `references/branches/*.md`. A ref that lives only in the reference-index catalogue = DARK = hard fail.
+- **EVALS.md: `must-fire` manifest** — the machine-readable subset of refs that must never go DARK, with
+  the enforcement contract. **To CI-enforce a new deep ref, add its path here.**
+
+### Verified
+- Positive: the current tree passes. Negative: blinding evolutionary-architecture's Mid-work trigger makes
+  the check FAIL — confirming the guard bites *and* that the Mid-work row is that ref's sole live trigger
+  (the exact v1.17 finding). This is shipright's own "fitness functions must themselves fail on a real
+  regression" principle (evolutionary-architecture.md) applied to shipright.
+
 ## [1.17.0] — 2026-07 — Runtime evals: does the knowledge FIRE at the right moment?
 Sixteen versions verified the **artifact** — files exist, are linked, are consistent (CI greps). But
 the real worry was the **runtime**: shipright *writes and understands* well, yet does the knowledge

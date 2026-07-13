@@ -49,6 +49,32 @@ exactly why dogfooding is necessary.
 that arise while building, mirroring the L4 operation-signal table. This gives the dark knowledge a
 concrete in-session firing path.
 
+## Must-fire manifest (CI-enforced)
+
+The scenario table above is run by hand. The refs below are the **subset that must never go DARK** —
+each surfaces *mid-session* (a realization or a signal), so it needs a concrete situation-trigger in the
+**reachable** context, not just a line in the reference index. CI (`validate.yml`) enforces this on every
+PR: for each path here, its basename must appear in the **trigger zone** = SKILL.md *above* the
+"Reference files — load on demand" index, **or** in any `references/branches/*.md`. Appearing only in the
+index (the catalogue) = DARK = hard fail. This is the v1.17 finding turned into a permanent fitness function.
+
+**To enforce a new deep ref: add its path to this list.** It then cannot merge until it has a live trigger.
+
+```must-fire
+references/evolutionary-architecture.md
+references/requirement-drift.md
+references/stacks/mcp.md
+references/security.md
+references/performance.md
+references/resilience.md
+references/observability.md
+references/team-scale.md
+references/testing.md
+references/code-quality.md
+references/code-health.md
+references/third-party-apis.md
+```
+
 ## The lesson
 
 shipright's runtime power = **retrieval + timing**, not content depth. The always-loaded core's real job

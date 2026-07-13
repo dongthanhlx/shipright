@@ -53,3 +53,24 @@ jobs:
           done
           if [ $rc -ne 0 ]; then exit 1; fi
           echo "✓ No orphaned reference files"
+
+      - name: Check must-fire refs have a live situation-trigger (no DARK spots — hard fail)
+        run: |
+          # v1.17 fitness function: a ref in EVALS.md's ```must-fire block must be reachable mid-session
+          # via a concrete trigger, not merely catalogued in the reference index. Trigger zone =
+          # SKILL.md ABOVE the "Reference files" index + all branch files. Basename match (refs are cited
+          # both as `references/x.md` and bare `x.md`), consistent with the orphan check.
+          idx=$(grep -n '^## Reference files' SKILL.md | head -1 | cut -d: -f1)
+          if [ -z "$idx" ]; then echo "Cannot find reference-index anchor in SKILL.md"; exit 1; fi
+          head -n $((idx-1)) SKILL.md > /tmp/tz.txt
+          cat references/branches/*.md >> /tmp/tz.txt
+          manifest=$(awk '/^## Must-fire manifest/{f=1;next} /^## /{f=0} f' EVALS.md | grep -oE 'references/[a-zA-Z0-9/_-]+\.md' | sort -u)
+          if [ -z "$manifest" ]; then echo "must-fire manifest empty or missing in EVALS.md"; exit 1; fi
+          rc=0
+          for ref in $manifest; do
+            test -f "$ref" || { echo "MANIFEST LISTS MISSING FILE: $ref"; rc=1; continue; }
+            base=$(basename "$ref")
+            grep -qF "$base" /tmp/tz.txt || { echo "DARK (no live trigger, only catalogued): $ref"; rc=1; }
+          done
+          if [ $rc -ne 0 ]; then exit 1; fi
+          echo "✓ All must-fire refs have a live situation-trigger"
