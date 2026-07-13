@@ -27,7 +27,7 @@ cancellation / timeout   → context.Context threaded through every call (first 
 
 ```
 Boundary 1 (no deep imports) → put module internals under internal/. The Go compiler FORBIDS any
-  package outside the internal/ parent from importing it. This is stronger than the v0.9 hook —
+  package outside the internal/ parent from importing it. This is stronger than the boundary-guard hook —
   it's a compile error, not a lint. Expose the public API from the package root.
     internal/orders/         ← package orders (the public API: NewService, Order, Repository)
     internal/orders/store/   ← internal/, only orders/ may import it
@@ -38,7 +38,7 @@ Boundary 2 (service never touches db) → the service holds a Repository INTERFA
   Grep guard: a service file importing pgx/database/sql is the violation.
 ```
 
-> Note: the v0.9 `boundary-guard.sh` hook targets TS/JS/Python file conventions (`*.service.ts`,
+> Note: the `boundary-guard.sh` hook targets TS/JS/Python file conventions (`*.service.ts`,
 > `shared/db`). In Go, the `internal/` directory gives you compile-time Boundary 1 enforcement for
 > free; use the grep checks below for Boundary 2.
 

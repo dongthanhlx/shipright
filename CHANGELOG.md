@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.15.0] — 2026-07 — Staleness & consistency propagation
+A sweep for spots that hadn't caught up with recent versions — the parts that "still used the old
+version". Fixed the leftovers, all consistent with what shipped in v0.8–v1.10.
+
+### Fixed
+- **Stale version strings**: `prompts.md` header "Current as of v0.7.2" → version-neutral; `go.md`
+  "the v0.9 hook" → "the boundary-guard hook" (won't rot). (The `MVP v0.1` in the L0 template is the
+  *generated project's* version, not shipright's — left as-is.)
+- **Leftover Boundary-5/6 collisions** (the same collision fixed in ai-projects.md at v1.1, missed
+  elsewhere): `blockchain.md` "The 5th boundary rule for blockchain" → "Blockchain-specific boundaries
+  (beyond the core 5)"; the custodial "6th boundary rule / Boundary 6" (private key) → "the private-key
+  boundary (custodial-specific)". Same fix in `prompts.md` and the `registry.md` custodial key
+  (`boundary-6` → `key-boundary`). Boundary 5 (v0.8) is integration timeout + fallback — nothing else.
+- **Build-order framing** in `prompts.md` still said "inside-out, test-first" (pre-v1.10) → updated to
+  the v1.10 model: drive OUTSIDE-IN from behavior, one VERTICAL slice, implement domain-first for convenience.
+- **Master roster** in `code-quality.md` still framed as "three masters" (Evans/Uncle Bob/Fowler) →
+  added a note that the construction hemisphere grew (Ousterhout, Kent Beck) and an operation hemisphere
+  (Nygard, SRE) sits alongside; this file covers the three foundational construction-quality dimensions.
+
 ## [1.14.0] — 2026-07 — Framework guidance for the backend stacks
 Framework suggestion was inconsistent: the AI/chatbot/blockchain stacks had full "framework decision"
 trees, but the general backend stacks either assumed one (python.md was titled "Python + FastAPI") or

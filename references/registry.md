@@ -377,7 +377,7 @@ shipright-adds-to-CLAUDE:
     - "TODO[launch]: bug bounty program via Immunefi"
 
 custodial-wallet-specific:
-  boundary-6: "Private key decrypted ONLY inside signing action — never passed between layers"
+  key-boundary: "Private key decrypted ONLY inside signing action — never passed between layers"
   idempotency: "All dedup checks in DB/Redis — never in-memory Map (lost on restart)"
   state-machine: "Every ticket: explicit states + logged transitions + terminal states immutable"
   scheduler: "Every scheduler: distributed lock + session audit + chunk processing"

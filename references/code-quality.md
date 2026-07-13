@@ -13,6 +13,12 @@ Three different dimensions. A project can fail at any one of them independently:
 
 Shipright enforces all three, in order: domain model first (Evans), then structure (Uncle Bob), then evolution (Fowler).
 
+> These three are the FOUNDATIONAL construction-quality dimensions — not the whole roster. The
+> construction hemisphere has since grown: **John Ousterhout** (deep modules / define errors out of
+> existence — a deliberate counterweight to Uncle Bob; `references/code-health.md`) and **Kent Beck**
+> (TDD; `references/testing.md`) round it out, and an **operation hemisphere** (Nygard resilience, SRE
+> observability) sits alongside. See SKILL.md for the two-hemisphere brain. This file covers the three.
+
 ---
 
 ## Layer 1: Eric Evans — Domain-Driven Design

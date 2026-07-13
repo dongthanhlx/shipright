@@ -1,11 +1,12 @@
 # Claude Code Prompts — Copy-Paste Library
 
-Current as of v0.7.2. Aligned with complexity tiers and ecosystem delegation.
+Copy-paste prompts for Claude Code, aligned with shipright's branches, complexity tiers, and ecosystem delegation.
 
 All prompts follow this pattern:
 1. **Orient** — tell Claude Code what to read first
 2. **Scope** — exactly what to create/change
-3. **Order** — sequence (inside-out, test-first)
+3. **Order** — drive OUTSIDE-IN from behavior, one VERTICAL slice, implement domain-first for
+   convenience (test-first) — see `references/levels.md` L3 "three axes"
 4. **Gate** — what "done" looks like
 
 ---
@@ -242,7 +243,7 @@ Rules:
 Read CLAUDE.md payout signing rules.
 Implement sendTransaction(ticket, account) for [network]:
 
-Rules (Boundary 6 — private key lifecycle):
+Rules (the private-key boundary — key lifecycle):
   1. Decrypt private key INSIDE this function only
   2. Create wallet/signer from decrypted key
   3. Build transaction

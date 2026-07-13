@@ -1,4 +1,4 @@
-# shipright v1.14.0
+# shipright v1.15.0
 
 > **Ship your MVP fast. Grow it right.**
 
@@ -273,6 +273,7 @@ shipright/
 - [x] **v1.12.0: evolutionary architecture — tempers the one-way-door thesis (Ford/Parsons/Bezos/Poppendieck): bias toward reversibility, last responsible moment, and NAMES shipright's existing fitness functions (boundary-guard, arch tests, budgets, SLOs) + the recovery path for when a settled decision was wrong**
 - [x] **v1.13.0: PHP stack file (PHP 8.3+): PHPStan-as-compiler, Deptrac boundary fitness function, Doctrine/Eloquent, exception taxonomy, and the PHP-specific security footguns (unserialize object injection, mass assignment, `==` type juggling)**
 - [x] **v1.14.0: consistent framework guidance for backend stacks (Node/Python/Go/PHP) — recommend a default + when to pick another + "keep the framework at the edge so it stays a two-way door (swappable)"; python.md no longer hard-assumes FastAPI**
+- [x] **v1.15.0: staleness/consistency propagation — removed stale version strings (prompts.md "v0.7.2", go.md "v0.9 hook"), fixed leftover Boundary-5/6 collisions (blockchain + prompts + registry), updated prompts build-order to the v1.10 outside-in/vertical model, noted the expanded master roster in code-quality.md**
 - [ ] references/registry.md community contributions (ongoing)
 - [x] **v0.9: PreToolUse boundary-enforcement hook (blocks service→db + deep cross-module imports; opt-in, fails open, self-test)**
 

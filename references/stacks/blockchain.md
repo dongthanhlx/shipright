@@ -30,7 +30,9 @@ Layer 2: Smart contracts (on-chain code)
 
 ---
 
-## The 5th boundary rule for blockchain (add to CLAUDE.md)
+## Blockchain-specific boundaries (beyond the core 5 — add to CLAUDE.md)
+> These are domain-specific boundaries for blockchain, in ADDITION to shipright's core boundaries 1–5
+> (Boundary 5 = integration timeout + fallback, see SKILL.md). Not a renumbering of the core set.
 
 ```markdown
 ## Blockchain boundary rules
@@ -423,10 +425,10 @@ Wallets / connection:
 > This section addresses patterns specific to systems where YOU hold private keys.
 > Source: analysis of real multi-chain custodial payment hub (EVM/SOL/TRON/TON/SUI).
 
-### The 6th boundary rule (custodial only)
+### The private-key boundary (custodial-specific)
 
 ```
-Boundary 6 — Private key only decrypted INSIDE signing action
+Private-key boundary — key only decrypted INSIDE the signing action
   Private key lifecycle: generate → encrypt → store(DB) → decrypt(signing action only) → sign → CLEAR
   Private key NEVER:
     - Passed as function argument between layers
@@ -629,7 +631,7 @@ Risks to handle:
 ```markdown
 ## Custodial wallet rules
 
-### Private key lifecycle (Boundary 6)
+### Private key lifecycle (the private-key boundary)
 Decrypt ONLY inside signing action. Clear immediately after signing.
 NEVER: pass as function arg, store in property, log, return from function.
 Code review must verify: no privateKey flows beyond signing action.
