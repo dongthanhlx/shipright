@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.13.0] — 2026-07 — PHP stack
+### Added
+- `references/stacks/php.md` — PHP (8.3+) is now a first-class stack alongside Node.js, Python, and Go.
+  Maps shipright's generic terms to modern PHP idioms and leans on the tools that give PHP its rigor:
+  - **PHPStan/Psalm at max level = the "does it compile" gate** (PHP has no compiler; static analysis is it).
+  - **Deptrac** as a **boundary fitness function** (evolutionary-architecture.md) — enforces module layers
+    in CI, since PHP has no compiler-enforced `internal/` like Go.
+  - Exception taxonomy (domain 4xx vs infrastructure 5xx; Result-value for expected branches, not exceptions —
+    Ousterhout), idempotency (pgx advisory lock + `ON CONFLICT`, money via brick/money — never float),
+    Doctrine/Eloquent + PDO prepared statements, Guzzle-with-timeout, Monolog, constructor-injection DI.
+  - A **Security** section for the PHP-specific footguns that cause most real breaches: `unserialize()`
+    object injection (RCE), mass assignment (`->all()` → privilege escalation), `==` type juggling → auth
+    bypass (use `hash_equals` + `===` + `strict_types=1`), SQLi/XSS, `composer audit` supply chain.
+
+### Changed
+- SKILL.md reference list + README structure + roadmap.
+
 ## [1.12.0] — 2026-07 — Evolutionary architecture (you WILL be wrong)
 A review of how shipright handles CHANGE and being WRONG found the core one-way-door thesis was
 over-confident about *prediction*: it assumes you can reliably classify what's irreversible and "get
