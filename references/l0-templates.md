@@ -7,8 +7,10 @@ The boundary rules appear in BOTH — they are never optional.
 > **CLAUDE.md is a lean, distilled contract — not a spec dump.** It is loaded into context at the
 > start of EVERY session, so how it's written decides how reliably Claude follows it (Anthropic's
 > guidance). shipright's rules:
-> - **Keep the root under 200 lines** — MVP ~50–60. "Longer files reduce adherence." Load-bearing
->   rules (boundaries, Ubiquitous Language) must not be diluted by conditional deep sections.
+> - **Every line load-bearing; size is the consequence, not the target.** Shorter improves adherence
+>   (Anthropic: "longer files reduce adherence") — but don't cut to hit a number (Goodhart). The rule
+>   is: keep what drives behavior (boundaries, Ubiquitous Language, rules); move duplication and
+>   explanation to `@import` files or `.claude/rules/`. The size then falls out (often <200; fine if more).
 > - **Distill, don't fill** — the content comes from the discovery conversation (the job, the
 >   one-way doors, the real risk), not from mechanically filling `[placeholders]`.
 > - **`@import` for deep/optional conventions** — put observability / rate-limit / AI conventions

@@ -1,5 +1,32 @@
 # Changelog
 
+## [1.16.0] — 2026-07 — Slim the always-loaded core (by principle, not by number)
+After 15 versions of adding, the always-loaded core (`SKILL.md`) had grown to 461 lines / ~4.4k
+tokens — paid every session — while shipright's own advice says a constitution should be lean.
+Applied the discipline of stopping (v1.11) + the lean-constitution principle (v1.7) to shipright itself.
+
+**Not a hard line-count target.** (The first proposal was "cut to <200"; that's a Goodhart trap —
+optimizing a proxy metric can cut load-bearing content and *reduce* effectiveness. Rejected.) The
+principle instead: **every line in the always-loaded core must be OPERATIONAL (drives a route /
+decision / check this session) or an index; move duplication and re-read explanation to the on-demand
+refs.** Size is the consequence, not the target.
+
+### Changed — SKILL.md 461 → 347 lines (~1k tokens/session saved), zero load-bearing loss
+- Cut **duplication** (safest, highest-value): the ecosystem-dispatch section duplicated `registry.md`'s
+  trigger index (−40 lines → conductor principle + pointer); the quality-system section duplicated
+  `code-quality.md`/`code-health.md`/`testing.md` (−34 → principle + pointers).
+- Compressed **re-read explanation**: the master-roster prose (−17 → a compact list + pointers), the
+  lifecycle-spine table (−11 → phase names + pointer), the skill→behavior mapping (−14 → a tight table),
+  "when not appropriate" (−5).
+- **Kept intact** every load-bearing instruction: the working-context bootstrap, the 6-branch routing,
+  BOTH executive questions, the 5 boundaries, skill detection, "how shipright asks", the reference
+  index, the L4 signal table, trigger dispatch. Verified present after the cut.
+
+### Changed — shipright's own advice, made consistent
+- `l0-templates.md`: reframed "keep the root under 200 lines" → **"every line load-bearing; size is
+  the consequence, not the target (Goodhart); move duplication/explanation to @import/rules."** shipright
+  now tells users what it just applied to itself.
+
 ## [1.15.0] — 2026-07 — Staleness & consistency propagation
 A sweep for spots that hadn't caught up with recent versions — the parts that "still used the old
 version". Fixed the leftovers, all consistent with what shipped in v0.8–v1.10.
