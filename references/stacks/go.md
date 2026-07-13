@@ -42,6 +42,18 @@ Boundary 2 (service never touches db) → the service holds a Repository INTERFA
 > `shared/db`). In Go, the `internal/` directory gives you compile-time Boundary 1 enforcement for
 > free; use the grep checks below for Boundary 2.
 
+## Framework — pick a default, keep it at the edge
+
+Go rewards small, explicit code — the stdlib is enough for most services. The domain never imports
+the router, so it stays a TWO-WAY door (swappable). Recommend, don't over-frame.
+```
+Default: net/http (stdlib, idiomatic) + chi — a lightweight router/middleware, no lock-in.
+Gin / Echo — when you want batteries (binding, validation, middleware) and accept the dependency.
+Avoid heavy "enterprise" frameworks — they fight Go's grain.
+```
+Confine it to the handler layer; internal/ domain packages never import the router. (This is also
+why Go's internal/ + boundary discipline makes the framework trivially swappable — evolutionary-architecture.md.)
+
 ## Project init prompt
 ```
 Read CLAUDE.md and ARCHITECTURE.md.

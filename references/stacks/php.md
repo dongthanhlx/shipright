@@ -23,6 +23,20 @@ scheduler                → Symfony Scheduler/Messenger or Laravel scheduler (c
 boundary enforcement     → Deptrac — a fitness function for module boundaries (evolutionary-architecture.md)
 ```
 
+## Framework — pick a default, keep it at the edge
+
+Recommend with a reason; keep the framework in the controller/infrastructure layer so the domain
+stays framework-free — a TWO-WAY door (swappable), so the choice is cheap to change (judgment.md +
+references/evolutionary-architecture.md). shipright's boundaries work identically in either.
+```
+Laravel — default for most: speed, DX, ecosystem (Eloquent, queues, scheduler, Horizon). Product apps.
+Symfony — when you want stricter architecture, decoupled components, and DDD rigor (Doctrine, Messenger).
+Slim / Mezzio — micro / API-only, when you want minimal.
+```
+Confine Eloquent/Doctrine + the framework to the controller + Infrastructure layer; the domain and
+services import NEITHER. A domain entity that extends `Model` (Eloquent) is a Boundary-2/4 violation
+and welds you to the framework.
+
 ## Project init prompt
 ```
 Read CLAUDE.md and ARCHITECTURE.md.

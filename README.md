@@ -1,4 +1,4 @@
-# shipright v1.12.0
+# shipright v1.14.0
 
 > **Ship your MVP fast. Grow it right.**
 
@@ -272,6 +272,7 @@ shipright/
 - [x] **v1.11.0: the discipline of STOPPING — completes the executive layer (judgment.md) with Definition-of-Done + good-enough (Hunt & Thomas / Shape Up scope-hammering / Pareto): cut SCOPE not QUALITY, appetite as a fixed budget, ship-then-feedback; a second executive question ("good enough, or gold-plating?")**
 - [x] **v1.12.0: evolutionary architecture — tempers the one-way-door thesis (Ford/Parsons/Bezos/Poppendieck): bias toward reversibility, last responsible moment, and NAMES shipright's existing fitness functions (boundary-guard, arch tests, budgets, SLOs) + the recovery path for when a settled decision was wrong**
 - [x] **v1.13.0: PHP stack file (PHP 8.3+): PHPStan-as-compiler, Deptrac boundary fitness function, Doctrine/Eloquent, exception taxonomy, and the PHP-specific security footguns (unserialize object injection, mass assignment, `==` type juggling)**
+- [x] **v1.14.0: consistent framework guidance for backend stacks (Node/Python/Go/PHP) — recommend a default + when to pick another + "keep the framework at the edge so it stays a two-way door (swappable)"; python.md no longer hard-assumes FastAPI**
 - [ ] references/registry.md community contributions (ongoing)
 - [x] **v0.9: PreToolUse boundary-enforcement hook (blocks service→db + deep cross-module imports; opt-in, fails open, self-test)**
 

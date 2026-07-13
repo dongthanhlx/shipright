@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.14.0] — 2026-07 — Framework guidance for the backend stacks
+Framework suggestion was inconsistent: the AI/chatbot/blockchain stacks had full "framework decision"
+trees, but the general backend stacks either assumed one (python.md was titled "Python + FastAPI") or
+listed two without a decision (php.md "Symfony or Laravel"; nodejs "express/fastify"). This makes it
+consistent — and states the principle that makes the choice low-stakes.
+
+### Changed — nodejs.md, python.md, go.md, php.md
+- Each gains a **"Framework — pick a default, keep it at the edge"** block: a recommended default
+  with a one-line reason + when to pick an alternative.
+  - Node: **Fastify** (default) · NestJS (structure/DI) · Express (ecosystem) · Hono (edge).
+  - Python: **FastAPI** (default) · Django (batteries-included) · Flask/Litestar (micro). python.md no
+    longer *assumes* FastAPI — it recommends it (title + framework block reframed).
+  - Go: **net/http + chi** (default) · Gin/Echo (batteries) · avoid heavy frameworks.
+  - PHP: **Laravel** (default: DX/ecosystem) · Symfony (stricter architecture/DDD) · Slim/Mezzio (micro).
+- **The shipright-native principle** (why the choice is low-stakes): the domain/service/repository
+  never import the framework, so it's confined to the edge (handler/controller + infrastructure) and
+  stays a **two-way door — swappable**. Choosing "wrong" is cheap to fix (judgment.md +
+  evolutionary-architecture.md). A domain entity that subclasses the ORM model, or a service that
+  imports the framework, is a Boundary-2/4 violation that welds you to it. Recommend, don't agonize.
+
 ## [1.13.0] — 2026-07 — PHP stack
 ### Added
 - `references/stacks/php.md` — PHP (8.3+) is now a first-class stack alongside Node.js, Python, and Go.

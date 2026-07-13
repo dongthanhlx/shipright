@@ -17,6 +17,20 @@ env validation          → zod (parse process.env at startup)
 scheduler               → node-cron
 ```
 
+## Framework — pick a default, keep it at the edge
+
+shipright is framework-agnostic: the domain/service/repository never import the framework, so it
+stays a TWO-WAY door — swappable, and choosing "wrong" is cheap to fix (judgment.md +
+references/evolutionary-architecture.md). Recommend with a reason; don't agonize.
+```
+Default: Fastify — fast, schema-first (pairs with zod), minimal ceremony.
+NestJS — opinionated structure + DI + decorators out of the box (larger teams / many modules).
+Express — when the team/ecosystem already lives there (biggest middleware ecosystem; older, slower).
+Hono — edge / serverless runtimes.
+```
+Confine it to the handler layer only. If a service or repository imports the framework, that's a
+Boundary 2 violation — and it also nails you to the framework (a one-way door you didn't need).
+
 ## Project init prompt
 ```
 Read CLAUDE.md and ARCHITECTURE.md.
