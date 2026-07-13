@@ -1,5 +1,42 @@
 # Changelog
 
+## [1.17.0] — 2026-07 — Runtime evals: does the knowledge FIRE at the right moment?
+Sixteen versions verified the **artifact** — files exist, are linked, are consistent (CI greps). But
+the real worry was the **runtime**: shipright *writes and understands* well, yet does the knowledge
+actually get pulled into context and applied *at the right moment*? That is a retrieval/timing
+property no grep can prove. So this version **dogfoods** shipright: 13 representative scenarios, each
+traced from what's actually in-context (SKILL.md always-loaded + the one routed branch) to whether a
+**concrete situation-trigger** surfaces the ref the scenario needs.
+
+### Found — a real firing gap 16 versions of content review never caught
+Most scenarios FIRE well (L4 signal table, branch security/quality gates, intake questions, executive
+questions). But the "**you were wrong / it changed under you**" family was **DARK** — beautifully
+written, but with **no in-session trigger**:
+- `evolutionary-architecture.md` (a settled decision / domain model turns out wrong) — SKILL match 0,
+  no branch trigger. Only reachable via judgment.md §1 (must already be loaded) or the registry.
+- `requirement-drift.md` (requirements changed mid-build) — catalogued only.
+- `stacks/mcp.md` (exposing tools/data to an AI host) — WEAK, registry entry only.
+
+**Why dark:** these needs surface *mid-construction* — a **realization**, not a routing moment and not
+an operation signal. shipright's triggers were strong at intake (routing) and at L4 (operation) but had
+**no trigger class for a construction-time realization**. Content review + greps can't see this because
+it's about *when* knowledge is retrieved, not *whether* it exists. Only running the scenarios exposed it.
+
+### Fixed
+- **Added a "Mid-work signals" table to `SKILL.md`** (always-loaded) — a trigger map for realizations
+  that arise while building (wrong decision → evolutionary-architecture; requirements changed →
+  requirement-drift; MCP exposure → stacks/mcp; module too big → team-scale; recurring smell →
+  code-quality). Sibling to the L4 operation-signal table; gives the dark refs a concrete firing path.
+- **Added `EVALS.md`** at repo root — the 13-scenario suite + verdicts + the finding, as a **reusable
+  fitness function** for shipright's runtime. Re-run each version; a DARK/WEAK on a high-value scenario
+  is a bug. A new deep ref is not "done" until a scenario here proves it FIRES.
+
+### The lesson
+shipright's runtime power is **retrieval + timing**, not content depth. The always-loaded core's real
+job is to be an excellent **trigger map** (concrete situation → ref) — which is exactly why adding a
+small, load-bearing trigger table (not more explanation) is the right kind of growth, even right after
+the v1.16 slim.
+
 ## [1.16.0] — 2026-07 — Slim the always-loaded core (by principle, not by number)
 After 15 versions of adding, the always-loaded core (`SKILL.md`) had grown to 461 lines / ~4.4k
 tokens — paid every session — while shipright's own advice says a constitution should be lean.

@@ -1,4 +1,4 @@
-# shipright v1.16.0
+# shipright v1.17.0
 
 > **Ship your MVP fast. Grow it right.**
 
@@ -275,6 +275,7 @@ shipright/
 - [x] **v1.14.0: consistent framework guidance for backend stacks (Node/Python/Go/PHP) — recommend a default + when to pick another + "keep the framework at the edge so it stays a two-way door (swappable)"; python.md no longer hard-assumes FastAPI**
 - [x] **v1.15.0: staleness/consistency propagation — removed stale version strings (prompts.md "v0.7.2", go.md "v0.9 hook"), fixed leftover Boundary-5/6 collisions (blockchain + prompts + registry), updated prompts build-order to the v1.10 outside-in/vertical model, noted the expanded master roster in code-quality.md**
 - [x] **v1.16.0: slim the always-loaded core (SKILL.md 461→347 lines) BY PRINCIPLE not by number — cut duplication (ecosystem-dispatch↔registry, quality-system↔refs) + re-read explanation; kept every load-bearing instruction; reframed shipright's own "<200 lines" advice (size is a consequence, not a Goodhart target)**
+- [x] **v1.17.0: RUNTIME evals — dogfooded shipright against 13 real scenarios to verify knowledge FIRES at the right moment (the artifact↔runtime gap greps can't see). Found the "we were wrong / requirements changed / MCP" family was DARK (catalogued but no in-session trigger, because they surface mid-construction — neither a routing moment nor an L4 operation signal). Fixed with a "Mid-work signals" trigger table in the always-loaded core; captured the suite as a reusable fitness function in `EVALS.md`**
 - [ ] references/registry.md community contributions (ongoing)
 - [x] **v0.9: PreToolUse boundary-enforcement hook (blocks service→db + deep cross-module imports; opt-in, fails open, self-test)**
 

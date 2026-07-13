@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 1.16.0
+version: 1.17.0
 description: >
   Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
   sets up constitution, enforces boundaries, judges what to build now vs defer,
@@ -39,7 +39,7 @@ Tests:         !`(npm test --silent 2>&1 | tail -2) || (pytest -q 2>&1 | tail -2
 
 ---
 
-# Shipright v1.16 — Project Brain OS
+# Shipright v1.17 — Project Brain OS
 
 An executive layer over two hemispheres. The executive decides how much of each hemisphere to
 apply, by stage × risk × reversibility (construction is ON from day one — the irreversible quadrant;
@@ -255,6 +255,22 @@ Never add L4 work proactively. Only when production gives a measurable signal.
 | "Can't reproduce prod issues" | Correlation ID missing | `references/observability.md` |
 | Team > 10, merge conflicts rising | Module ownership + arch tests | `references/scaling-guide.md` |
 | Adding features getting slower | Fowler smells accumulated | `references/code-quality.md` |
+
+---
+
+## Mid-work signals — load the moment you realize it, not just at routing
+
+Routing (intake) and the L4 table (operation) cover session-start and production. But some needs
+surface *mid-construction* — a **realization**, not a route. These have no other firing path, so catch
+them here: when the thought below crosses your mind while building, load the ref immediately.
+
+| You realize, while building… | Load |
+|---|---|
+| "A settled decision / the domain model is wrong — it must change" | `references/evolutionary-architecture.md` (evolve under guard, recovery path) |
+| "The requirements changed under us mid-build" | `references/requirement-drift.md` (expand → migrate → contract) |
+| "We're exposing tools/data to an AI host (MCP server/client)" | `references/stacks/mcp.md` (lethal-trifecta boundary) |
+| "This module got too big for one person to hold in their head" | `references/team-scale.md` (cognitive load → split) |
+| "I keep threading the same 3 fields / a string stands in for a domain concept" | `references/code-quality.md` (smells → extract) |
 
 ---
 
