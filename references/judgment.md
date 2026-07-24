@@ -218,11 +218,50 @@ Throwaway prototype, < 1 week lifespan?     → skip everything, hack freely, de
 Script / CLI, < 200 lines, no domain?       → flat functions, no layers, no DI.
 Solo, < 3 domain entities, read-only data?   → simple modules, no repository indirection.
 One-off data migration / glue script?        → correctness + idempotency only; ignore structure.
+Static / marketing / landing site?           → the UI/UX floor is the job; the backend 5-boundaries mostly
+                                               don't apply — don't over-architect it (see §5b).
 Otherwise                                     → use shipright.
 ```
 
 Applying the full tree to a 50-line script is the same mistake as skipping it on a
 payment system — both are failures of judgment, in opposite directions.
+
+---
+
+## 5b. Which FLOOR does this project need? — balancing system vs experience by shape
+
+The two hemispheres (construction + operation) are the CODE dials. But a project also has a SHAPE, and
+the shape decides the mix of **two floors** — both are "do it right", neither is optional *when it
+applies*, and the classic mistake is developing one while neglecting the other:
+
+- **System floor** (architecture): the 5 boundaries, layering, domain model, resilience, tests. Backend-shaped.
+- **Experience floor** (UI/UX — `references/ui-design.md`): a11y, responsive/mobile, information
+  architecture, audience/emotion fit, the state-floor. Front-of-house-shaped.
+
+```
+Backend / API / CLI / data pipeline    → System floor IS the job. No experience floor (nothing to design).
+Static / marketing / landing / brochure→ Experience floor IS the job. The backend 5-boundaries mostly
+                                         DON'T apply — service/repo/module-db on a static site is
+                                         over-engineering. (The frontend still holds its LIGHT architecture:
+                                         components carry no business logic, data-fetching in hooks — no more.)
+Full-stack product (SaaS, marketplace) → BOTH floors, integrated. The API gets the 5 boundaries; the UI
+                                         gets the experience floor; the API contract is the seam where they
+                                         meet. Neither is a bolt-on to the other.
+```
+
+The failure is imbalance in EITHER direction: over-architecting a landing page (system machinery it will
+never need), OR treating a product's UI as an afterthought once the "real" backend is done. On a
+full-stack product the experience floor is **not** lower-priority than the architecture floor — it is the
+other half of the same product. A veteran weights both by shape, not by which one they find more fun.
+
+**Per task, not just per project — the two alternate over time.** A full-stack build is not "do all the
+system, then all the UI." You switch between them task by task (an API endpoint, then its screen, then a
+background job, then a landing section). So detect the CURRENT task's mode every time and switch what you
+ask and how you handle it: a **system task** gets the system questions (domain, boundaries, API contract,
+data identity) and the system floor; an **experience task** gets the design brief (audience, feeling,
+voice, content — `references/ui-design.md`) and the UI/UX floor. Don't run a UI task through a
+boundaries-and-repository intake, or interrogate an API endpoint about brand voice. Branch B's Step 3
+makes this the first fork of every feature.
 
 ---
 

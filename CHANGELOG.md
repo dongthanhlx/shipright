@@ -1,5 +1,62 @@
 # Changelog
 
+## [1.19.0] — 2026-07 — UI/UX judgment layer + system-vs-experience balance
+shipright's UI/UX went from a bare taste-skill dispatch table to a full masters-grounded judgment
+hemisphere (emotion, audience, icons, logo, deep mobile, design-brief intake), and the executive layer
+learned to balance the system floor against the experience floor — both per project shape and per task.
+
+### Fixed (balance — system vs UI/UX, per project AND per task)
+- **Per-task mode detection.** Balancing floors by project shape (§5b) wasn't enough: a full-stack build
+  *alternates* system ↔ experience task by task, and Branch B classified only by complexity (tier), with
+  "UI features" bolted on as an end appendix — so a UI task ran through a system-shaped flow and hit the
+  design brief late (or never). Branch B Step 3 now forks on **KIND first** (system / experience /
+  full-stack-spanning) before sizing complexity, routing each to the right intake questions + floor; §5b
+  gained a "per task, not just per project" note. So shipright asks the design brief for a UI task and the
+  domain/contract questions for an API task — and doesn't cross them.
+- **The executive layer now balances system-vs-experience, not just construction-vs-operation.** Review
+  after the UI/UX build found the real imbalance: `judgment.md` (the executive) mentioned UI/UX zero times
+  and modelled only two hemispheres, so it had no way to weigh architecture against UI/UX — a landing site
+  would get the backend 5-boundaries (over-engineering) and a full-stack product's UI could be treated as a
+  bolt-on. Added **judgment.md §5b "Which FLOOR does this project need?"**: system floor vs experience
+  floor, allocated by project shape (backend → system only; static/marketing → experience only, backend
+  boundaries don't apply; full-stack → BOTH, integrated at the API contract). Added a static-site row to §5
+  and a "match the floor to the shape" line to SKILL.md's "When workflow is not appropriate". (UI/UX did
+  NOT bloat the core — 3 lines — so the imbalance was in *framing*, not footprint.)
+
+### Added (UI/UX — emotion, audience, icons, logo, deeper mobile) + intake wiring
+- **Eliciting the design brief** — closes the loop: the audience/emotion judgment needs inputs shipright
+  can't read from code (who it's for + how they should FEEL, brand voice, real content/assets), so intake
+  must gather them or the judgment stays dark. Added a section teaching HOW — the shipright way (infer +
+  confirm, ask only the irreplaceable, never a design questionnaire; calibrate to stakes: brand-facing →
+  all, internal CRUD → none). Wired into Branch A's Phase-2b UI trigger so it fires at intake.
+- **Emotional design — make it FELT, not the sterile "AI-slop" look** (Aaron Walter *Designing for
+  Emotion* + Norman's reflective level). Distinct from the tone axis (which *feeling*) — this is *how* a
+  design gets soul instead of dry generic AI output: Walter's hierarchy (delight sits on top of a usable
+  base, never instead), and the anti-slop-at-the-soul-level rules — specificity over generic (real
+  copy/photos, not lorem/stock), **voice in microcopy** (where personality lives and AI is blandest),
+  earned delight, intentional over uniform. Plus the honest boundary: soul needs real human inputs, so
+  shipright refuses the generic defaults + mandates specificity/voice + **prompts the human** for the
+  irreplaceable bits rather than faking them.
+- **Audience & emotional tone** (Norman *Emotional Design* + Jung/Mark & Pearson brand archetypes) — a
+  second axis orthogonal to the category archetype: the archetype is set by *what the product does*, the
+  tone by *who it's for and how they should feel*. Maps emotional goals (strong/Hero, gentle/Caregiver,
+  fresh/Innocent, credible/Sage, refined/Lover) to concrete levers (color temp, type personality, motion,
+  density, shape), with an explicit **anti-stereotype guard** (read the emotional job + context, not
+  "women→pink"; demographics are a weak hypothesis, not a rule) and a **compose** rule (final direction =
+  category × audience tone × brand positioning).
+- **Icons — SVG sets, never emoji.** New section: emoji-as-UI-icon is banned (renders differently per OS,
+  can't theme/size, not accessible, looks amateur); use one SVG set (Lucide / Heroicons / Phosphor /
+  Tabler / Radix / Material Symbols), consistent stroke+size on the type scale, icon+label for nav
+  (Nielsen), `currentColor` for theming, proper a11y. Grounded in Material / SF Symbols + Refactoring UI.
+- **Logo — use it well (Paul Rand), don't invent a brand here.** Scoped section: shipright implements/uses
+  a logo (SVG, favicon set, monochrome + tiny survival, light/dark, clear space, day-one clean-wordmark
+  default = MVP-first) and dispatches actual mark design to a designer/brand skill.
+- **Mobile-first, deepened to "professional, not crude."** The prior section was rules; added the polish
+  that separates professional from phèn — ≥16px body (no iOS zoom), consistent spacing scale, **safe
+  areas / notch** (`env(safe-area-inset)`), nav-by-context (bottom tab vs hamburger), mobile forms
+  (`inputmode`/`type`/`autocomplete`, Wroblewski), performance-as-polish (no CLS), and **per-industry/
+  audience emphasis** (e-commerce / fintech / editorial / admin / consumer / dev-tool).
+
 ## [1.18.0] — 2026-07 — UI/UX judgment layer (masters-grounded, MVP-first, wired to fire)
 The one domain with zero master grounding now has a full judgment hemisphere: principles decide, vendor
 skills execute, and it fires at the right moment (dogfooded, v1.17 method). Also carries the earlier

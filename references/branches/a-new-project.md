@@ -113,6 +113,9 @@ What's in scope — INFER from what you learned, and state it as an assumption t
     hold the UI/UX floor — accessibility, responsive/mobile, information architecture (one-way doors) — and
     use the right structure (landing anatomy / admin data-table patterns). references/ui-design.md."
     (Decide it; the a11y + mobile floor is NOT deferrable. Heavy token/theming/component-lib IS — MVP-first.)
+    For a brand-facing UI, also elicit the design brief — audience + how they should FEEL, brand voice, real
+    content/assets — infer-and-confirm, not a quiz (ui-design.md "Eliciting the design brief"). Skip it for
+    an internal/throwaway tool.
   • Observability: shipright's call, not the user's. MVP → Correlation ID only; more on signal.
     Don't ask "need observability?" — decide it.
 ```

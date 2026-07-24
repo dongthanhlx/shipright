@@ -105,8 +105,79 @@ actions visible, don't bury everything); horizontal group → vertical stack; fi
   Best → worst: show 2–3 key columns + tap-through to detail; card-per-row with labelled fields; horizontal
   scroll with a frozen first column as a last resort. Never a 12-column table crushed into 360px.
 
+**What separates professional mobile from "crude" (the polish that's actually rules, not luck):**
+- **Type & spacing:** body text ≥ 16px (smaller triggers iOS auto-zoom on focus and reads cheap); line
+  length ~35–40 chars on phones; one consistent spacing scale (arbitrary margins are what read as "phèn").
+- **Safe areas:** respect the notch / home indicator with `env(safe-area-inset-*)`; sticky top/bottom bars
+  sit *above* the home indicator, content never hides under it. Ignoring this is the #1 crude tell.
+- **Navigation by context:** app-like product → bottom tab bar (thumb-reachable, 3–5 items); content/
+  marketing → top bar + hamburger for the long tail, but keep the 1 primary action always visible. Don't
+  bury everything behind a hamburger.
+- **Forms (Wroblewski):** set the right `inputmode`/`type` so the correct keyboard opens (email, numeric,
+  tel); `autocomplete` on; labels stay visible; big tap targets; single column. Bad mobile forms are where
+  products feel most amateur.
+- **Performance IS the polish:** no layout shift (reserve image/space — CLS), lazy-load below the fold,
+  lighter motion. A page that jumps while loading reads as broken no matter how nice the pixels.
+
+**Per industry / audience (same structure, different emphasis — this is where "appropriate" comes from):**
+- **E-commerce:** sticky add-to-cart / buy bar in the thumb zone; big product imagery; one-thumb checkout.
+- **Fintech / banking:** clarity + trust on a small screen; big legible numbers; never cram; biometric-friendly.
+- **Content / editorial / docs:** reading comfort first — ≥16px, generous line-height, comfortable measure,
+  code blocks scroll horizontally instead of wrapping.
+- **Dashboard / admin:** the hard case above — cards + progressive disclosure + tap-through, never a squeezed grid.
+- **Consumer / social:** gesture-rich and quick; delight is allowed here (where an enterprise tool would restrain).
+- **Dev tool:** responsive docs, copyable commands, code blocks that scroll, dark-capable.
+
 **Verify at 360px with a real thumb** — not a resized desktop window — and at 200% text zoom (a11y + reflow
 overlap).
+
+---
+
+## Icons — SVG icon sets, never emoji
+
+> Emoji as UI icons is the fastest way to look amateur: they render differently on every OS/browser, can't
+> be recoloured or sized to match, aren't accessible, and clash with any real visual system. **Use SVG
+> icons.** Grounded in Material / SF Symbols icon guidelines + Refactoring UI (consistency).
+
+**Rules:**
+- **No emoji in product UI** (buttons, nav, status, empty states). SVG only. (Emoji is fine only as literal
+  user content — a chat message, a reaction — never as chrome.)
+- **Pick ONE set and stay in it.** Mixing icon families (different stroke weights / corner radii) is
+  instantly incoherent. One set = one visual voice.
+- **Curated free sets (living sources — pick one):** **Lucide** (the community-standard, huge, clean),
+  **Heroicons** (Tailwind team), **Phosphor** (flexible weights), **Tabler**, **Radix Icons**, **Material
+  Symbols**, Feather, Bootstrap Icons. Prefer a set with matching weights to your type.
+- **Consistent stroke width + size**, snapped to the type scale (16 / 20 / 24). Optically align to text,
+  don't just box-align. An icon that's a different weight than its neighbours reads as "off".
+- **Icon + label for navigation** (Nielsen: recognition over recall — icon-only nav fails; a bare
+  hamburger/kebab is the exception). Icons *support* words, they rarely replace them.
+- **SVG uses `currentColor`** so icons theme with text (dark mode free). Size in `em` to track the type.
+- **Accessibility:** decorative icon → `aria-hidden`; meaningful icon → `aria-label` (or a visible label).
+
+Dispatch: the execution skill uses the chosen set; shipright's job is to *pick the set + enforce the rules*.
+
+---
+
+## Logo — use it well (Paul Rand); don't invent a brand identity here
+
+> Scope: shipright handles **implementing and using** a logo professionally. Inventing a brand identity
+> (the mark itself) is a designer / brand skill — say so, don't fake it. Grounded in **Paul Rand** (IBM,
+> UPS, NeXT; *A Designer's Art*).
+
+**Paul Rand's bar for a mark:** simple, memorable, works at any size, works in **one colour**, timeless.
+"A logo derives its meaning from the quality of the thing it symbolises, not the other way around" — so
+don't over-invest in a mark before the product is real (MVP-first: a clean wordmark in the product's
+typeface is a perfectly professional day-one logo; a bespoke identity is deferred scope).
+
+**Practical rules for using one in a build:**
+- **SVG**, so it's crisp from a 16px favicon to a hero. Provide a proper favicon + app-icon set (multiple sizes).
+- Must survive **monochrome** and **tiny** (favicon) — if it dies at 16px or in one colour, it's too complex.
+- Provide **light + dark** variants (or a single currentColor mark); never a white logo on a white surface.
+- **Clear space** around it; never stretch, rotate, recolour arbitrarily, add shadows/gradients, or place on
+  a busy background. Lock the aspect ratio.
+
+Dispatch: need an actual mark designed → a dedicated design/brand skill or a human designer. shipright
+advises placement, formats, favicon, and the day-one "clean wordmark" default.
 
 ---
 
@@ -133,6 +204,105 @@ overlap).
 Rule: pick the archetype from the JOB, **confirm with the user**, then brief taste-skill/dataviz with it
 as the direction. Unsure between two → show the two exemplars and let the user point. The dials map to the
 "3 dials" section below.
+
+---
+
+## Audience & emotional tone — design for WHO it's for (Norman's *Emotional Design*)
+
+> A second axis, orthogonal to the archetype. The **archetype** (above) is set by *what the product does*;
+> the **tone** is set by *who it's for and how they should feel*. Same category, different audience →
+> different tone (a fitness app and a meditation app are both "consumer" but must feel opposite). Grounded
+> in **Norman — *Emotional Design*** (visceral → behavioral → reflective) and **brand archetypes**
+> (Jung / Mark & Pearson, *The Hero and the Outlaw*). This is the "thấu hiểu cảm xúc đối tượng" layer.
+
+**Read the emotional GOAL and CONTEXT, not the demographic.** This is the professional bar and it matters:
+"women → pink & soft, men → dark & bold" is dated and usually *wrong* (many of the strongest brands for
+women are bold; much of men's grooming/premium is soft and quiet). Demographics are a **weak starting
+hypothesis to confirm**, never a rule — stereotype-pandering reads as cheap; designing for the specific
+emotional job reads as professional. Always confirm the intended feeling with the user before committing.
+
+**The levers that actually produce a tone:**
+- **Color temperature** — warm = energetic/friendly; cool = calm/trusted/clinical (meaning is partly
+  cultural — verify per market, e.g. red, white).
+- **Type personality** — geometric sans = modern/clean; humanist/rounded = friendly/soft; serif =
+  trustworthy/editorial; heavy condensed grotesk = bold/strong.
+- **Motion** — snappy/springy = energetic; slow/eased = calm/premium.
+- **Density & whitespace** — airy = premium/calm; dense = utilitarian/serious.
+- **Shape & imagery** — rounded + human photography = approachable; sharp + abstract = precise/serious.
+
+**Emotional goal → tone (archetype lens; examples, not laws):**
+
+| The audience should FEEL… | Tone (archetype) | Levers |
+|---|---|---|
+| strong, capable, high-energy (sport/fitness/performance — "khỏe khoắn") | Hero | high contrast, heavy/condensed type, dynamic motion, dark + bold accent |
+| cared-for, calm, gentle (wellness/beauty/health — "dịu dàng") | Caregiver / Lover | warm muted palette, rounded humanist type, generous space, soft motion |
+| fresh, playful, optimistic (youth/social/creative — "tươi tắn năng động") | Innocent / Explorer | bright saturated color, friendly rounded type, lively motion, illustration |
+| assured, credible, in-control (office/enterprise/B2B — "clean chuyên nghiệp") | Sage / Ruler | restrained cool palette, neutral grotesk, structured grid, minimal motion |
+| refined, exclusive, quiet luxury | Lover / Ruler | lots of whitespace, thin sans or elegant serif, muted/mono, slow elegant motion |
+
+**Compose, don't pick one.** Final direction = **category archetype (what) × audience tone (who) × the
+brand's own positioning**. E.g. a *fintech app for Gen-Z* = fintech's trust/legibility base, warmed and
+brightened toward Innocent/Explorer — not the sober Ruler tone a private bank would use. State the
+composition to the user and, when unsure, show two directions and let them point.
+
+---
+
+## Emotional design — make it FELT, not the sterile "AI-slop" look (Aaron Walter)
+
+> The tone table says *which* feeling; this says *how* a design comes to feel human at all instead of the
+> dry, generic, soulless output that screams "an AI made this." Grounded in **Aaron Walter — *Designing
+> for Emotion*** and Norman's **reflective** level. The antidote to AI-slop is not more decoration — it's
+> **specificity, voice, and earned delight.**
+
+**Walter's hierarchy (emotion sits at the TOP — earn the base first):** functional → reliable → usable →
+**pleasurable**. Delight is added *on top of* a solid, usable base — never instead of it. A charming empty
+state on a broken flow is lipstick; get the floor (a11y, states, responsive) right, then add soul.
+
+**Why AI design feels dead, and the fix (each is a rule, not a vibe):**
+- **Specificity beats generic.** Real copy and real data, never lorem ipsum; real photography or
+  intentional illustration, never generic stock-y "diverse team pointing at a laptop"; a concrete point of
+  view over safe blandness. Genericness is the #1 source of the soulless feel.
+- **Voice is where personality lives** (Walter). The microcopy — buttons, empty states, errors,
+  onboarding, confirmations — carries the brand's personality. "Something went wrong" is dead; a line in
+  the product's actual voice is alive. This is exactly where AI output is blandest, so it's the highest-leverage fix.
+- **Earned delight in the details.** One considered moment — a thoughtful empty state, a satisfying
+  micro-interaction, a human touch — beats decoration everywhere. Restrained and intentional; a serious
+  enterprise tool earns less than a consumer app (tie it back to the audience tone).
+- **Intentional over uniform.** Perfect symmetry and default-everything read as machine-made. A deliberate
+  point of view — an asymmetric hero, a signature color, a real illustration — reads as human.
+
+**The honest boundary (don't fake soul).** Emotion ultimately comes from real human inputs — real content,
+an actual brand voice, real photos/stories, a genuine point of view. shipright's job is to (1) **refuse
+the generic defaults** that cause the dead feeling, (2) **mandate specificity + voice + earned delight** in
+the brief, and (3) **prompt the human for the irreplaceable bits** ("what's your product's voice? do you
+have real photos/copy?") rather than paper over them with stock and lorem. A machine can remove the
+soulless tells and demand the human inputs; it can't manufacture the soul from nothing — so ask for it.
+
+---
+
+## Eliciting the design brief — what to ASK vs INFER (same intake philosophy)
+
+> The audience-tone and emotional sections need inputs shipright can't read from code — so intake has to
+> gather them, or all that judgment stays dark. Gather them the shipright way (SKILL.md "How shipright
+> asks"): **infer what you can, state it as an assumption to confirm, ask ONLY the irreplaceable.** Never a
+> design questionnaire, never a cold quiz.
+
+**INFER from the product + market, then confirm (don't ask cold):**
+- Likely **audience + emotional tone** — derive it and play it back: "A fitness app for young athletes —
+  I'd aim energetic / Hero: high contrast, bold type, dynamic motion. That fit, or is your crowd different?"
+- **Category archetype** — from what the product does.
+
+**ASK — only the user knows these, and they're what create soul (skip for a throwaway/internal tool):**
+- **Who is it really for, and how should they feel using it?** (the emotional goal — confirms or corrects
+  the inference above; this is the "hiểu cảm xúc đối tượng" input.)
+- **Brand voice / personality** — is there one already? Show an example, or should shipright propose one?
+- **Real content & assets** — real copy, real photos, a real logo? Or placeholders for now? This drives
+  specificity vs the generic AI-slop look. **If none exist, say so honestly**: "with placeholder content
+  it'll look generic until real copy/photos land" — flag it, don't paper over it with stock + lorem.
+- **Hard brand constraints** — existing colours, typeface, brand guidelines to honour.
+
+**Calibrate to stakes:** a public, brand-facing product → gather all of the above; an internal CRUD admin
+→ none of it (don't over-interview). Depth of the design intake tracks how much the feeling matters.
 
 ---
 

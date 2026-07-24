@@ -76,8 +76,26 @@ TIER1-BLOCKER effort > 20% deadline → workaround + TODO[fix-before-scale], pro
 
 ---
 
-## Step 3 — Classify complexity
+## Step 3 — Classify: KIND first, then complexity
 
+**First, the task's KIND — system or experience?** They need different questions and a different floor,
+and on a full-stack product you ALTERNATE between them task by task. Detect it every time; don't carry
+system-mode questions into a UI task or design questions into an API.
+```
+System task (API, data, domain logic, module, job)  → SYSTEM floor. Ask the system questions (domain
+                                                       terms, one-way doors, API contract, data identity,
+                                                       idempotency). Continue below.
+Experience task (page, screen, flow, form, dashboard)→ EXPERIENCE floor. Load references/ui-design.md NOW
+                                                       (not the appendix afterthought). Ask the DESIGN BRIEF
+                                                       (audience + how they should feel, voice, real
+                                                       content) and apply the UI/UX floor. Details: "UI
+                                                       features" section below. Then size it.
+Full-stack feature (spans both)                      → BOTH, at their seam: define the API contract first
+                                                       (system), then build the UI against it (experience).
+                                                       Ask each half its own questions.
+```
+
+**Then size the complexity:**
 ```
 1 file, obvious change            → Tier S (trivial, < 30 min)
 2–5 files, clear scope            → Tier M (simple, < 2 hrs)

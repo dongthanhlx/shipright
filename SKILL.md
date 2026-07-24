@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 1.18.0
+version: 1.19.0
 description: >
   Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
   sets up constitution, enforces boundaries, judges what to build now vs defer,
@@ -39,7 +39,7 @@ Tests:         !`if [ -f package.json ] && grep -q '"test":' package.json; then 
 
 ---
 
-# Shipright v1.18 — Project Brain OS
+# Shipright v1.19 — Project Brain OS
 
 An executive layer over two hemispheres. The executive decides how much of each hemisphere to
 apply, by stage × risk × reversibility (construction is ON from day one — the irreversible quadrant;
@@ -299,6 +299,11 @@ AI-specific code (eval loop, LLM boundaries) — use both, no overlap.
 Throwaway/<1wk · script <200 lines no domain · solo <3 entities read-only → skip the machinery, hack
 freely (flat functions, no layers/DI). Otherwise use shipright. Senior judgment = knowing when NOT to
 apply a pattern (over-applying to a 50-line script = under-applying on a payment system). `judgment.md` §5.
+
+**Match the FLOOR to the project shape — don't skew system vs UI/UX.** Backend/API/CLI → system floor (5
+boundaries), no UI. Static/marketing/landing → the UI/UX floor (`references/ui-design.md`), NOT the backend
+boundaries (that's over-engineering). Full-stack product → BOTH floors, integrated (neither a bolt-on).
+`judgment.md` §5b.
 
 ---
 
