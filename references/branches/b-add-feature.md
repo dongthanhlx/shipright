@@ -85,6 +85,10 @@ system-mode questions into a UI task or design questions into an API.
 System task (API, data, domain logic, module, job)  → SYSTEM floor. Ask the system questions (domain
                                                        terms, one-way doors, API contract, data identity,
                                                        idempotency). Continue below.
+   ↳ integrates a NEW 3rd-party API (including an LLM/AI API)? → Layer 1 exploration is MANDATORY before any
+     Adapter code: call the real API/sandbox → save real responses as tests/fixtures/ → THEN write the
+     Adapter + unit tests (from fixtures) + a contract test. Docs alone are wrong/incomplete.
+     references/third-party-apis.md (LLM specifics — token/cost/streaming/errors: references/stacks/ai-projects.md).
 Experience task (page, screen, flow, form, dashboard)→ EXPERIENCE floor. Load references/ui-design.md NOW
                                                        (not the appendix afterthought). Ask the DESIGN BRIEF
                                                        (audience + how they should feel, voice, real

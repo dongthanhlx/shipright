@@ -1,5 +1,29 @@
 # Changelog
 
+## [1.19.1] — 2026-07 — Firing fixes: 3rd-party + LLM API exploration now fire
+Patch after a system-wide firing audit (does complete content actually load at the right moment?). The
+Layer-1 API-exploration mandate — call the real API → save fixtures → then Adapter + tests — was strong
+in content but weakly triggered; now unmissable for both HTTP and LLM APIs.
+
+### Fixed (firing audit — content complete but not firing)
+- **System-wide firing audit** (v1.17 dogfood method, every ref). Verdict: top-level refs mostly FIRE;
+  `prompts.md` is DARK but correctly so (a passive copy-paste library, pulled by hand, needs no trigger);
+  language stack files fire via Branch A's generic "load the matching stack file" + the index (acceptable).
+  **One real repeat of the third-party-API gap: LLM API exploration.** An LLM is a third-party API with the
+  same "explore before coding, save real responses" mandate (plus token/cost/streaming/error specifics),
+  but it only fired via the `rag-pipeline` registry entry — adding an LLM feature in Branch B didn't trigger
+  it. Extended the Mid-work API signal and Branch B's system-task path to name **LLM/AI APIs explicitly**
+  (→ `third-party-apis.md` §Layer-1 + `stacks/ai-projects.md`).
+
+### Fixed (3rd-party API integration — wire the mandate to fire)
+- **Layer 1 API exploration now fires prominently.** `third-party-apis.md` already *mandates* it (call the
+  real API/sandbox → save real responses as fixtures → THEN Adapter + unit + contract tests; "the most
+  skipped step in AI coding"), but the only trigger was a single conditional line in Branch B Step 0 — not
+  reinforced at implement time and with no always-loaded signal, so in practice a "add a YouTube API v3
+  integration" task could skip calling the API, saving fixtures, and writing tests. Added an always-loaded
+  **Mid-work signal** ("about to call/integrate a NEW 3rd-party API → §Layer-1, MANDATORY") and reinforced
+  it in Branch B's Step 3 system-task path. Content was right; the trigger was weak — classic artifact↔runtime gap.
+
 ## [1.19.0] — 2026-07 — UI/UX judgment layer + system-vs-experience balance
 shipright's UI/UX went from a bare taste-skill dispatch table to a full masters-grounded judgment
 hemisphere (emotion, audience, icons, logo, deep mobile, design-brief intake), and the executive layer

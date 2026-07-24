@@ -1,4 +1,4 @@
-# shipright v1.19.0
+# shipright v1.19.1
 
 > **Ship your MVP fast. Grow it right.**
 
