@@ -1,6 +1,55 @@
 # Changelog
 
 ## [Unreleased]
+### Added
+- **UI/UX judgment layer — the one domain that had zero master grounding now has it.** `references/ui-design.md`
+  was pure vendor dispatch ("which taste-skill for which page type"); if no design skill was installed the
+  fallback was empty, and the whole file was visual/landing-page-centric with no UX (flows, forms, state).
+  Added a masters-grounded judgment section — **Norman** (affordance/feedback/mapping/constraints),
+  **Nielsen** (heuristics), **Krug** (cognitive load), **Refactoring UI** (hierarchy via weight/spacing,
+  grayscale-first), **Fitts + Gestalt**, **Tufte** (→ `dataviz` skill), **WCAG as correctness**, and the
+  **state-floor** (loading/empty/error/success, inline validation, confirm-destructive). Applies *even
+  without any vendor skill* (capability, not vendor); vendor skills execute, principles decide.
+- **Style archetypes + reference sources** — shipright can now *reason about taste*, durably: a
+  project-category → native-aesthetic-language → exemplars → dial map (dev-tool / fintech / dashboard /
+  consumer / agency / AI-chat / docs / e-commerce / web3), plus a curated pointer list to **living**
+  sources (Mobbin, Awwwards, Land-book, Godly; design systems Apple HIG / Material 3 / Polaris / Carbon /
+  Geist / Primer; Tailwind UI / shadcn / Radix). Deliberately encodes the *durable* archetype + where-to-
+  look, NOT frozen trends (aesthetics churn); direction, not pixels.
+- **Landing-page anatomy + conversion** (Krug + Cialdini): the durable section stack (hero → social proof →
+  value → objection → proof → pricing → FAQ → repeat-CTA), copy hierarchy (outcome > benefit > feature), and
+  per-industry emphasis shifts. The archetype styles it; this decides what goes on it.
+- **Admin panels & dashboards — a full pattern language**, the biggest prior gap (taste-skill excludes admin;
+  vercel-labs gives rules, not pattern judgment). Grounded in **Tidwell (*Designing Interfaces*)**,
+  **Wroblewski (*Web Form Design*)**, **Tufte**: information architecture, data-table conventions (alignment,
+  sorting, bulk actions, pagination-vs-scroll, state-floor), faceted filtering + saved views, form/inline-edit
+  rules, CRUD + undoable-destructive, chart-selection (which chart for which question → then `dataviz`), and
+  the admin state-floor. shipright now owns the *design decisions*; vercel-labs + dataviz execute.
+- **"MVP-first applies here too" section** — makes explicit that UI/UX obeys the same one-way/two-way door
+  discipline: MVP-first is scope, not quality; the *floor* (a11y, responsive/mobile, IA, semantic HTML, a
+  minimal scale — free from a framework) is done day-one, the *scope* (heavy token pipeline, component lib,
+  polish) is deferred. Resolves the "proper-from-the-start vs MVP-first" false dichotomy.
+- **Mobile & responsive judgment** (Wroblewski *Mobile First*) — the biggest hole in the first pass:
+  mobile-first (rank content on the smallest screen), content-driven breakpoints (not device widths),
+  touch targets + thumb zone (Fitts for fingers, hover is enhancement-only), reflow patterns, and the two
+  hard cases — landing collapse + **data tables on mobile** (key-columns/tap-through, card-per-row, frozen
+  first column). Cuts across landing and admin.
+- **Dispatch now knows `dataviz`** (charts/dashboards) and **`artifact-design`** (Claude Artifacts).
+- SKILL.md UI fallback row rewritten to point at real judgment, not "describe manually".
+
+### Fixed (UI/UX doc)
+- **Runtime firing (dogfood, v1.17 method).** Traced whether `ui-design.md` actually loads when a UI/UX
+  task happens. It fired from Branch B and session-start detection, but **Branch A (new project) had NO
+  trigger** — so a new UI-centric project (landing / dashboard / web app) would never fire the UI judgment
+  (a real dark spot). Added a UI trigger to Branch A's Phase-2b scope inference, framed as the day-one
+  floor (a11y + mobile) with the heavy stuff MVP-deferred. Also rewrote Branch B's "UI features" trigger:
+  it described `ui-design.md` as the old "page type → taste-skill variant" dispatch and wrongly told the
+  model to *skip dashboards* — now it points at the judgment layer (which owns admin/dashboards) and
+  dispatches from there.
+- Anti-slop section re-scoped: it governs **taste-skill's generated output**, not this reference file or
+  shipright's reasoning. The em-dash rule no longer reads as a universal typography law (the doc itself
+  uses em-dashes) — it's a binary anti-slop signal for generated marketing copy.
+
 ### Fixed
 - **Working-context `Tests:` injection no longer runs the test suite.** It executed `npm test`/`pytest`
   silently at every session start (before the model reasons, under the broad Bash grant) — slow,

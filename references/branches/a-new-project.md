@@ -109,6 +109,10 @@ What's in scope — INFER from what you learned, and state it as an assumption t
   • Auth / payments / PII / untrusted input surfaced? → "This handles [X], so I'll run the L0
     threat model (Shostack's 4 questions, references/security.md) and activate security-and-hardening.
     Insecure Design is cheapest to fix now." (Triggered by what you learned — not a cold quiz.)
+  • User-facing UI (page / landing / dashboard / admin / web app)? → "This has a UI, so from day one I'll
+    hold the UI/UX floor — accessibility, responsive/mobile, information architecture (one-way doors) — and
+    use the right structure (landing anatomy / admin data-table patterns). references/ui-design.md."
+    (Decide it; the a11y + mobile floor is NOT deferrable. Heavy token/theming/component-lib IS — MVP-first.)
   • Observability: shipright's call, not the user's. MVP → Correlation ID only; more on signal.
     Don't ask "need observability?" — decide it.
 ```

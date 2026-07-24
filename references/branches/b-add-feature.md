@@ -228,5 +228,8 @@ Last updated: [date]
 
 ## UI features
 
-Load `references/ui-design.md` — page type → correct taste-skill variant.
-Skip for: backend API, CLI, background jobs, dashboards (use vercel-labs instead).
+Any user-facing surface — page, flow, form, **or dashboard/admin**. Load `references/ui-design.md`: it is
+the UI/UX judgment layer (floor = a11y + responsive/mobile + IA; structure = landing anatomy / admin
+data-table patterns; archetype for the feel), which THEN dispatches execution to the right skill
+(taste-skill / vercel-labs / dataviz). Apply the floor even if no design skill is installed.
+Skip for: backend API, CLI, background jobs (no user-facing surface).

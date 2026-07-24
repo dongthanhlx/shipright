@@ -132,7 +132,7 @@ Project state section in CLAUDE.md shows where things left off last session.
 | review | before merge on Tier M+ | manual quality gate (code-quality.md) |
 | debug | all bugs (Branch C) | Branch C 5-step flow |
 | security | auth/payments/untrusted input appears | manual OWASP (security.md; not enough for contracts) |
-| taste | UI pages | describe direction manually (ui-design.md) |
+| taste | UI/UX pages, flows, forms | apply ui-design.md UI/UX principles — Norman/Nielsen/Refactoring UI/WCAG + the state-floor (real judgment, not hand-waving). Charts → dataviz skill |
 
 When a skill = NO: say "X not installed — using shipright's built-in guidance instead." Never pretend
 it's available; never skip the step.
