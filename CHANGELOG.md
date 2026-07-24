@@ -1,6 +1,10 @@
 # Changelog
 
-## [Unreleased]
+## [1.18.0] — 2026-07 — UI/UX judgment layer (masters-grounded, MVP-first, wired to fire)
+The one domain with zero master grounding now has a full judgment hemisphere: principles decide, vendor
+skills execute, and it fires at the right moment (dogfooded, v1.17 method). Also carries the earlier
+working-context `Tests:` fix.
+
 ### Added
 - **UI/UX judgment layer — the one domain that had zero master grounding now has it.** `references/ui-design.md`
   was pure vendor dispatch ("which taste-skill for which page type"); if no design skill was installed the

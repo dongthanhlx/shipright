@@ -1,4 +1,4 @@
-# shipright v1.17.0
+# shipright v1.18.0
 
 > **Ship your MVP fast. Grow it right.**
 
@@ -276,6 +276,7 @@ shipright/
 - [x] **v1.15.0: staleness/consistency propagation — removed stale version strings (prompts.md "v0.7.2", go.md "v0.9 hook"), fixed leftover Boundary-5/6 collisions (blockchain + prompts + registry), updated prompts build-order to the v1.10 outside-in/vertical model, noted the expanded master roster in code-quality.md**
 - [x] **v1.16.0: slim the always-loaded core (SKILL.md 461→347 lines) BY PRINCIPLE not by number — cut duplication (ecosystem-dispatch↔registry, quality-system↔refs) + re-read explanation; kept every load-bearing instruction; reframed shipright's own "<200 lines" advice (size is a consequence, not a Goodhart target)**
 - [x] **v1.17.0: RUNTIME evals — dogfooded shipright against 13 real scenarios to verify knowledge FIRES at the right moment (the artifact↔runtime gap greps can't see). Found the "we were wrong / requirements changed / MCP" family was DARK (catalogued but no in-session trigger, because they surface mid-construction — neither a routing moment nor an L4 operation signal). Fixed with a "Mid-work signals" trigger table in the always-loaded core; captured the suite as a reusable fitness function in `EVALS.md`**
+- [x] **v1.18.0: UI/UX judgment layer — the one domain with zero master grounding now has a full hemisphere. `references/ui-design.md` rebuilt from a pure taste-skill dispatch table into judgment (Norman/Nielsen/Krug/Refactoring UI/Tufte/Tidwell/Wroblewski + WCAG-as-correctness + state-floor), an MVP-first floor-vs-scope split, mobile/responsive (incl. data-tables-on-mobile), durable style archetypes + living reference sources, landing anatomy (Krug/Cialdini) and an admin/dashboard pattern language. Wired to FIRE from Branch A + B + session-start (dogfooded). Judgment decides; taste-skill/dataviz/vercel execute**
 - [ ] references/registry.md community contributions (ongoing)
 - [x] **v0.9: PreToolUse boundary-enforcement hook (blocks service→db + deep cross-module imports; opt-in, fails open, self-test)**
 
