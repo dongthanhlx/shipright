@@ -107,6 +107,11 @@ Commit: "fix([module]): [description]"
 After fix: could this same pattern occur elsewhere?
   Yes → add test or lint rule to prevent recurrence
   No  → done
+
+Did the bug live in auth / session / a permission check / money / PII / anything user-controlled?
+  → A passing test is NOT the finish line. Load references/security.md and run /security-review
+    (bundled, free) on the change. A bug in that code is evidence the invariant was never enforced,
+    so ask what ELSE that same gap exposes — don't just close the one report.
 ```
 
 ---

@@ -92,6 +92,20 @@ stopped there.
 A third failure mode, then: the knowledge fires, the target is real — and the target isn't *present*.
 Treating absence as permanent is its own dead end when acquisition costs ten seconds.
 
+### Backend / system / security scenarios (v1.24)
+
+| # | Situation | Before | Verdict → fix |
+|---|---|---|---|
+| 32 | "fix this bug in the payment flow" / "refactor the auth module" | security fired from Branch A intake + one Branch B checklist item only — **Branches C, D, F had no security trigger at all** | **DARK → fixed v1.24.** The moments a vulnerability moves while every test stays green were the ones with no signal. Mid-work row fires in any branch, plus Branch C and D specifically. |
+| 33 | the merge gate on a change touching auth | shipright offered to install a third-party skill; `/security-review` ships with Claude Code, free, and reviews the actual diff | **BUNDLED-IGNORED → fixed v1.24** |
+| 34 | "is this reviewed?" on Tier M+ | no dispatch to `/code-review`, which is **user-invoke-only** — a wrong assumption here turns a missing check into a false assurance | **BUNDLED-IGNORED → fixed v1.24** (ask the user; never claim the gate closed) |
+| 35 | Branch B full-stack: "define the API contract first" | `api-and-interface-design` was mapped to multi-step forms, an optional registry line and Branch A's ladder — never the moment itself | **WEAK → fixed v1.24** |
+
+**BUNDLED-IGNORED** — a fifth failure mode, and the cheapest to fix: the capability is already installed,
+free, and always present, and shipright reached past it for a third-party skill. It got worse the moment
+v1.22 taught shipright to *offer installs*: an unnecessary install is now an active cost, not just a
+missed shortcut. Before dispatching anywhere, check the bundled set.
+
 ### Finding (v1.20) — the trigger can be perfect and still dead-end
 
 v1.17's lesson was *retrieval + timing*. v1.20 adds: **the target must exist**. shipright's UI dispatch

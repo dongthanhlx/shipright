@@ -18,7 +18,10 @@ the default heuristic (a payment MVP needs security on day one; a read-only Grow
 | Feature touches 2+ files | incremental-implementation | addyosmani |
 | Before merging Tier M+ | code-review-and-quality | addyosmani |
 | Tier L/XL with unclear requirements | spec-driven-development | addyosmani |
-| Auth / payments / untrusted input appears | security-and-hardening (+ references/security.md spine) | addyosmani |
+| Auth / payments / untrusted input appears — in ANY branch, incl. a bug fix or refactor | `/security-review` (BUNDLED, free, always there) + security-and-hardening if installed + `references/security.md` spine | bundled + addyosmani |
+| API/interface contract being defined (a one-way door once a consumer exists) | api-and-interface-design | addyosmani |
+| Irreversible / security-sensitive decision, or confidence in unfamiliar code | doubt-driven-development — a fresh-context adversarial review; the second opinion a one-way door deserves | addyosmani + references/judgment.md |
+| Need the authoritative API/framework behavior, not remembered patterns | source-driven-development (grounds decisions in official docs). Note the tension with `third-party-apis.md` §Layer-1: for a 3rd-party API, docs are the *starting* point — you still call the real sandbox and save fixtures | addyosmani |
 | Prod behavior invisible ("can't tell what happened") | observability-and-instrumentation | addyosmani |
 | A dependency can take the system down | (shipright built-in) | references/resilience.md |
 | Multiple devs, each owning module(s), in parallel | (shipright built-in) | references/team-scale.md |
@@ -38,6 +41,13 @@ the default heuristic (a payment MVP needs security on day one; a read-only Grow
 | RAG retrieval/prompt change to evaluate | RAGAS | `pip install ragas` |
 | Agent trajectory to evaluate | DeepEval / Confident-AI | — |
 | LLM tracing needed | LangSmith / Arize Phoenix | — |
+
+**Bundled with Claude Code — never suggest installing these** (`/security-review` · `/code-review` ·
+`/run` · `/debug` · `/claude-api` · `dataviz` · `artifact-design` · `/simplify`). No install, so they are
+the FIRST thing to reach for. Normally present but **not guaranteed** — the set varies by version and
+`disableBundledSkills` / `skillOverrides` can remove any of them, so confirm against this session's
+available-skills list rather than trusting this roster. `/code-review` and `/verify` are user-invoke-only:
+ask the user to run them; don't claim the gate is closed yourself. See SKILL.md §Ecosystem dispatch.
 
 Shipright already covers — do NOT load these: interview-me, idea-refine (→ Branch A intake);
 frontend-ui-engineering (→ taste-skill); performance-optimization (→ L4 + performance.md);

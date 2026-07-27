@@ -23,6 +23,12 @@ Both (UI code is a mess AND the UI looks bad)            → run the EXPERIENCE 
                                                             separately. Don't fuse them into one blob.
 ```
 
+> **Refactoring auth, permissions, money or anything user-controlled?** Characterization tests capture
+> current *behavior* — they do not capture whether the current behavior was SAFE, so a green suite after
+> a security-adjacent refactor proves nothing about security. Load `references/security.md` and run
+> `/security-review` (bundled, free) on the diff before merging; activate `security-and-hardening` if
+> installed. This is the single easiest place to move a vulnerability while every test stays green.
+
 > **The "no measurable pain" guard in Step 1 does NOT apply to the experience track.** For a
 > brand-facing surface, "it looks unprofessional / users bounce / it's unusable on my phone" *is* the
 > measurable pain — that's the experience floor failing, not aesthetics-for-aesthetics. Never redirect a
