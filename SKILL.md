@@ -151,6 +151,14 @@ fallback either. **Offer to install it (see Check 3), because a skill installed 
 
 **Check 3: Missing skill → offer once, install on consent, use it this session**
 
+**First: is it already there?** Nothing gets installed until the BUNDLED set is ruled out
+(`/security-review` · `/code-review` · `/run` · `/debug` · `/claude-api` · `dataviz` ·
+`artifact-design` · `/simplify` — see §Ecosystem dispatch). They ship with Claude Code, cost nothing,
+and need no install: you invoke them. Offering to install over one of those is a straight downgrade —
+it spends the user's consent and disk on capability they already had.
+
+Only when nothing bundled covers the job does the flow below apply.
+
 Claude Code **watches the skill directories**: a skill added under `~/.claude/skills/` during a session
 takes effect immediately, no restart. So the useful move at the moment a trigger fires is not "here's a
 command, run it sometime" — it's "want it? 10 seconds, and I'll use it right now."
