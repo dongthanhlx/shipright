@@ -5,6 +5,10 @@
 > dispatch to `addyosmani/agent-skills: security-and-hardening` (activate the moment auth / payments
 > / untrusted input appears — see registry trigger index).
 >
+> **Reviewing the actual diff is `/security-review` — bundled with Claude Code, free, always available.**
+> Design principles do not catch what got written; run it on the change whenever this file applies, and
+> never tell the user to install something for a review they already have. Design here → review there.
+>
 > Masters: **Saltzer & Schroeder** (1975 — the 8 timeless design principles); **OWASP** (Top 10
 > 2025, API Security Top 10, ASVS, Cheat Sheet Series); **Adam Shostack** (threat modeling). For AI:
 > **Simon Willison + OWASP LLM Top 10** (mcp.md / ai-agent.md). For smart contracts: Trail of Bits /

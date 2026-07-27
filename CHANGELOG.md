@@ -1,5 +1,55 @@
 # Changelog
 
+## [1.24.0] — 2026-07 — Backend / system / architecture / security: the bundled skills, and the branches security never reached
+A firing audit of the system-side domains, run the same way as the UI one. The refs themselves came out
+well — resilience, observability, performance, error-handling, domain-thinking, team-scale,
+evolutionary-architecture, third-party-apis and scaling-guide all hold trigger-table rows, and the stack
+files fixed in v1.20 survived v1.23's slim intact. Two things did not hold.
+
+### Fixed — shipright was recommending installs for capability it already had
+**Claude Code ships bundled skills. shipright dispatched to exactly none of them** (beyond `dataviz` /
+`artifact-design`), while telling users to install third-party skills for the same jobs. Since v1.22 this
+got actively worse: shipright now *offers to install* things — so it could offer an install for work a
+free, always-present skill does better. Now mapped, with a standing rule to reach for them first:
+- **`/security-review`** — a real review of the branch's pending changes. This is the missing *execution*
+  arm of `security.md`, which owns where security lives but cannot catch what actually got written. The
+  old fallback text ("manual OWASP") was selling shipright short: the review was there all along, free.
+- **`/code-review`** — the Tier M+ merge gate. **User-invoke-only**, so shipright must *ask the user to
+  run it* and must not claim the gate is closed on its own — recorded, because getting that wrong turns
+  a missing check into a false assurance.
+- **`/run`** — see the system actually work; the non-browser counterpart to the
+  `browser-testing-with-devtools` added in v1.21. **`/debug`** for Branch C. **`/claude-api`** before any
+  LLM Adapter (Boundary 4) — model ids, pricing, params, token counting, never answered from memory.
+
+### Fixed — security fired at intake and nowhere else
+- **Branches C, D and F had no security trigger at all.** Security fired from Branch A's intake and one
+  Branch B checklist item — so *fixing a bug in a payment path* or *refactoring auth* triggered nothing.
+  That is backwards: those are the moments a vulnerability moves while every test stays green.
+  Added a Mid-work signal that fires in **any** branch ("touching auth, a session, a permission check,
+  money, PII, file paths, or anything user-controlled"), plus Branch C (a passing test is not the finish
+  line — ask what else that gap exposes) and Branch D (characterization tests capture *behavior*, never
+  whether the behavior was *safe*).
+- The quality gate now closes with a real review on Tier M+ rather than a self-assessment.
+
+### Added — two skills that land squarely in this domain
+- **`doubt-driven-development`** — a fresh-context adversarial review of high-stakes decisions, explicitly
+  for "security-sensitive logic, irreversible operations". That is shipright's one-way door in someone
+  else's words; it is the second opinion the executive question deserves.
+- **`api-and-interface-design`** now fires where it matters. It was mapped only to multi-step forms, an
+  optional registry line, and Branch A's ladder — never at Branch B's "define the API contract first",
+  the exact moment. The fallback also spells out what holding a contract means without the skill.
+- **`source-driven-development`** mapped in the trigger index with its tension to `third-party-apis.md`
+  §Layer-1 stated honestly: for a third-party API, official docs are the *starting* point — you still
+  call the real sandbox and save fixtures. Not added: `git-workflow-and-versioning` (outside shipright's
+  spine — it owns architecture decisions, not git hygiene) and `context-engineering`.
+
+### Cost, stated plainly
+Core goes **390 → 406 lines, 6113 → 6663 tokens** — one release after v1.23 slimmed it. The bundled table
+earns its place in the always-loaded core specifically because Check 3 (offer-to-install) lives there:
+the "don't offer an install for something bundled" guard is useless if it only loads after routing. The
+security Mid-work row buys in-session coverage for the highest-stakes domain. Both are firing machinery,
+which is the part v1.23 said was worth its weight.
+
 ## [1.23.0] — 2026-07 — Slim the core again — by principle, and only where it was clearly waste
 Three releases of firing fixes put 56 net lines back into the always-loaded core (369 → 425), pushing it
 toward the ~460 that v1.16 deliberately cut. This pass takes back 35 lines / ~740 tokens **without

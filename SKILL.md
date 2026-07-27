@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 1.23.0
+version: 1.24.0
 description: >
   Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
   sets up constitution, enforces boundaries, judges what to build now vs defer,
@@ -43,7 +43,7 @@ Tests:         !`if [ -f package.json ] && grep -q '"test":' package.json; then 
 
 ---
 
-# Shipright v1.23 — Project Brain OS
+# Shipright v1.24 — Project Brain OS
 
 An executive layer over two hemispheres. The executive decides how much of each hemisphere to
 apply, by stage × risk × reversibility (construction is ON from day one — the irreversible quadrant;
@@ -141,7 +141,7 @@ name appears in `skill/core` or `skill/ui`.
 | test-driven-development | any feature with logic | RED test manually first |
 | code-review-and-quality | before merge on Tier M+ | manual quality gate (code-quality.md) |
 | debugging-and-error-recovery | all bugs (Branch C) | Branch C 5-step flow |
-| security-and-hardening | auth/payments/untrusted input appears | manual OWASP (security.md; not enough for contracts) |
+| security-and-hardening | auth/payments/untrusted input appears | `security.md` spine + **`/security-review` on the diff** (bundled, free — this is a real review, not "manual OWASP"). Still not enough for smart contracts: those need an audit |
 | a taste-skill | UI/UX pages, flows, forms — activate the one matching the PAGE TYPE (`ui-design.md` §Page type), not whichever happens to be installed | apply ui-design.md UI/UX principles — Norman/Nielsen/Refactoring UI/WCAG + the state-floor (real judgment, not hand-waving). Charts → dataviz skill |
 | web-design-guidelines | dashboard/admin/data-heavy UI, a11y-critical UI | apply ui-design.md §Admin patterns + §WCAG-as-correctness manually (judgment is shipright's either way; only the rule-set is missing) |
 | browser-testing-with-devtools | verifying a UI actually renders/works (360px, console, network) | capture the state manually and say the check was by eye, not measured — never call a UI responsive or accessible from reading code |
@@ -246,6 +246,9 @@ Enforced across the lifecycle; the detail lives in the refs (load on demand):
   vertical · implement domain-first): `references/levels.md` L3.
 - **Before every commit — the quality gate**: tests? names from Ubiquitous Language? function > 20
   lines? Feature Envy / Primitive Obsession? Full gate: `references/code-quality.md` + `code-health.md`.
+  On Tier M+, close it with a real review, not a self-assessment: run `/security-review` if the change
+  touched auth/payments/untrusted input, and ask the user to run `/code-review` (it is user-invoke-only).
+  Both are bundled — recommending an install here would be wrong.
 
 **Compound engineering**: a repeated mistake → a rule that prevents it. Durable architectural rule →
 CLAUDE.md / `.claude/rules/`; incidental learning (build cmd, debug insight) → Claude Code's native
@@ -304,6 +307,8 @@ them here: when the thought below crosses your mind while building, load the ref
 | "I'm writing code in this project's language for the first time this session" | `references/stacks/<language>.md` — ONCE, before the first implementation. Not just a Branch A concern: the stack file carries compile-time boundary enforcement, timeout/context idioms, the error taxonomy and the language's security footguns, and existing projects (Branch B/C/D) need them just as much. |
 | "What's the right shape for this domain concept — entity, value object, aggregate? Where does this invariant live?" | `references/domain-thinking.md` (Evans tactical: aggregate roots, invariants, domain events, "DDD or not?") |
 | "I'm writing the failure path — what should this return / throw / retry / roll back?" | `references/error-handling.md` (taxonomy, Result type, saga, race conditions, idempotency) — decide it while writing, not after an incident |
+| "I'm touching auth, a session, a permission check, money, PII, file paths, or anything a user controls" — **in ANY branch, not just a new feature** | `references/security.md` (Saltzer & Schroeder, OWASP → layer map). Then EXECUTE the review: `/security-review` (bundled, free) and `security-and-hardening` if installed. Refactoring auth or fixing a payment bug is exactly when this gets skipped — and exactly when it costs most. |
+| "This decision is irreversible, security-sensitive, or I'm confident in unfamiliar code" | `references/judgment.md` (one-way door) — and if `doubt-driven-development` is installed, that IS the adversarial second opinion the one-way door deserves |
 | "A settled decision / the domain model is wrong — it must change" | `references/evolutionary-architecture.md` (evolve under guard, recovery path). A fitness function only guards you if it RUNS on every commit → `ci-cd-and-automation` |
 | "The requirements changed under us mid-build" | `references/requirement-drift.md` (expand → migrate → contract). Removing the old path / moving users off it is the contract phase → `deprecation-and-migration` |
 | "I just decided a ONE-WAY door (public interface, data identity, money, persisted state)" | Record it before it becomes folklore — shipright decides *what* is irreversible, `documentation-and-adrs` records it properly (ARCHITECTURE.md / ADR). An unrecorded one-way door gets re-litigated by the next session. |
@@ -328,6 +333,17 @@ routing · irreversible decisions). Community skills own HOW. Two hard rules:
 never). The full capability/signal → skill table (addyosmani, taste-skill, AI-eval) is the **trigger
 index in `references/registry.md`** — load it after routing. Default ladder if no trigger fires:
 SEED=debug · VALIDATE=+tdd/incremental/review · HARDEN=+spec/security/observability · SCALE=+specialized.
+
+**Reach for the BUNDLED skills first — they ship with Claude Code, cost nothing, and are always there.**
+Never offer to install something these already cover (Check 3 exists for what is genuinely missing).
+
+| Bundled | Use it when |
+|---|---|
+| `/security-review` | Security review of the branch's pending changes — the EXECUTION arm of `security.md`. Run it whenever auth / payments / untrusted input was touched, before the merge gate. This is not "manual OWASP"; it is a real review and it is free. |
+| `/code-review` | The quality gate on Tier M+. **User-invoke-only** — shipright cannot run it, so ASK the user to run it rather than claiming the gate is done. |
+| `/run` | See the system actually work — the counterpart to `browser-testing-with-devtools` for anything that isn't a browser UI (CLI, server, job). Verifying by running beats asserting from the diff. |
+| `/debug` | Branch C, alongside shipright's own flow |
+| `/claude-api` | ANY work against an LLM API — model ids, pricing, params, streaming, tool use, token counting. Load it before writing the LLM Adapter (Boundary 4), never answer from memory |
 
 **SKIP (shipright already covers):** interview-me / idea-refine → Branch A intent discovery (dispatch
 only when the idea is genuinely vague + installed); frontend-ui-engineering → taste-skill; performance-

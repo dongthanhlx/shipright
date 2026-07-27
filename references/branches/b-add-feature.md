@@ -97,7 +97,12 @@ Experience task (page, screen, flow, form, dashboard)→ EXPERIENCE floor. Load 
                                                        features" section below. Then size it.
 Full-stack feature (spans both)                      → BOTH, at their seam: define the API contract first
                                                        (system), then build the UI against it (experience).
-                                                       Ask each half its own questions.
+                                                       Ask each half its own questions. The contract is a
+                                                       ONE-WAY door once a consumer exists → activate
+                                                       api-and-interface-design (addyosmani) if installed;
+                                                       otherwise hold the contract yourself: name the
+                                                       resources in Ubiquitous Language, fix error shapes
+                                                       and pagination now, version from the first consumer.
 ```
 
 **Then size the complexity:**
