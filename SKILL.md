@@ -1,16 +1,21 @@
 ---
 name: shipright
-version: 1.19.1
+version: 1.20.0
 description: >
   Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
   sets up constitution, enforces boundaries, judges what to build now vs defer,
   hardens for fault tolerance, and orchestrates community skills at the right moment.
   Use when: starting ANY project, adding features (2+ files), fixing unclear bugs,
   refactoring, resuming after break, production incidents, integrating APIs,
-  adding observability/tracing/resilience, scaling, building AI/RAG/chatbot projects.
+  adding observability/tracing/resilience, scaling, building AI/RAG/chatbot projects,
+  AND designing or redesigning ANY user-facing surface (page, landing, dashboard, admin,
+  form, flow, mobile/responsive layout) — shipright carries the UI/UX floor and design brief.
   Triggers: "build", "start project", "add feature", "bug", "refactor",
   "production down", "back on this", "integrate API", "add tracing", "make it resilient",
-  "scale this", "build chatbot".
+  "scale this", "build chatbot",
+  "design a page/screen/UI", "landing page", "dashboard", "admin panel", "frontend",
+  "redesign", "make it look better", "improve the UI/UX", "responsive", "mobile layout",
+  "accessibility".
   Skip for: single-line fixes, knowledge questions, mid-implementation steps.
   Manual invoke: /shipright — always reliable.
 allowed-tools: Read, Write, Bash, Glob, Grep
@@ -26,20 +31,25 @@ Last commit:   !`git log --oneline -1 2>/dev/null || echo "no commits"`
 CLAUDE.md:     !`test -f CLAUDE.md && echo "EXISTS — read first" || echo "MISSING"`
 ARCHITECTURE:  !`test -f ARCHITECTURE.md && echo "EXISTS — read first" || echo "MISSING"`
 Project state: !`grep -A3 "## Shipright state" CLAUDE.md 2>/dev/null | tail -3 || echo "no state tracked"`
-# Granular skill detection (checks both personal + project-scoped)
-skill/spec-driven: !`test -f ~/.claude/skills/agent-skills/skills/spec-driven-development/SKILL.md || test -f .claude/skills/agent-skills/skills/spec-driven-development/SKILL.md && echo YES || echo NO`
-skill/incremental: !`test -f ~/.claude/skills/agent-skills/skills/incremental-implementation/SKILL.md || test -f .claude/skills/agent-skills/skills/incremental-implementation/SKILL.md && echo YES || echo NO`
-skill/tdd:         !`test -f ~/.claude/skills/agent-skills/skills/test-driven-development/SKILL.md || test -f .claude/skills/agent-skills/skills/test-driven-development/SKILL.md && echo YES || echo NO`
-skill/review:      !`test -f ~/.claude/skills/agent-skills/skills/code-review-and-quality/SKILL.md || test -f .claude/skills/agent-skills/skills/code-review-and-quality/SKILL.md && echo YES || echo NO`
-skill/debug:       !`test -f ~/.claude/skills/agent-skills/skills/debugging-and-error-recovery/SKILL.md || test -f .claude/skills/agent-skills/skills/debugging-and-error-recovery/SKILL.md && echo YES || echo NO`
-skill/security:    !`test -f ~/.claude/skills/agent-skills/skills/security-and-hardening/SKILL.md || test -f .claude/skills/agent-skills/skills/security-and-hardening/SKILL.md && echo YES || echo NO`
-skill/taste:       !`test -f ~/.claude/skills/taste-skill/SKILL.md || test -f .claude/skills/taste-skill/SKILL.md && echo YES || echo NO`
+# Granular skill detection — match the SKILL.md `name:` field, NOT a guessed path: `npx skills add`
+# (flat, by install name) and `git clone` (repo/skills/<name>/) produce different layouts, and a
+# path-shaped probe silently returns NO forever under the other one. Personal + project scope.
+skill/spec-driven: !`grep -rqsE '^name: *"?spec-driven-development"? *$' ~/.claude/skills .claude/skills --include=SKILL.md && echo YES || echo NO`
+skill/incremental: !`grep -rqsE '^name: *"?incremental-implementation"? *$' ~/.claude/skills .claude/skills --include=SKILL.md && echo YES || echo NO`
+skill/tdd:         !`grep -rqsE '^name: *"?test-driven-development"? *$' ~/.claude/skills .claude/skills --include=SKILL.md && echo YES || echo NO`
+skill/review:      !`grep -rqsE '^name: *"?code-review-and-quality"? *$' ~/.claude/skills .claude/skills --include=SKILL.md && echo YES || echo NO`
+skill/debug:       !`grep -rqsE '^name: *"?debugging-and-error-recovery"? *$' ~/.claude/skills .claude/skills --include=SKILL.md && echo YES || echo NO`
+skill/security:    !`grep -rqsE '^name: *"?security-and-hardening"? *$' ~/.claude/skills .claude/skills --include=SKILL.md && echo YES || echo NO`
+# taste-skill is an ECOSYSTEM and its folder names ≠ install names — list which are actually present,
+# because ui-design.md dispatches to a SPECIFIC one (see references/ui-design.md §Page type → skill)
+skill/taste:       !`grep -rhsE '^name: *"?(design-taste-frontend(-v1)?|minimalist-ui|high-end-visual-design|redesign-existing-projects|industrial-brutalist-ui|gpt-taste|image-to-code|stitch-design-taste|imagegen-frontend-(web|mobile)|brandkit|full-output-enforcement)"? *$' ~/.claude/skills .claude/skills --include=SKILL.md | sed 's/^name: *//; s/"//g' | paste -sd',' | grep . || echo NO`
+skill/web-a11y:    !`grep -rqsE '^name: *"?web-design-guidelines"? *$' ~/.claude/skills .claude/skills --include=SKILL.md && echo YES || echo NO`
 Tests:         !`if [ -f package.json ] && grep -q '"test":' package.json; then echo "npm test"; elif [ -f pytest.ini ] || [ -f pyproject.toml ] || [ -d tests ]; then echo "pytest"; else echo "none detected"; fi`
 ```
 
 ---
 
-# Shipright v1.19 — Project Brain OS
+# Shipright v1.20 — Project Brain OS
 
 An executive layer over two hemispheres. The executive decides how much of each hemisphere to
 apply, by stage × risk × reversibility (construction is ON from day one — the irreversible quadrant;
@@ -80,6 +90,11 @@ OPERATION (on signal)  — Nygard (resilience.md) · SRE/Majors (observability.m
 
 Boundaries 1–4: cheap to do right from day one, expensive to fix at 10k users — non-negotiable in MVP.
 Boundary 5: timeouts + idempotency from day one; full resilience patterns on signal (not at SEED).
+
+The rules above are the whole contract, but they are stated abstractly. **The moment you are about to
+write or review layered code and "does this violate a boundary?" is not obvious from the rule alone →
+load `references/boundaries.md`** — the same 5 rules as concrete violation/fix pairs in real code.
+Language-specific enforcement (Go `internal/`, PHP Deptrac, Python import rules) lives in the stack file.
 
 Optional **enforcement**: `hooks/boundary-guard.sh` is a PreToolUse hook that BLOCKS the two
 highest-confidence violations (service→db import, deep cross-module import) before they're written —
@@ -132,7 +147,8 @@ Project state section in CLAUDE.md shows where things left off last session.
 | review | before merge on Tier M+ | manual quality gate (code-quality.md) |
 | debug | all bugs (Branch C) | Branch C 5-step flow |
 | security | auth/payments/untrusted input appears | manual OWASP (security.md; not enough for contracts) |
-| taste | UI/UX pages, flows, forms | apply ui-design.md UI/UX principles — Norman/Nielsen/Refactoring UI/WCAG + the state-floor (real judgment, not hand-waving). Charts → dataviz skill |
+| taste (lists the INSTALLED names) | UI/UX pages, flows, forms — activate the one matching the page type (`ui-design.md` §Page type), not whichever is installed | apply ui-design.md UI/UX principles — Norman/Nielsen/Refactoring UI/WCAG + the state-floor (real judgment, not hand-waving). Charts → dataviz skill |
+| web-a11y | dashboard/admin/data-heavy UI, a11y-critical UI | apply ui-design.md §Admin patterns + §WCAG-as-correctness manually (judgment is shipright's either way; only the rule-set is missing) |
 
 When a skill = NO: say "X not installed — using shipright's built-in guidance instead." Never pretend
 it's available; never skip the step.
@@ -266,11 +282,16 @@ them here: when the thought below crosses your mind while building, load the ref
 
 | You realize, while building… | Load |
 |---|---|
+| "I'm writing code in this project's language for the first time this session" | `references/stacks/<language>.md` — ONCE, before the first implementation. Not just a Branch A concern: the stack file carries compile-time boundary enforcement, timeout/context idioms, the error taxonomy and the language's security footguns, and existing projects (Branch B/C/D) need them just as much. |
+| "What's the right shape for this domain concept — entity, value object, aggregate? Where does this invariant live?" | `references/domain-thinking.md` (Evans tactical: aggregate roots, invariants, domain events, "DDD or not?") |
+| "I'm writing the failure path — what should this return / throw / retry / roll back?" | `references/error-handling.md` (taxonomy, Result type, saga, race conditions, idempotency) — decide it while writing, not after an incident |
 | "A settled decision / the domain model is wrong — it must change" | `references/evolutionary-architecture.md` (evolve under guard, recovery path) |
 | "The requirements changed under us mid-build" | `references/requirement-drift.md` (expand → migrate → contract) |
 | "We're exposing tools/data to an AI host (MCP server/client)" | `references/stacks/mcp.md` (lethal-trifecta boundary) |
 | "This module got too big for one person to hold in their head" | `references/team-scale.md` (cognitive load → split) |
 | "I keep threading the same 3 fields / a string stands in for a domain concept" | `references/code-quality.md` (smells → extract) |
+| "I'm about to write / touch a user-facing surface — a page, screen, form, table, dashboard" | `references/ui-design.md` — the EXPERIENCE floor is not optional and not an afterthought: a11y + responsive/mobile + IA + the state-floor (loading / empty / error / success are *designed*). Then dispatch execution (taste-skill / vercel-labs / dataviz). |
+| "This screen only has a happy path / this table is unusable at 360px / these are emoji icons" | `references/ui-design.md` (state-floor · §Mobile & responsive · §Icons — SVG, never emoji) |
 | "I'm about to call / integrate a NEW 3rd-party API (YouTube, Stripe, **or an LLM API**, …)" | `references/third-party-apis.md` §Layer-1 — MANDATORY before the Adapter: call the real API/sandbox → save real responses as `tests/fixtures/` → THEN write the Adapter + unit tests (fixtures) + a contract test. Never code an Adapter from docs alone. **LLM APIs count** — also capture token-usage / cost / streaming / error shapes (`references/stacks/ai-projects.md`). |
 
 ---
@@ -335,7 +356,9 @@ boundaries (that's over-engineering). Full-stack product → BOTH floors, integr
 - `references/team-scale.md` — multi-dev/parallel-module: boundary = team API (Conway/Parnas/Evans/Team Topologies), cognitive load, contract tests (signal-driven; solo skips)
 - `references/evolutionary-architecture.md` — when you were WRONG: fitness functions (name shipright's existing ones), last responsible moment, the recovery path (Ford/Parsons) — tempers the one-way-door thesis
 - `references/third-party-apis.md` — Adapter pattern, 3-layer testing, resilience
-- `references/ui-design.md` — taste-skill: page type → correct skill → dials
+- `references/ui-design.md` — the EXPERIENCE floor + UI/UX judgment hemisphere (Norman/Nielsen/Krug/
+  Refactoring UI/Tufte/Tidwell/Wroblewski/Walter/Rand + WCAG-as-correctness, state-floor, mobile,
+  archetype & audience tone, landing anatomy, admin patterns) — THEN dispatch: page type → skill → dials
 - `references/l0-templates.md` — CLAUDE.md + ARCHITECTURE.md templates
 - `references/levels.md` — lifecycle spine + L0→L4 gates, Conway's Law, graduate checklist
 - `references/requirement-drift.md` — Expand-Contract + 3 architecture change scenarios

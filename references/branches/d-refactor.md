@@ -6,6 +6,59 @@
 
 ---
 
+## Step 0 — Which KIND of improvement? (fork before anything else)
+
+Same fork as Branch B Step 3: an improvement is either **system** (architecture/code) or **experience**
+(the UI a human looks at). They have different pain, different DONE, different flow. Detect it from what
+the user said — don't ask them to classify.
+
+```
+System refactor (code structure, coupling, perf, tests)  → Step 1 below (smell diagnosis).
+Experience redesign (a page/screen/dashboard "looks bad",
+  "feels dated", "looks amateur", "not responsive",
+  bad UX/flow, a11y problems)                            → EXPERIENCE track (below). Load
+                                                            references/ui-design.md NOW.
+Both (UI code is a mess AND the UI looks bad)            → run the EXPERIENCE track for what the user
+                                                            sees; system smells go through Step 1
+                                                            separately. Don't fuse them into one blob.
+```
+
+> **The "no measurable pain" guard in Step 1 does NOT apply to the experience track.** For a
+> brand-facing surface, "it looks unprofessional / users bounce / it's unusable on my phone" *is* the
+> measurable pain — that's the experience floor failing, not aesthetics-for-aesthetics. Never redirect a
+> UI redesign with "refactor without measurable pain rarely pays." (That guard exists for code, where
+> tidiness has no user.) Do still refuse pure restyling of an internal throwaway tool — judgment.md §5.
+
+### EXPERIENCE track — audit BEFORE you touch anything
+
+```
+1. AUDIT first — never jump straight to a taste-skill on existing UI (ui-design.md says this explicitly).
+   [skill/taste lists redesign-existing-projects] → run it: it audits the current UI, names the generic/
+                         AI-slop patterns, and covers hierarchy/contrast/spacing defects too
+   [skill/taste = NO ] → shipright audits manually against ui-design.md: the FLOOR (a11y/WCAG contrast +
+                         keyboard + semantics · responsive at 360px + 200% zoom · information architecture)
+                         then the state-floor (loading / empty / error / success / permission) then
+                         Nielsen's 10 + Norman (affordance, feedback) then Refactoring UI mechanics
+                         (hierarchy by weight+color, spacing, grayscale-first) then icons (SVG, one set)
+                         and archetype/tone fit. Name each finding with its principle + evidence.
+2. Report findings and CONFIRM the target direction before editing — archetype + audience tone
+   (ui-design.md §Style archetypes, §Audience & emotional tone). Show two exemplars if unsure.
+3. Separate FLOOR fixes (a11y, mobile, missing states — do them, one-way doors) from SCOPE changes
+   (restyle, motion, component library — MVP-first, only what the user asked for).
+4. THEN execute: dispatch per ui-design.md §Page type → skill (taste-skill family · vercel-labs for
+   admin/dashboards · dataviz for every chart), briefed with the archetype + the audit findings.
+5. DONE is still mandatory (Step 2 below) and still measurable for UI:
+   "contrast ≥ 4.5:1 everywhere · keyboard-reachable with visible focus · usable at 360px · every
+   screen has loading/empty/error states · [the specific hierarchy findings] fixed."
+6. The guard equivalent of characterization tests: capture BEFORE screenshots (and the current a11y
+   check output) so you can prove the redesign didn't regress behavior or accessibility.
+```
+
+Then skip to Step 2 (define DONE) — Steps 1 and 3 (smell diagnosis, characterization tests) are the
+system track's tools.
+
+---
+
 ## Step 1 — The user names the PAIN; shipright diagnoses the SMELL
 
 Ask only what the user knows — the real, measurable pain — and where it hurts. Do NOT ask them to

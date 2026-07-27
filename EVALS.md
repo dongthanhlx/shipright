@@ -18,6 +18,20 @@ scenario needs. Verdict:
 A DARK ref is beautifully-written knowledge that won't fire when needed — the exact failure mode this
 file exists to catch. Re-run this each version; treat any DARK/WEAK on a high-value scenario as a bug.
 
+**A second failure mode, added v1.20:** a trigger can fire perfectly and still dead-end, because it
+dispatches to a skill **name that does not exist** or probes an **install path that never appears**.
+Firing is necessary but not sufficient — the target has to be real. Verdicts extend with:
+- **BROKEN-TARGET** — the trigger fires, but the skill name / install command / detection path is wrong,
+  so nothing is actually reachable. Indistinguishable from DARK at runtime, invisible to greps.
+
+Check targets against reality, not against this repo's memory of it:
+```bash
+curl -s https://api.github.com/repos/addyosmani/agent-skills/contents/skills | grep -oP '"name": *"\K[^"]*'
+curl -s https://api.github.com/repos/Leonxlnx/taste-skill/contents/skills  | grep -oP '"name": *"\K[^"]*'
+# taste-skill: --skill takes the INSTALL NAME (SKILL.md `name:`), which differs from the folder name.
+# Its README's "Install name" column is the source of truth.
+```
+
 ## Scenarios + last run (v1.17)
 
 | # | Situation (the prompt) | Needs | Firing path | Verdict |
@@ -35,6 +49,40 @@ file exists to catch. Re-run this each version; treat any DARK/WEAK on a high-va
 | **11** | **"we were WRONG about the domain model — it must change"** | **evolutionary-architecture.md** (recovery path) | none — only catalogued + judgment.md §1 | **DARK → fixed v1.17** |
 | **12** | **"the requirements changed under us mid-build"** | **requirement-drift.md** (expand-contract) | none — only catalogued | **DARK → fixed v1.17** |
 | **13** | **"we're exposing tools/data to an AI host (MCP)"** | **stacks/mcp.md** | registry mcp-server entry only (weak) | **WEAK → fixed v1.17** |
+
+## Re-run + new scenarios (v1.20) — the UI/UX layer and the ecosystem targets
+
+Two audits: (a) does the v1.18/v1.19 UI/UX hemisphere fire, (b) do the skills shipright dispatches to
+actually exist under the names it uses. **Scenario 5's v1.17 "FIRES" verdict was wrong** — re-verified.
+
+| # | Situation (the prompt) | Needs | Firing path (before) | Verdict → fix |
+|---|---|---|---|---|
+| 14 | *"design a landing page"* / *"the dashboard looks amateur"* | ui-design.md | **shipright's own description had no UI vocabulary** — the skill never woke up | **DARK → fixed v1.19.2** (description triggers) |
+| 15 | "redesign this page / make it look better" (existing code) | ui-design.md redesign track | Branch D had no experience fork; its "no measurable pain" guard bounced the request | **DARK → fixed v1.19.2** (Branch D Step 0) |
+| 16 | "the layout breaks on mobile / contrast is unreadable" | ui-design.md floor | Branch C classified only reproducible-vs-intermittent | **DARK → fixed v1.19.2** (Branch C visual/UX row) |
+| 17 | mid-build: "this screen has no empty state" | ui-design.md state-floor | none — a construction realization | **DARK → fixed v1.19.2** (Mid-work rows) |
+| 18 | "install the skill for a SaaS landing page" | taste-skill | trigger fired, but **6 of 8 install commands named folder names or skills that don't exist** | **BROKEN-TARGET → fixed v1.20** |
+| 19 | any session where a community skill IS installed | Check-2 dispatch | probes assumed one install layout; `skill/taste` probed a path a correct install never creates | **BROKEN-TARGET → fixed v1.20** (probe the `name:` field) |
+| 20 | "build a Telegram chatbot" (re-run of #5) | chatbot-platforms.md | registry entry listed installs but had **no `load:` line** — the architecture content was unreachable | **WEAK → fixed v1.20** (`load:` added to all 6 entries missing it) |
+| 21 | "add an endpoint" in an existing Go/PHP project | stacks/go.md, php.md | only Branch A ("load the matching stack file") — Branch B/C/D never did, so `internal/`, context timeouts, PHPStan/Deptrac and the language security footguns never fired for existing code | **DARK → fixed v1.20** (Mid-work row) |
+| 22 | "is this an aggregate? where does this invariant live?" | domain-thinking.md | one parenthetical in Branch A | **WEAK → fixed v1.20** (Mid-work row) |
+| 23 | "what should this failure path return / roll back?" | error-handling.md | Branch C/F only — classify an existing failure, never write a new one | **WEAK → fixed v1.20** (Mid-work row) |
+| 24 | "does this violate a boundary? show me in real code" | boundaries.md | **catalogue only** — the sole other mention was a sample `.claude/rules/` listing inside Branch D, i.e. a project's own file, not shipright's ref | **DARK → fixed v1.20** |
+| 25 | "give me a copy-paste prompt for X" | prompts.md | catalogue only | **DARK — accepted** (passive library, pulled by hand; no trigger needed) |
+
+### Finding (v1.20) — the trigger can be perfect and still dead-end
+
+v1.17's lesson was *retrieval + timing*. v1.20 adds: **the target must exist**. shipright's UI dispatch
+table had been rewritten twice for content quality while pointing at `bugbuster` and
+`elite-frontend-design-2026` (never in the repo) and at folder names (`soft-skill`) where the CLI wants
+install names (`high-end-visual-design`). Every review passed because the *prose* was excellent and CI
+greps only check internal links. The failure is only visible by resolving external names against the
+external source — hence the curl commands above, now part of the method.
+
+Second lesson: **detection must not encode an install layout.** Probing
+`~/.claude/skills/<repo>/skills/<name>/SKILL.md` works for `git clone` and fails forever for
+`npx skills add`; the reverse is also true. Probe the `name:` field inside SKILL.md instead — it is what
+the skill *is*, independent of how it got there.
 
 ## Finding (v1.17) — and the fix
 

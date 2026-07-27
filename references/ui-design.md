@@ -176,8 +176,9 @@ typeface is a perfectly professional day-one logo; a bespoke identity is deferre
 - **Clear space** around it; never stretch, rotate, recolour arbitrarily, add shadows/gradients, or place on
   a busy background. Lock the aspect ratio.
 
-Dispatch: need an actual mark designed → a dedicated design/brand skill or a human designer. shipright
-advises placement, formats, favicon, and the day-one "clean wordmark" default.
+Dispatch: need an actual mark designed → **`brandkit`** (logo directions, palettes, type, identity boards
+— see the dispatch section) or a human designer for the final mark. shipright advises placement, formats,
+favicon, and the day-one "clean wordmark" default.
 
 ---
 
@@ -447,10 +448,16 @@ For pages outside taste-skill scope → see "Other skills" section below.
 
 ## Page type → correct skill → dial settings
 
+> **`--skill` takes the INSTALL NAME, not the folder name.** The taste-skill repo's folder and install
+> name differ for most skills (`soft-skill/` installs as `high-end-visual-design`) and the repo's README
+> is the source of truth for that column. Using the folder name makes the install command **fail** — so
+> the names below are install names. Verify against the repo README before adding a new one here.
+
 ### SaaS landing page (B2B, serious but modern)
 ```
-Skill: design-taste-frontend (v2)
+Skill: design-taste-frontend   (folder: taste-skill — the general default; currently v2, experimental)
 Install: npx skills add https://github.com/Leonxlnx/taste-skill --skill "design-taste-frontend"
+Pin to v1 if v2 breaks your workflow: --skill "design-taste-frontend-v1"
 
 Dials: DESIGN_VARIANCE: 7 / MOTION_INTENSITY: 6 / VISUAL_DENSITY: 3
 Tell Claude: "SaaS B2B landing page, serious but modern, conversion-focused"
@@ -458,17 +465,21 @@ Tell Claude: "SaaS B2B landing page, serious but modern, conversion-focused"
 
 ### Agency / creative portfolio (Awwwards-level)
 ```
-Skill: elite-frontend-design-2026
-Install: npx skills add https://github.com/Leonxlnx/taste-skill --skill "elite-frontend-design-2026"
+Skill: design-taste-frontend at high dials — it is the variance/motion skill, no separate "elite" skill exists.
+Install: npx skills add https://github.com/Leonxlnx/taste-skill --skill "design-taste-frontend"
 
 Dials: DESIGN_VARIANCE: 9 / MOTION_INTENSITY: 7 / VISUAL_DENSITY: 2
 Tell Claude: "agency portfolio, Awwwards-level, experimental layout"
+
+If the direction is already chosen, swap in the committed variant instead:
+  hard / Swiss / mechanical / experimental → industrial-brutalist-ui   (folder: brutalist-skill)
+  you want stricter anti-slop + heavier GSAP motion enforcement → gpt-taste  (folder: gpt-tasteskill)
 ```
 
 ### SaaS product UI (Notion/Linear feel)
 ```
-Skill: minimalist-skill
-Install: npx skills add https://github.com/Leonxlnx/taste-skill --skill "minimalist-skill"
+Skill: minimalist-ui   (folder: minimalist-skill)
+Install: npx skills add https://github.com/Leonxlnx/taste-skill --skill "minimalist-ui"
 
 Dials: DESIGN_VARIANCE: 5 / MOTION_INTENSITY: 4 / VISUAL_DENSITY: 6
 Tell Claude: "editorial product UI, Linear-style, restrained palette"
@@ -476,8 +487,8 @@ Tell Claude: "editorial product UI, Linear-style, restrained palette"
 
 ### Premium consumer app (Apple-y, calm, expensive feel)
 ```
-Skill: soft-skill
-Install: npx skills add https://github.com/Leonxlnx/taste-skill --skill "soft-skill"
+Skill: high-end-visual-design   (folder: soft-skill)
+Install: npx skills add https://github.com/Leonxlnx/taste-skill --skill "high-end-visual-design"
 
 Dials: DESIGN_VARIANCE: 6 / MOTION_INTENSITY: 5 / VISUAL_DENSITY: 2
 Tell Claude: "premium, generous whitespace, calm feel, spring motion"
@@ -485,37 +496,48 @@ Tell Claude: "premium, generous whitespace, calm feel, spring motion"
 
 ### Blog / editorial site
 ```
-Skill: minimalist-skill
+Skill: minimalist-ui   (folder: minimalist-skill)
 Dials: DESIGN_VARIANCE: 4 / MOTION_INTENSITY: 3 / VISUAL_DENSITY: 5
 Tell Claude: "editorial, typography-first, content-heavy"
 ```
 
-### Redesigning existing UI (already has code)
+### Redesigning existing UI (already has code) — and visual/hierarchy defects in shipped UI
 ```
-Step 1: redesign-skill first — audit before touching anything
-Install: npx skills add https://github.com/Leonxlnx/taste-skill --skill "redesign-skill"
-→ 6-category audit, identifies what's wrong
+Entry point: Branch D Step 0 → EXPERIENCE track (audit → confirm direction → floor-vs-scope → execute).
+The steps below are that track's execution half; the audit is mandatory with or without the skill.
 
-Step 2: apply appropriate skill from above based on target aesthetic
-DO NOT jump straight to taste-skill on existing projects — audit first.
-```
+Step 1: redesign-existing-projects — AUDIT before touching anything   (folder: redesign-skill)
+Install: npx skills add https://github.com/Leonxlnx/taste-skill --skill "redesign-existing-projects"
+→ Audits current UI, names the generic/AI-slop patterns, then fixes layout, spacing, hierarchy, styling
+  without breaking functionality. This is also the right skill for specific visual defects (contrast,
+  spacing, broken hierarchy) — there is no separate diagnostic skill.
 
-### UI has specific visual bugs / hierarchy problems
-```
-Skill: bugbuster (diagnostic mode)
-Install: npx skills add https://github.com/Leonxlnx/taste-skill --skill "bugbuster"
-→ Detects and fixes visual hierarchy, contrast, spacing in existing code
-→ Run before applying other taste skills
+Step 2: apply the appropriate skill from above based on target aesthetic
+DO NOT jump straight to a taste-skill on existing projects — audit first.
 ```
 
 ### No visual direction yet (blank canvas)
 ```
-Step 1: imagegen-frontend-web — generate reference images first
+Step 1: generate reference images first
+  web pages   → imagegen-frontend-web
+  mobile app screens/flows → imagegen-frontend-mobile
 Install: npx skills add https://github.com/Leonxlnx/taste-skill --skill "imagegen-frontend-web"
 → Generates visual references, AI analyzes them, then implements
 → Costs one extra step but produces much clearer direction
 
-Step 2: implement with appropriate skill from above
+Step 2: implement with the appropriate skill from above.
+Alternative one-shot pipeline: image-to-code (folder: image-to-code-skill) does generate → analyze →
+implement in one skill; use it instead of Step 1 + Step 2 when the visual is the whole point.
+```
+
+### Brand identity / logo system / palette + type board
+```
+Skill: brandkit   (image-generation, not code)
+Install: npx skills add https://github.com/Leonxlnx/taste-skill --skill "brandkit"
+→ Brand-guideline boards: logo directions, palettes, type, identity applications.
+→ This is the "dedicated design/brand skill" the §Logo section defers to. It produces DIRECTIONS to
+  choose from — it does not replace a human designer for a final mark, and MVP-first still says a clean
+  wordmark is a fine day-one logo.
 ```
 
 ---
@@ -621,7 +643,7 @@ Conversational overrides (no dial number needed):
 **Output-skill pairing:**
 If Claude keeps generating placeholders or skips sections:
 ```
-Also activate: output-skill
+Also activate: full-output-enforcement   (folder: output-skill)
 → Forces complete, non-lazy output, no "// TODO" comments
 ```
 
@@ -630,19 +652,32 @@ Also activate: output-skill
 ## Install summary
 
 ```bash
-# Core taste skills (install the ones for your project type)
-npx skills add https://github.com/Leonxlnx/taste-skill --skill "design-taste-frontend"
-npx skills add https://github.com/Leonxlnx/taste-skill --skill "soft-skill"
-npx skills add https://github.com/Leonxlnx/taste-skill --skill "minimalist-skill"
-npx skills add https://github.com/Leonxlnx/taste-skill --skill "redesign-skill"
-npx skills add https://github.com/Leonxlnx/taste-skill --skill "bugbuster"
+# Core taste skills — INSTALL NAMES (folder names in comments; passing the folder name FAILS)
+npx skills add https://github.com/Leonxlnx/taste-skill --skill "design-taste-frontend"      # taste-skill
+npx skills add https://github.com/Leonxlnx/taste-skill --skill "high-end-visual-design"     # soft-skill
+npx skills add https://github.com/Leonxlnx/taste-skill --skill "minimalist-ui"              # minimalist-skill
+npx skills add https://github.com/Leonxlnx/taste-skill --skill "redesign-existing-projects" # redesign-skill
 
 # For pages outside taste-skill scope
-git clone https://github.com/vercel-labs/agent-skills ~/.claude/skills/vercel-skills
+npx skills add https://github.com/vercel-labs/agent-skills --skill "web-design-guidelines"
+#   (or: git clone https://github.com/vercel-labs/agent-skills ~/.claude/skills/vercel-skills)
 
 # Utility
-npx skills add https://github.com/Leonxlnx/taste-skill --skill "output-skill"
+npx skills add https://github.com/Leonxlnx/taste-skill --skill "full-output-enforcement"    # output-skill
 ```
+
+Verify a name before adding it here: `curl -s https://api.github.com/repos/Leonxlnx/taste-skill/contents/skills`
+lists the folders; the repo README's "Install name" column is what `--skill` accepts. They differ.
 
 Do NOT install all taste skills at once — context budget is finite.
 Install only what your current page type needs.
+
+**How detection works (do not "fix" it back into a path check):** the repo name never appears on disk,
+and the on-disk layout differs between `npx skills add` (flat, by install name) and `git clone` (nested
+under `<repo>/skills/<name>/`). So SKILL.md's `skill/taste` probe matches the **`name:` field inside
+SKILL.md** — what the skill *is*, independent of how it got installed — and lists which taste skills are
+actually present, because dispatch depends on the specific one. **Adding a new sibling skill here means
+adding its install name to that probe**, or it will read as "not installed" forever.
+
+**Already available — do not tell the user to install these:** `dataviz` and `artifact-design` ship with
+Claude Code. Invoke them directly for charts and for Artifact pages.

@@ -17,23 +17,43 @@ grep "^version:" "${CLAUDE_SKILL_DIR}/../SKILL.md" 2>/dev/null \
 echo ""
 echo "=== Ecosystem skills ==="
 
-# addyosmani/agent-skills
-if [ -f ~/.claude/skills/agent-skills/SKILL.md ]; then
-  ver=$(grep "^version:" ~/.claude/skills/agent-skills/SKILL.md 2>/dev/null | awk '{print $2}')
-  echo "addyosmani/agent-skills: installed (${ver:-unknown version})"
-else
-  echo "addyosmani/agent-skills: NOT installed"
+# Detect by the SKILL.md `name:` field, never by a guessed path: `npx skills add` installs flat by
+# install name, `git clone` nests under repo/skills/<name>/. A path-shaped probe breaks under one of them.
+# NOTE: neither addyosmani/agent-skills nor Leonxlnx/taste-skill has a ROOT SKILL.md — they are
+# multi-skill repos. Probing for one always reports "not installed".
+present() { grep -rqsE "^name: *\"?$1\"? *\$" ~/.claude/skills .claude/skills --include=SKILL.md; }
+
+# addyosmani/agent-skills — the 6 shipright dispatches to
+echo "addyosmani/agent-skills (shipright dispatches to these 6):"
+for s in spec-driven-development incremental-implementation test-driven-development \
+         code-review-and-quality debugging-and-error-recovery security-and-hardening; do
+  present "$s" && echo "  ✓ $s" || echo "  ✗ $s"
+done
+present spec-driven-development || present test-driven-development || \
   echo "  Install: npx skills add https://github.com/addyosmani/agent-skills"
+
+# taste-skill — an ECOSYSTEM, and its FOLDER names differ from its INSTALL names.
+# The values below are install names (what `--skill` accepts and what lands in the frontmatter).
+echo "taste-skill family (install names, not folder names):"
+found=$(grep -rhsE '^name: *"?(design-taste-frontend(-v1)?|minimalist-ui|high-end-visual-design|redesign-existing-projects|industrial-brutalist-ui|gpt-taste|image-to-code|stitch-design-taste|imagegen-frontend-(web|mobile)|brandkit|full-output-enforcement)"? *$' \
+  ~/.claude/skills .claude/skills --include=SKILL.md 2>/dev/null | sed 's/^name: *//; s/"//g' | sort -u | paste -sd', ')
+if [ -n "$found" ]; then
+  echo "  installed: ${found}"
+else
+  echo "  none installed"
+  echo "  Install per page type: npx skills add https://github.com/Leonxlnx/taste-skill --skill \"design-taste-frontend\""
+  echo "  (see references/ui-design.md — install names ≠ folder names; do NOT install all of them)"
 fi
 
-# taste-skill
-if [ -f ~/.claude/skills/taste-skill/SKILL.md ]; then
-  ver=$(grep "^version:" ~/.claude/skills/taste-skill/SKILL.md 2>/dev/null | awk '{print $2}')
-  echo "taste-skill: installed (${ver:-unknown version})"
+# vercel-labs/agent-skills — dashboards, admin, a11y-critical UI
+if present web-design-guidelines; then
+  echo "vercel-labs web-design-guidelines: installed"
 else
-  echo "taste-skill: NOT installed"
-  echo "  Install: npx skills add https://github.com/Leonxlnx/taste-skill"
+  echo "vercel-labs web-design-guidelines: NOT installed"
+  echo "  Install: npx skills add https://github.com/vercel-labs/agent-skills --skill \"web-design-guidelines\""
 fi
+
+echo "dataviz + artifact-design: bundled with Claude Code (no install needed)"
 
 echo ""
 echo "=== Project constitution ==="

@@ -1,4 +1,4 @@
-# shipright v1.19.1
+# shipright v1.20.0
 
 > **Ship your MVP fast. Grow it right.**
 
@@ -126,7 +126,7 @@ Shipright orchestrates. These execute.
 | Skill | Stage | What it handles |
 |---|---|---|
 | addyosmani/agent-skills | Traction+ | Implementation, TDD, code review, security |
-| taste-skill | When UI needed | Landing pages, portfolios, product UI |
+| taste-skill | When UI needed | Landing pages, portfolios, product UI, redesign audit, brand kit. An ecosystem — install per page type, and **`--skill` takes the install name, not the folder name** (`soft-skill/` → `high-end-visual-design`). See `references/ui-design.md` |
 | RAGAS | RAG projects | Evaluation metrics (Hit Rate, Faithfulness) |
 | LangSmith / Arize | AI projects | LLM tracing and observability |
 | vercel-labs/agent-skills | Dashboards | Data-heavy UI, a11y, UX correctness |
@@ -210,7 +210,9 @@ shipright/
     team-scale.md             # multi-dev/parallel-module: boundary = team API, cognitive load, contract tests (signal-driven)
     evolutionary-architecture.md # when you were WRONG: fitness functions, last responsible moment, the recovery path (Ford/Parsons)
     third-party-apis.md       # Adapter pattern, 3-layer testing, resilience
-    ui-design.md              # taste-skill: page type → correct skill → dials
+    ui-design.md              # EXPERIENCE floor + UI/UX judgment (Norman/Nielsen/Krug/Refactoring UI/Tufte/
+                              #   Tidwell/Wroblewski/Walter/Rand): a11y-as-correctness, state-floor, mobile,
+                              #   archetype + audience tone, landing anatomy, admin patterns → THEN dispatch
     l0-templates.md           # CLAUDE.md + ARCHITECTURE.md templates + state section
     levels.md                 # Lifecycle spine + L0→L4, gates, Conway's Law, graduate checklist
     boundaries.md             # 5 boundary rules with code examples
@@ -278,6 +280,7 @@ shipright/
 - [x] **v1.17.0: RUNTIME evals — dogfooded shipright against 13 real scenarios to verify knowledge FIRES at the right moment (the artifact↔runtime gap greps can't see). Found the "we were wrong / requirements changed / MCP" family was DARK (catalogued but no in-session trigger, because they surface mid-construction — neither a routing moment nor an L4 operation signal). Fixed with a "Mid-work signals" trigger table in the always-loaded core; captured the suite as a reusable fitness function in `EVALS.md`**
 - [x] **v1.18.0: UI/UX judgment layer — the one domain with zero master grounding now has a full hemisphere. `references/ui-design.md` rebuilt from a pure taste-skill dispatch table into judgment (Norman/Nielsen/Krug/Refactoring UI/Tufte/Tidwell/Wroblewski + WCAG-as-correctness + state-floor), an MVP-first floor-vs-scope split, mobile/responsive (incl. data-tables-on-mobile), durable style archetypes + living reference sources, landing anatomy (Krug/Cialdini) and an admin/dashboard pattern language. Wired to FIRE from Branch A + B + session-start (dogfooded). Judgment decides; taste-skill/dataviz/vercel execute**
 - [x] **v1.19.0: UI/UX judgment layer + system-vs-experience balance — `ui-design.md` rebuilt into a masters-grounded hemisphere (Norman/Nielsen/Krug/Refactoring UI/Tufte/Tidwell/Wroblewski/Walter + brand archetypes + Paul Rand): principles, MVP-first floor-vs-scope, deep mobile/responsive, SVG icons (no emoji), logo, style archetypes + audience emotional tone + emotional design (anti-AI-slop), and design-brief intake. The executive layer (judgment.md §5b) now balances the SYSTEM floor vs the EXPERIENCE floor — by project shape AND per task (Branch B forks on task KIND before complexity). Wired to fire from Branch A/B + session-start**
+- [x] **v1.20.0: system-wide firing audit — (a) the UI/UX layer now actually fires: the description carried zero UI vocabulary so the whole v1.18/v1.19 hemisphere only loaded if the user said "build", Branch D had no redesign track (its "no measurable pain" guard was bouncing legitimate UI work), Branch C didn't recognize visual/UX bugs, and there was no mid-work UI signal. (b) Then the harder question — do the dispatch targets exist? **6 of 8 taste-skill install commands were broken** (folder names where the CLI wants install names) and two named skills were never in the repo at all; every skill probe encoded one install layout and returned NO forever under the other; `/shipright-version` probed a root SKILL.md that multi-skill repos don't have. Plus `boundaries.md` was DARK, stack files fired only from Branch A, and 6 registry entries had no `load:` line. EVALS.md gains a **BROKEN-TARGET** verdict — a trigger that fires into a name that doesn't exist is indistinguishable from no trigger**
 - [ ] references/registry.md community contributions (ongoing)
 - [x] **v0.9: PreToolUse boundary-enforcement hook (blocks service→db + deep cross-module imports; opt-in, fails open, self-test)**
 
