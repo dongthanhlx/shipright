@@ -151,13 +151,20 @@ fallback either. **Offer to install it (see Check 3), because a skill installed 
 
 **Check 3: Missing skill → offer once, install on consent, use it this session**
 
-**First: is it already there?** Nothing gets installed until the BUNDLED set is ruled out
-(`/security-review` · `/code-review` · `/run` · `/debug` · `/claude-api` · `dataviz` ·
-`artifact-design` · `/simplify` — see §Ecosystem dispatch). They ship with Claude Code, cost nothing,
-and need no install: you invoke them. Offering to install over one of those is a straight downgrade —
-it spends the user's consent and disk on capability they already had.
-
-Only when nothing bundled covers the job does the flow below apply.
+**First: is it already there?** Nothing gets installed until you have ruled that out. "Already there" is
+three things, and only the second is on disk:
+```
+1. Skills listed in THIS SESSION's available-skills list — the authority, and it is already in your
+   context. Read it. Bundled skills (/security-review, /code-review, /run, /debug, /claude-api,
+   dataviz, artifact-design, /simplify …) normally appear there, but the set varies by Claude Code
+   version and `disableBundledSkills` / `skillOverrides` can remove any of them. Treat the names in
+   §Ecosystem dispatch as what to LOOK FOR, never as a guarantee that it is present.
+2. Already installed on disk — `skill/core` and `skill/ui` above list these (stale after any
+   mid-session install; re-check per §Install recipes).
+3. Served by a connected MCP server or plugin — those appear in the session list too.
+```
+Offering to install over something in that list is a straight downgrade: it spends the user's consent
+and disk on capability they already had. Only when nothing there covers the job does the flow below apply.
 
 Claude Code **watches the skill directories**: a skill added under `~/.claude/skills/` during a session
 takes effect immediately, no restart. So the useful move at the moment a trigger fires is not "here's a
@@ -342,8 +349,11 @@ never). The full capability/signal → skill table (addyosmani, taste-skill, AI-
 index in `references/registry.md`** — load it after routing. Default ladder if no trigger fires:
 SEED=debug · VALIDATE=+tdd/incremental/review · HARDEN=+spec/security/observability · SCALE=+specialized.
 
-**Reach for the BUNDLED skills first — they ship with Claude Code, cost nothing, and are always there.**
-Never offer to install something these already cover (Check 3 exists for what is genuinely missing).
+**Reach for the BUNDLED skills first — they ship with Claude Code and need no install.** Never offer to
+install something these already cover (Check 3 exists for what is genuinely missing). They are normally
+present but **not guaranteed**: the set varies by version, and `disableBundledSkills` / `skillOverrides`
+can remove any of them. Confirm against this session's available-skills list before promising one; if it
+isn't there, say so and fall back rather than inventing it.
 
 | Bundled | Use it when |
 |---|---|

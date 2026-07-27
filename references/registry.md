@@ -43,10 +43,11 @@ the default heuristic (a payment MVP needs security on day one; a read-only Grow
 | LLM tracing needed | LangSmith / Arize Phoenix | — |
 
 **Bundled with Claude Code — never suggest installing these** (`/security-review` · `/code-review` ·
-`/run` · `/debug` · `/claude-api` · `dataviz` · `artifact-design` · `/simplify`). They cost nothing and
-are always present, so they are the FIRST thing to reach for. `/code-review` and `/verify` are
-user-invoke-only — ask the user to run them; don't claim the gate is closed yourself. See SKILL.md
-§Ecosystem dispatch.
+`/run` · `/debug` · `/claude-api` · `dataviz` · `artifact-design` · `/simplify`). No install, so they are
+the FIRST thing to reach for. Normally present but **not guaranteed** — the set varies by version and
+`disableBundledSkills` / `skillOverrides` can remove any of them, so confirm against this session's
+available-skills list rather than trusting this roster. `/code-review` and `/verify` are user-invoke-only:
+ask the user to run them; don't claim the gate is closed yourself. See SKILL.md §Ecosystem dispatch.
 
 Shipright already covers — do NOT load these: interview-me, idea-refine (→ Branch A intake);
 frontend-ui-engineering (→ taste-skill); performance-optimization (→ L4 + performance.md);
