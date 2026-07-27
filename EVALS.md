@@ -70,6 +70,18 @@ actually exist under the names it uses. **Scenario 5's v1.17 "FIRES" verdict was
 | 24 | "does this violate a boundary? show me in real code" | boundaries.md | **catalogue only** — the sole other mention was a sample `.claude/rules/` listing inside Branch D, i.e. a project's own file, not shipright's ref | **DARK → fixed v1.20** |
 | 25 | "give me a copy-paste prompt for X" | prompts.md | catalogue only | **DARK — accepted** (passive library, pulled by hand; no trigger needed) |
 
+### Capability scenarios (v1.21) — a real need with no executor at all
+
+The audit's other half: not a wrong name, but **no name**. These fired into shipright's own prose and
+stopped there.
+
+| # | Situation | Needs | Before | Verdict → fix |
+|---|---|---|---|---|
+| 26 | "is this actually responsive / accessible?" | a real browser | shipright mandated "verify at 360px with a real thumb" and had **no way to run a page** — verdicts came from reading code | **NO-EXECUTOR → fixed v1.21** (`browser-testing-with-devtools`, + a ban on code-only a11y/responsive verdicts) |
+| 27 | "the React app is slow" | React/Next specifics | `performance.md` ladder only (deliberately stack-agnostic) | **NO-EXECUTOR → fixed v1.21** (`vercel-react-best-practices`) |
+| 28 | "we just decided the money type / public API shape" | a durable record | judgment.md named the one-way door; nothing recorded it | **NO-EXECUTOR → fixed v1.21** (`documentation-and-adrs` Mid-work row) |
+| 29 | "now remove the old path" (contract phase) | migration discipline | requirement-drift.md described the phase, named no executor | **NO-EXECUTOR → fixed v1.21** (`deprecation-and-migration`) |
+
 ### Finding (v1.20) — the trigger can be perfect and still dead-end
 
 v1.17's lesson was *retrieval + timing*. v1.20 adds: **the target must exist**. shipright's UI dispatch

@@ -26,7 +26,9 @@ VISUAL / UX bug — the code "works" but the screen is wrong: broken layout, ove
                                      → load references/ui-design.md. The failing "test" is the FLOOR
                                        (a11y / responsive / state-floor), not a unit test — Step 1 below
                                        becomes: capture the broken state (screenshot at 360px, contrast
-                                       number, keyboard path) as the repro. [skill/taste = YES] →
+                                       number, keyboard path) as the repro, using
+                                       browser-testing-with-devtools if installed (real runtime beats
+                                       reading the CSS). [skill/taste = YES] →
                                        redesign-existing-projects (its audit covers hierarchy/contrast/
                                        spacing; there is no separate visual-diagnostic skill). If it's a
                                        whole-screen redesign, not one defect → Branch D EXPERIENCE track.

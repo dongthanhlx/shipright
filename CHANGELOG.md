@@ -1,5 +1,48 @@
 # Changelog
 
+## [1.21.0] — 2026-07 — Capability additions, curated by trigger (the audit's second half)
+The v1.20 audit resolved every dispatched skill name against its real repo. That same pass surfaced
+capable skills shipright had **never mapped at all** — a quieter failure than a broken name, but the same
+outcome: a real need with no executor. Added only those with a genuine, non-duplicating trigger, and
+wired each to a firing surface rather than a catalogue line. Every description below was read from the
+skill's own SKILL.md, not inferred from its name (the v1.20 lesson).
+
+### Added — each with the moment it fires
+- **`browser-testing-with-devtools`** (addyosmani) — the biggest hole. `ui-design.md` mandates "verify at
+  360px with a real thumb" and Branch D's new experience track wants before/after screenshots plus a11y
+  output, but shipright had **no way to actually see the page run**. Wired into the mobile-verification
+  rule, Branch D step 6, and Branch C's visual-bug repro, with an explicit ban on declaring a UI
+  "responsive" or "accessible" from reading code alone. Requires the chrome-devtools MCP server.
+- **`vercel-react-best-practices`** (vercel-labs) — React/Next is the `full-stack-web` default stack, and
+  `performance.md` is deliberately a stack-agnostic measure-first *ladder*; this is the framework
+  execution detail (waterfalls, bundle size, server-vs-client, re-renders). Wired to the L4 latency
+  signal and the registry entry. `vercel-optimize` noted for the narrower "the Vercel bill is the
+  problem" case.
+- **`documentation-and-adrs`** (addyosmani) — shipright's whole executive layer turns on naming one-way
+  doors, and an unrecorded one gets re-litigated next session. New Mid-work signal: decision made →
+  shipright decides *what* is irreversible, the skill records it properly.
+- **`deprecation-and-migration`** (addyosmani) — the contract phase of `requirement-drift.md`'s
+  expand → migrate → contract had no executor. Named on that Mid-work row.
+- **`ci-cd-and-automation`** (addyosmani) — a fitness function only guards you if it *runs*; named on the
+  `evolutionary-architecture.md` Mid-work row.
+
+### Not added (recorded so it isn't re-proposed)
+- `code-simplification` → duplicates `code-quality.md` (Fowler smells) + `code-health.md` (Ousterhout
+  over-extraction), and Claude Code ships `/simplify`. `planning-and-task-breakdown` → duplicates
+  Branch B's complexity tiers + spec-driven. Both added to the SKIP list: loading a skill you would
+  duplicate spends context and dilutes reasoning — shipright's own dispatch rule 2.
+- `composition-patterns` has an **empty description** in its SKILL.md; unverifiable, so not mapped.
+  react-view-transitions / react-native / deploy-to-vercel / vercel-cli / writing-guidelines /
+  git-workflow / shipping-and-launch / context-engineering / doubt-driven / source-driven: no clear
+  shipright trigger, or too narrow to earn always-loaded space.
+
+### Note on detection cost
+The new skills are **checked on demand when their trigger fires**, not probed at session start. Probing
+everything every session would cost more context than it saves — the same budget argument shipright makes
+about loading skills. Recorded explicitly in the registry so it reads as a decision, not an oversight.
+Also confirmed: vercel prefixes some install names (`vercel-react-best-practices`) but not others
+(`web-design-guidelines`) — verify each against its own SKILL.md `name:` field.
+
 ## [1.20.0] — 2026-07 — System-wide firing audit: the UI/UX layer fires, and the dispatch targets are real
 Two audits in one release. **(a)** The hemisphere v1.18/v1.19 built had complete content and correct
 judgment wiring into Branch A and Branch B — but the front door didn't open on UI vocabulary, two of six

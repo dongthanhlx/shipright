@@ -30,12 +30,25 @@ the default heuristic (a payment MVP needs security on day one; a read-only Grow
 | Visual defect: hierarchy / contrast / spacing in shipped UI | `redesign-existing-projects` (same skill — its audit covers this) | Branch C + references/ui-design.md |
 | Need a logo / brand direction | `brandkit` (directions, not a final mark) | references/ui-design.md §Logo |
 | Any chart, graph, dashboard viz | dataviz (ships with Claude Code — no install) | references/ui-design.md |
+| Writing / reviewing React or Next.js code | `vercel-react-best-practices` (waterfalls, bundle size, server-vs-client, re-renders) | vercel-labs |
+| Need to SEE it run: verify UI in a real browser, capture console/network, confirm a visual fix | `browser-testing-with-devtools` (needs the chrome-devtools MCP server) | addyosmani |
+| A one-way door was just decided / a public API changed | `documentation-and-adrs` (shipright decides WHAT is irreversible; the skill records it properly) | addyosmani |
+| Removing/sunsetting an old API, migrating users off an implementation | `deprecation-and-migration` | addyosmani + references/requirement-drift.md |
+| A fitness function / arch test must actually run on every commit | `ci-cd-and-automation` | addyosmani + references/evolutionary-architecture.md |
 | RAG retrieval/prompt change to evaluate | RAGAS | `pip install ragas` |
 | Agent trajectory to evaluate | DeepEval / Confident-AI | — |
 | LLM tracing needed | LangSmith / Arize Phoenix | — |
 
 Shipright already covers — do NOT load these: interview-me, idea-refine (→ Branch A intake);
-frontend-ui-engineering (→ taste-skill); performance-optimization (→ L4 + performance.md).
+frontend-ui-engineering (→ taste-skill); performance-optimization (→ L4 + performance.md);
+code-simplification (→ code-quality.md Fowler smells + code-health.md Ousterhout over-extraction, and
+Claude Code ships `/simplify`); planning-and-task-breakdown (→ Branch B complexity tiers +
+spec-driven-development). Loading a skill you would duplicate spends context and dilutes reasoning.
+
+**Only the skills in the session-start probe list are detected automatically** — the long tail above is
+checked on demand, at the moment its trigger fires. Probing everything at every session start would cost
+more context than it saves. When a trigger fires: check, then either activate or say plainly it is not
+installed and use shipright's fallback. Never assume presence.
 
 Default ladder when no specific trigger has fired yet (by lifecycle phase):
 SEED debug · VALIDATE +tdd/incremental/review · HARDEN +spec/security/observability · SCALE +specialized.
@@ -296,6 +309,14 @@ install:
   ui:
     - taste-skill (page-type dependent — read references/ui-design.md)
     - vercel-labs/agent-skills web-design-guidelines (for dashboard/admin pages)
+  framework:
+    - vercel-labs/agent-skills vercel-react-best-practices
+      when: writing or reviewing React/Next.js code (this entry's default stack)
+      why: shipright's performance.md is the measure-first LADDER (stack-agnostic); this is the
+           React/Next execution detail — waterfalls, bundle size, server-vs-client, re-renders
+  verification:
+    - addyosmani/agent-skills browser-testing-with-devtools
+      when: confirming the UI actually works/looks right (needs the chrome-devtools MCP server)
 
 tested-with: React 18+, Next.js 14+, addyosmani 2025-06
 load: references/stacks/nodejs.md (or the API's language file) for the SYSTEM floor, AND

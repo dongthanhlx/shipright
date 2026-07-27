@@ -131,6 +131,12 @@ actions visible, don't bury everything); horizontal group → vertical stack; fi
 **Verify at 360px with a real thumb** — not a resized desktop window — and at 200% text zoom (a11y + reflow
 overlap).
 
+> **Verification is a step, not a hope.** The floor above is only real if someone looks. Execute it with
+> **`browser-testing-with-devtools`** (addyosmani; needs the chrome-devtools MCP server): render at 360px,
+> capture console errors, check the network waterfall, and screenshot the result. If it is not installed,
+> say so and ask the user to check the screen themselves — do NOT declare a UI "responsive" or "accessible"
+> from reading the code alone. Reviewing the markup is `web-design-guidelines`' job; seeing it run is this.
+
 ---
 
 ## Icons — SVG icon sets, never emoji

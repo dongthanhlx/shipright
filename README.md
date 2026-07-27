@@ -1,4 +1,4 @@
-# shipright v1.20.0
+# shipright v1.21.0
 
 > **Ship your MVP fast. Grow it right.**
 
@@ -129,7 +129,8 @@ Shipright orchestrates. These execute.
 | taste-skill | When UI needed | Landing pages, portfolios, product UI, redesign audit, brand kit. An ecosystem — install per page type, and **`--skill` takes the install name, not the folder name** (`soft-skill/` → `high-end-visual-design`). See `references/ui-design.md` |
 | RAGAS | RAG projects | Evaluation metrics (Hit Rate, Faithfulness) |
 | LangSmith / Arize | AI projects | LLM tracing and observability |
-| vercel-labs/agent-skills | Dashboards | Data-heavy UI, a11y, UX correctness |
+| vercel-labs/agent-skills | Dashboards, React/Next | `web-design-guidelines` (data-heavy UI, a11y, UX correctness) · `vercel-react-best-practices` (waterfalls, bundle size, re-renders) |
+| browser-testing-with-devtools | Any browser UI | Seeing it actually run — 360px render, console, network, screenshots (needs the chrome-devtools MCP server) |
 
 **Never install all addyosmani skills at once.** Context budget is finite.
 Registry tells you exactly which skills to install for your project type.
@@ -281,6 +282,7 @@ shipright/
 - [x] **v1.18.0: UI/UX judgment layer — the one domain with zero master grounding now has a full hemisphere. `references/ui-design.md` rebuilt from a pure taste-skill dispatch table into judgment (Norman/Nielsen/Krug/Refactoring UI/Tufte/Tidwell/Wroblewski + WCAG-as-correctness + state-floor), an MVP-first floor-vs-scope split, mobile/responsive (incl. data-tables-on-mobile), durable style archetypes + living reference sources, landing anatomy (Krug/Cialdini) and an admin/dashboard pattern language. Wired to FIRE from Branch A + B + session-start (dogfooded). Judgment decides; taste-skill/dataviz/vercel execute**
 - [x] **v1.19.0: UI/UX judgment layer + system-vs-experience balance — `ui-design.md` rebuilt into a masters-grounded hemisphere (Norman/Nielsen/Krug/Refactoring UI/Tufte/Tidwell/Wroblewski/Walter + brand archetypes + Paul Rand): principles, MVP-first floor-vs-scope, deep mobile/responsive, SVG icons (no emoji), logo, style archetypes + audience emotional tone + emotional design (anti-AI-slop), and design-brief intake. The executive layer (judgment.md §5b) now balances the SYSTEM floor vs the EXPERIENCE floor — by project shape AND per task (Branch B forks on task KIND before complexity). Wired to fire from Branch A/B + session-start**
 - [x] **v1.20.0: system-wide firing audit — (a) the UI/UX layer now actually fires: the description carried zero UI vocabulary so the whole v1.18/v1.19 hemisphere only loaded if the user said "build", Branch D had no redesign track (its "no measurable pain" guard was bouncing legitimate UI work), Branch C didn't recognize visual/UX bugs, and there was no mid-work UI signal. (b) Then the harder question — do the dispatch targets exist? **6 of 8 taste-skill install commands were broken** (folder names where the CLI wants install names) and two named skills were never in the repo at all; every skill probe encoded one install layout and returned NO forever under the other; `/shipright-version` probed a root SKILL.md that multi-skill repos don't have. Plus `boundaries.md` was DARK, stack files fired only from Branch A, and 6 registry entries had no `load:` line. EVALS.md gains a **BROKEN-TARGET** verdict — a trigger that fires into a name that doesn't exist is indistinguishable from no trigger**
+- [x] **v1.21.0: capability additions, curated by trigger — the audit's second half surfaced capable skills shipright had never mapped at all (a quieter failure than a broken name, same outcome: a real need with no executor). Added `browser-testing-with-devtools` (shipright mandated "verify at 360px with a real thumb" but had no way to actually see a page run — now wired into the mobile rule, Branch D's before/after capture, and Branch C's visual repro, with an explicit ban on calling a UI responsive/accessible from reading code), `vercel-react-best-practices` (React/Next execution detail under performance.md's stack-agnostic ladder), `documentation-and-adrs` (a one-way door nobody recorded gets re-litigated next session), `deprecation-and-migration` (the contract phase of expand→migrate→contract), `ci-cd-and-automation` (a fitness function only guards you if it runs). Explicitly NOT added, and recorded so it isn't re-proposed: code-simplification and planning-and-task-breakdown (duplicate shipright), composition-patterns (empty description — unverifiable)**
 - [ ] references/registry.md community contributions (ongoing)
 - [x] **v0.9: PreToolUse boundary-enforcement hook (blocks service→db + deep cross-module imports; opt-in, fails open, self-test)**
 

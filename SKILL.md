@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 1.20.0
+version: 1.21.0
 description: >
   Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
   sets up constitution, enforces boundaries, judges what to build now vs defer,
@@ -49,7 +49,7 @@ Tests:         !`if [ -f package.json ] && grep -q '"test":' package.json; then 
 
 ---
 
-# Shipright v1.20 — Project Brain OS
+# Shipright v1.21 — Project Brain OS
 
 An executive layer over two hemispheres. The executive decides how much of each hemisphere to
 apply, by stage × risk × reversibility (construction is ON from day one — the irreversible quadrant;
@@ -265,7 +265,7 @@ Never add L4 work proactively. Only when production gives a measurable signal.
 | "One dependency takes the system down" | Timeout + circuit breaker + bulkhead | `references/resilience.md` |
 | "Retries storm a struggling dependency" | Backoff+jitter + retry budget | `references/resilience.md` |
 | "Duplicate charges / double-processing" | Idempotency key (DB/Redis, structural) | `references/resilience.md` |
-| "p95 latency / DB CPU over target" | Profile → fix query/N+1 → cache → replica | `references/performance.md` |
+| "p95 latency / DB CPU over target" | Profile → fix query/N+1 → cache → replica | `references/performance.md` (React/Next front end → also `vercel-react-best-practices`; deployed on Vercel and it's the BILL → `vercel-optimize`) |
 | "Need SLOs / error budget" | Golden signals + SLO + alerting | `references/observability.md` |
 | "API changed silently" | Schema validation + contract tests | `references/third-party-apis.md` |
 | "Can't reproduce prod issues" | Correlation ID missing | `references/observability.md` |
@@ -285,8 +285,9 @@ them here: when the thought below crosses your mind while building, load the ref
 | "I'm writing code in this project's language for the first time this session" | `references/stacks/<language>.md` — ONCE, before the first implementation. Not just a Branch A concern: the stack file carries compile-time boundary enforcement, timeout/context idioms, the error taxonomy and the language's security footguns, and existing projects (Branch B/C/D) need them just as much. |
 | "What's the right shape for this domain concept — entity, value object, aggregate? Where does this invariant live?" | `references/domain-thinking.md` (Evans tactical: aggregate roots, invariants, domain events, "DDD or not?") |
 | "I'm writing the failure path — what should this return / throw / retry / roll back?" | `references/error-handling.md` (taxonomy, Result type, saga, race conditions, idempotency) — decide it while writing, not after an incident |
-| "A settled decision / the domain model is wrong — it must change" | `references/evolutionary-architecture.md` (evolve under guard, recovery path) |
-| "The requirements changed under us mid-build" | `references/requirement-drift.md` (expand → migrate → contract) |
+| "A settled decision / the domain model is wrong — it must change" | `references/evolutionary-architecture.md` (evolve under guard, recovery path). A fitness function only guards you if it RUNS on every commit → `ci-cd-and-automation` |
+| "The requirements changed under us mid-build" | `references/requirement-drift.md` (expand → migrate → contract). Removing the old path / moving users off it is the contract phase → `deprecation-and-migration` |
+| "I just decided a ONE-WAY door (public interface, data identity, money, persisted state)" | Record it before it becomes folklore — shipright decides *what* is irreversible, `documentation-and-adrs` records it properly (ARCHITECTURE.md / ADR). An unrecorded one-way door gets re-litigated by the next session. |
 | "We're exposing tools/data to an AI host (MCP server/client)" | `references/stacks/mcp.md` (lethal-trifecta boundary) |
 | "This module got too big for one person to hold in their head" | `references/team-scale.md` (cognitive load → split) |
 | "I keep threading the same 3 fields / a string stands in for a domain concept" | `references/code-quality.md` (smells → extract) |
@@ -311,7 +312,8 @@ SEED=debug · VALIDATE=+tdd/incremental/review · HARDEN=+spec/security/observab
 
 **SKIP (shipright already covers):** interview-me / idea-refine → Branch A intent discovery (dispatch
 only when the idea is genuinely vague + installed); frontend-ui-engineering → taste-skill; performance-
-optimization → L4 signal-driven. For AI/RAG: addyosmani covers infra code, shipright AI files cover
+optimization → L4 signal-driven; code-simplification → code-quality.md + code-health.md (and `/simplify`);
+planning-and-task-breakdown → Branch B tiers + spec-driven. For AI/RAG: addyosmani covers infra code, shipright AI files cover
 AI-specific code (eval loop, LLM boundaries) — use both, no overlap.
 
 ---

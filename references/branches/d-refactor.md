@@ -52,6 +52,8 @@ Both (UI code is a mess AND the UI looks bad)            → run the EXPERIENCE 
    screen has loading/empty/error states · [the specific hierarchy findings] fixed."
 6. The guard equivalent of characterization tests: capture BEFORE screenshots (and the current a11y
    check output) so you can prove the redesign didn't regress behavior or accessibility.
+   Execute this with `browser-testing-with-devtools` (real browser, real runtime, console + network).
+   Not installed → capture the before-state manually and say the comparison is by eye, not measured.
 ```
 
 Then skip to Step 2 (define DONE) — Steps 1 and 3 (smell diagnosis, characterization tests) are the
