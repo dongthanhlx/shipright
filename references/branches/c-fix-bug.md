@@ -20,6 +20,18 @@ Then shipright INFERS the type from the description (don't quiz — diagnose):
 reproduces every time                → the flow below
 intermittent / production-only / grows over time (memory/resource leak)
                                      → load references/debug-intermittent.md
+VISUAL / UX bug — the code "works" but the screen is wrong: broken layout, overflow, unreadable
+  contrast, wrong spacing/hierarchy, unusable on mobile, no focus ring, missing loading/empty/error
+  state, keyboard trap
+                                     → load references/ui-design.md. The failing "test" is the FLOOR
+                                       (a11y / responsive / state-floor), not a unit test — Step 1 below
+                                       becomes: capture the broken state (screenshot at 360px, contrast
+                                       number, keyboard path) as the repro, using
+                                       browser-testing-with-devtools if installed (real runtime beats
+                                       reading the CSS). [skill/taste = YES] →
+                                       redesign-existing-projects (its audit covers hierarchy/contrast/
+                                       spacing; there is no separate visual-diagnostic skill). If it's a
+                                       whole-screen redesign, not one defect → Branch D EXPERIENCE track.
 ```
 Play it back if unsure: "This sounds production-only — visible in prod but not locally, right?"
 

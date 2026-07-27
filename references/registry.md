@@ -26,12 +26,49 @@ the default heuristic (a payment MVP needs security on day one; a read-only Grow
 | p95 latency / DB CPU over target | (shipright built-in) | references/performance.md |
 | Building a user-facing UI page | taste-skill (per page type) | references/ui-design.md |
 | Dashboard / admin / data-heavy UI | vercel-labs/agent-skills | vercel-labs |
+| Redesigning EXISTING UI ("looks bad/dated/amateur") | `redesign-existing-projects` (audit FIRST, never restyle blind) | Branch D §Step 0 EXPERIENCE track + references/ui-design.md |
+| Visual defect: hierarchy / contrast / spacing in shipped UI | `redesign-existing-projects` (same skill — its audit covers this) | Branch C + references/ui-design.md |
+| Need a logo / brand direction | `brandkit` (directions, not a final mark) | references/ui-design.md §Logo |
+| Any chart, graph, dashboard viz | dataviz (ships with Claude Code — no install) | references/ui-design.md |
+| Writing / reviewing React or Next.js code | `vercel-react-best-practices` (waterfalls, bundle size, server-vs-client, re-renders) | vercel-labs |
+| Need to SEE it run: verify UI in a real browser, capture console/network, confirm a visual fix | `browser-testing-with-devtools` (needs the chrome-devtools MCP server) | addyosmani |
+| A one-way door was just decided / a public API changed | `documentation-and-adrs` (shipright decides WHAT is irreversible; the skill records it properly) | addyosmani |
+| Removing/sunsetting an old API, migrating users off an implementation | `deprecation-and-migration` | addyosmani + references/requirement-drift.md |
+| A fitness function / arch test must actually run on every commit | `ci-cd-and-automation` | addyosmani + references/evolutionary-architecture.md |
 | RAG retrieval/prompt change to evaluate | RAGAS | `pip install ragas` |
 | Agent trajectory to evaluate | DeepEval / Confident-AI | — |
 | LLM tracing needed | LangSmith / Arize Phoenix | — |
 
 Shipright already covers — do NOT load these: interview-me, idea-refine (→ Branch A intake);
-frontend-ui-engineering (→ taste-skill); performance-optimization (→ L4 + performance.md).
+frontend-ui-engineering (→ taste-skill); performance-optimization (→ L4 + performance.md);
+code-simplification (→ code-quality.md Fowler smells + code-health.md Ousterhout over-extraction, and
+Claude Code ships `/simplify`); planning-and-task-breakdown (→ Branch B complexity tiers +
+spec-driven-development). Loading a skill you would duplicate spends context and dilutes reasoning.
+
+**Only the skills in the session-start probe list are detected automatically** — the long tail above is
+checked on demand, at the moment its trigger fires. Probing everything at every session start would cost
+more context than it saves. When a trigger fires: check, then either activate, or **offer the install and
+use it this session on consent** (SKILL.md Check 3 — a skill added mid-session works immediately, no
+restart). Never assume presence; never install without asking.
+
+### Install recipes — verify the name, install, re-verify
+
+```bash
+REPO=https://github.com/addyosmani/agent-skills     # or Leonxlnx/taste-skill · vercel-labs/agent-skills
+
+npx -y skills@latest add $REPO --list                        # exact INSTALL names — installs nothing
+npx -y skills@latest add $REPO -y -g --skill "<install-name>"  # -g = user-level (default is project-level)
+grep -rqsE '^name: *"?<install-name>"? *$' ~/.claude/skills .claude/skills --include=SKILL.md \
+  && echo INSTALLED || echo FAILED                           # re-verify — never assume it worked
+```
+
+- **Always `--list` first for taste-skill**: its folder names differ from its install names, and passing
+  the folder name fails. `--list` is the source of truth (it prints what `--skill` accepts).
+- **`-g` (user-level) is the default choice** — same place shipright lives, no repo change. Drop `-g`
+  only when the whole team should get the skill; that writes into `.claude/skills/` and gets committed.
+- **`skills use <pkg>@<skill>`** borrows a skill's guidance without installing anything — the right
+  option for a one-off when the user doesn't want another skill on disk.
+- The CLI detects an agent environment and runs non-interactively; it will not hang on a prompt.
 
 Default ladder when no specific trigger has fired yet (by lifecycle phase):
 SEED debug · VALIDATE +tdd/incremental/review · HARDEN +spec/security/observability · SCALE +specialized.
@@ -60,6 +97,9 @@ install:
       when: always
 
 tested-with: addyosmani/agent-skills commit 2025-06
+load: references/stacks/<language>.md — the project's language file (Node/Python/Go/PHP): compile-time
+      boundary enforcement, timeout/context idioms, error taxonomy, language security footguns.
+      Load it before the first implementation, not just at scaffold time.
 
 shipright-adds-to-CLAUDE:
   boundary-1: "Service never imports db — grep check: grep -r 'shared/db' src/modules/ must be empty"
@@ -95,6 +135,8 @@ install:
     - datadog-labs/dd-llmo-eval-bootstrap (production LLM eval)
 
 tested-with: RAGAS 0.2+, LangChain 0.3+, LlamaIndex 0.11+
+load: references/stacks/ai-projects.md — the LLM boundary (Boundary 4 for AI), THEN
+      references/stacks/ai-rag.md — RAG deep dive (eval loop, chunking, vector DB, retrieval metrics)
 
 framework-decision:
   retrieval-first: LlamaIndex
@@ -137,6 +179,8 @@ install:
     - RAGAS (if RAG-powered chatbot)
 
 tested-with: grammy 1.x, discord.js 14.x, python-telegram-bot 20.x
+load: references/stacks/chatbot-platforms.md — PlatformAdapter (the ACL for Telegram/Discord),
+      webhook vs polling, per-platform limits. AI-powered bot → also stacks/ai-projects.md
 
 platform-decision:
   polling: development / no SSL / behind NAT
@@ -175,6 +219,8 @@ install:
     - jest-webextension-mock: npm install --save-dev jest-webextension-mock
 
 tested-with: Chrome MV3, Firefox MV3 (via Extension.js)
+load: references/stacks/browser-extension.md — MV3 architecture, message passing, storage boundaries,
+      and the content-script security model (a content script trusts a hostile DOM — see security.md)
 
 tooling:
   recommended: Extension.js (Chrome + Firefox from same source)
@@ -283,8 +329,18 @@ install:
   ui:
     - taste-skill (page-type dependent — read references/ui-design.md)
     - vercel-labs/agent-skills web-design-guidelines (for dashboard/admin pages)
+  framework:
+    - vercel-labs/agent-skills vercel-react-best-practices
+      when: writing or reviewing React/Next.js code (this entry's default stack)
+      why: shipright's performance.md is the measure-first LADDER (stack-agnostic); this is the
+           React/Next execution detail — waterfalls, bundle size, server-vs-client, re-renders
+  verification:
+    - addyosmani/agent-skills browser-testing-with-devtools
+      when: confirming the UI actually works/looks right (needs the chrome-devtools MCP server)
 
 tested-with: React 18+, Next.js 14+, addyosmani 2025-06
+load: references/stacks/nodejs.md (or the API's language file) for the SYSTEM floor, AND
+      references/ui-design.md for the EXPERIENCE floor — a full-stack product owes both (judgment.md §5b)
 
 shipright-adds-to-CLAUDE:
   frontend-boundary: "UI components never contain business logic. Data fetching in hooks/services only."
@@ -312,6 +368,8 @@ install:
       when: complex business logic exists
 
 tested-with: Node.js 20+, Python 3.11+
+load: references/stacks/<language>.md — the CLI's language file. A CLI has no UI/UX floor but still
+      owes the system floor when it grows past a script (judgment.md §5)
 
 note: "CLIs rarely need full DDD/SOLID treatment. Flat functions are often correct."
 

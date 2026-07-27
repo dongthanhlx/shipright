@@ -1,5 +1,190 @@
 # Changelog
 
+## [1.22.0] — 2026-07 — Acquisition: a missing skill is a 10-second problem, not a permanent one
+The third firing failure mode. v1.17 found knowledge that never fired. v1.20 found triggers that fired
+into names that didn't exist. This one: the trigger fires, the target is real — and it simply isn't
+installed, so shipright printed a command and resigned to its fallback. That policy rested on an
+assumption nobody had checked.
+
+### Fixed — "not installed" was being treated as permanent
+- **Claude Code watches the skill directories.** Per the docs, a skill added under `~/.claude/skills/`
+  during a session *"takes effect within the current session without restarting"* (only creating a
+  top-level skills dir that didn't exist at startup needs a restart — and it always exists when shipright
+  is personal-installed). So the useful move when a trigger fires is not "here's a command for later",
+  it's "want it? ten seconds, and I'll use it right now."
+- **Check 3 rewritten from *note it* to *offer → install on consent → use it this session*.** Verified
+  the mechanics: `npx skills add` detects an agent environment and runs non-interactively (`-y`, `-g`),
+  and `--list` prints the exact install names without installing anything. Branch A and Branch B's
+  "mention once, then proceed" lines now route to the same flow; registry gained the command recipes.
+- **Consent is mandatory and must come from shipright.** Its own `allowed-tools` pre-approves Bash, so
+  the harness shows *no* permission prompt — silence would be indistinguishable from approval. This is
+  third-party code from GitHub landing in the user's home directory, and the docs warn a skill can grant
+  itself broad tool access. Offer once per skill per session; refused → fallback, don't re-ask.
+  `-g` (user-level) is the default; project-level writes into the repo and gets committed.
+  `skills use <pkg>@<skill>` noted for borrowing a skill without installing it.
+
+### Fixed — the detection snapshot was frozen for the whole session
+- The `skill/*` values are dynamic-context injections, rendered **once** when shipright is invoked;
+  the docs are explicit that Claude Code does not re-read the skill file on later turns. So a user who
+  followed shipright's own advice and installed the skill mid-session kept getting "X not installed —
+  using the built-in fallback" for the rest of the session. shipright now re-runs the grep after any
+  install and whenever the user says they installed something, instead of trusting the stale snapshot.
+  This was a bug under the old policy too.
+
+### Changed
+- Name verification now uses `npx skills add <repo> --list` (authoritative — it prints **install** names,
+  which is what `--skill` accepts) instead of the GitHub folder listing, which shows folder names that
+  differ and fail. EVALS.md updated; the `git clone` install for vercel replaced with the `npx` form.
+- EVALS.md gains **NOT-ACQUIRED** / **STALE-SNAPSHOT** verdicts and 2 scenarios.
+
+## [1.21.0] — 2026-07 — Capability additions, curated by trigger (the audit's second half)
+The v1.20 audit resolved every dispatched skill name against its real repo. That same pass surfaced
+capable skills shipright had **never mapped at all** — a quieter failure than a broken name, but the same
+outcome: a real need with no executor. Added only those with a genuine, non-duplicating trigger, and
+wired each to a firing surface rather than a catalogue line. Every description below was read from the
+skill's own SKILL.md, not inferred from its name (the v1.20 lesson).
+
+### Added — each with the moment it fires
+- **`browser-testing-with-devtools`** (addyosmani) — the biggest hole. `ui-design.md` mandates "verify at
+  360px with a real thumb" and Branch D's new experience track wants before/after screenshots plus a11y
+  output, but shipright had **no way to actually see the page run**. Wired into the mobile-verification
+  rule, Branch D step 6, and Branch C's visual-bug repro, with an explicit ban on declaring a UI
+  "responsive" or "accessible" from reading code alone. Requires the chrome-devtools MCP server.
+- **`vercel-react-best-practices`** (vercel-labs) — React/Next is the `full-stack-web` default stack, and
+  `performance.md` is deliberately a stack-agnostic measure-first *ladder*; this is the framework
+  execution detail (waterfalls, bundle size, server-vs-client, re-renders). Wired to the L4 latency
+  signal and the registry entry. `vercel-optimize` noted for the narrower "the Vercel bill is the
+  problem" case.
+- **`documentation-and-adrs`** (addyosmani) — shipright's whole executive layer turns on naming one-way
+  doors, and an unrecorded one gets re-litigated next session. New Mid-work signal: decision made →
+  shipright decides *what* is irreversible, the skill records it properly.
+- **`deprecation-and-migration`** (addyosmani) — the contract phase of `requirement-drift.md`'s
+  expand → migrate → contract had no executor. Named on that Mid-work row.
+- **`ci-cd-and-automation`** (addyosmani) — a fitness function only guards you if it *runs*; named on the
+  `evolutionary-architecture.md` Mid-work row.
+
+### Not added (recorded so it isn't re-proposed)
+- `code-simplification` → duplicates `code-quality.md` (Fowler smells) + `code-health.md` (Ousterhout
+  over-extraction), and Claude Code ships `/simplify`. `planning-and-task-breakdown` → duplicates
+  Branch B's complexity tiers + spec-driven. Both added to the SKIP list: loading a skill you would
+  duplicate spends context and dilutes reasoning — shipright's own dispatch rule 2.
+- `composition-patterns` has an **empty description** in its SKILL.md; unverifiable, so not mapped.
+  react-view-transitions / react-native / deploy-to-vercel / vercel-cli / writing-guidelines /
+  git-workflow / shipping-and-launch / context-engineering / doubt-driven / source-driven: no clear
+  shipright trigger, or too narrow to earn always-loaded space.
+
+### Note on detection cost
+The new skills are **checked on demand when their trigger fires**, not probed at session start. Probing
+everything every session would cost more context than it saves — the same budget argument shipright makes
+about loading skills. Recorded explicitly in the registry so it reads as a decision, not an oversight.
+Also confirmed: vercel prefixes some install names (`vercel-react-best-practices`) but not others
+(`web-design-guidelines`) — verify each against its own SKILL.md `name:` field.
+
+## [1.20.0] — 2026-07 — System-wide firing audit: the UI/UX layer fires, and the dispatch targets are real
+Two audits in one release. **(a)** The hemisphere v1.18/v1.19 built had complete content and correct
+judgment wiring into Branch A and Branch B — but the front door didn't open on UI vocabulary, two of six
+branches had no experience path, and the taste-skill probe could never return YES. **(b)** Then a
+harder question: do the skills shipright dispatches to actually *exist* under the names it uses?
+Resolved every external name against the real repos. They largely did not.
+
+A judgment layer that doesn't load is a judgment layer that doesn't exist — and a trigger that fires into
+a skill name that was never in the repo is indistinguishable from no trigger at all. EVALS.md gains a
+**BROKEN-TARGET** verdict and the curl commands to catch this class, which greps structurally cannot.
+
+### Fixed (BROKEN-TARGET — dispatch pointed at things that don't exist)
+- **6 of 8 taste-skill install commands were broken.** The repo's **folder names differ from its install
+  names** and `--skill` takes the install name, so `--skill "soft-skill"` fails — it is
+  `high-end-visual-design`. Corrected: `minimalist-skill`→`minimalist-ui`,
+  `soft-skill`→`high-end-visual-design`, `redesign-skill`→`redesign-existing-projects`,
+  `output-skill`→`full-output-enforcement` (`design-taste-frontend` and `imagegen-frontend-web` were
+  already right). Every page-type block now carries both names.
+- **Two dispatch targets never existed at all**: `elite-frontend-design-2026` (the agency/portfolio
+  recommendation) and `bugbuster` (the visual-defect recommendation). Replaced with what the repo
+  actually ships — `design-taste-frontend` at high dials, plus `industrial-brutalist-ui` / `gpt-taste`
+  when the direction is committed; and `redesign-existing-projects`, whose audit covers hierarchy /
+  contrast / spacing, for visual defects.
+- **Real skills shipright never mentioned** are now mapped: `brandkit` (the §Logo section deferred to "a
+  dedicated design/brand skill" — it exists), `imagegen-frontend-mobile`, `image-to-code`,
+  `industrial-brutalist-ui`, `gpt-taste`, `stitch-design-taste`. Also noted that
+  `design-taste-frontend` is currently v2-experimental with `-v1` pinnable.
+- addyosmani/agent-skills: all 12 dispatched names verified against the repo — **correct, no change**.
+  vercel-labs `web-design-guidelines`: verified, install switched to the `npx skills add` form.
+
+### Fixed (detection encoded an install layout, so it could never succeed)
+- **Every skill probe was path-shaped.** `npx skills add` installs flat by install name; `git clone`
+  nests under `<repo>/skills/<name>/`. A path-shaped probe silently returns NO forever under the layout
+  it wasn't written for — and the 6 addyosmani probes assumed the clone layout while README/registry tell
+  users to use `npx`. All probes now match the **`name:` field inside SKILL.md**: what the skill *is*,
+  independent of how it was installed. Verified against both layouts, quoted and unquoted, with no
+  self-match on shipright's own SKILL.md.
+- `skill/taste` additionally **lists which taste skills are present** — dispatch depends on the specific
+  one, not on "some design skill exists".
+- Added `skill/web-a11y` (vercel `web-design-guidelines`), previously undetected though the
+  admin/dashboard and a11y-critical paths dispatch to it, plus its fallback row in the session-start table.
+- **`/shipright-version` probed `~/.claude/skills/agent-skills/SKILL.md`** — a multi-skill repo has no
+  root SKILL.md, so it reported "NOT installed" unconditionally. Now reports each of the 6 skills
+  individually, plus the taste family by install name.
+
+### Fixed (shipright's own refs with no firing path)
+- **`boundaries.md` was DARK.** The always-loaded core states the 5 rules abstractly; the file holding
+  their concrete violation/fix code examples was reachable only from the catalogue index. (Its one other
+  mention was a sample `.claude/rules/boundaries.md` inside Branch D — a *project's* file, not
+  shipright's ref.) Added a trigger at the boundary block: the moment "does this violate a boundary?"
+  isn't obvious from the rule alone.
+- **Language stack files fired only from Branch A.** v1.19.1 judged this "acceptable"; re-examined and
+  rejected — Branch B/C/D work on *existing* projects, which is most work, and those files carry
+  compile-time boundary enforcement (Go `internal/`, PHP Deptrac), timeout/context idioms, the error
+  taxonomy and language security footguns. Added a Mid-work signal to load the stack file once before the
+  first implementation, and a `load:` line to the registry entries.
+- **`domain-thinking.md` (WEAK)** — one parenthetical in Branch A; a Branch B domain feature never
+  reached Evans' tactical patterns. **`error-handling.md` (WEAK)** — fired only in Branch C/F to classify
+  an existing failure, never while *writing* a failure path. Both now have Mid-work signals.
+- **6 registry entries had no `load:` line** (web-api, rag-pipeline, chatbot-telegram-discord,
+  browser-extension, full-stack-web, cli-tool) while ai-agent/mcp/blockchain did — so their stack files
+  were unreachable from the registry. This also **invalidates EVALS scenario 5's v1.17 "FIRES" verdict**
+  for "build a Telegram chatbot": the install list fired, `chatbot-platforms.md` did not. All 6 fixed.
+- `prompts.md` remains DARK **by design** (a passive copy-paste library) — now recorded as an accepted
+  verdict rather than an unexamined gap.
+
+### Fixed (the front door — highest-leverage gap)
+- **shipright's own description had zero UI vocabulary.** No "design", "UI", "landing page", "dashboard",
+  "frontend", "redesign", "responsive", "accessibility" — so the entire v1.18/v1.19 UI/UX hemisphere only
+  fired when the user happened to say "build" or "add feature". "Redesign this page", "the dashboard looks
+  amateur", "make it responsive" didn't wake shipright at all, and `ui-design.md` was never reached.
+  Added the surface + the trigger phrases to the frontmatter. Everything downstream was already correct;
+  the door was locked.
+
+### Fixed (branches with no experience path)
+- **Branch D had no redesign track.** `ui-design.md` mandates "audit before touching anything — do NOT
+  jump straight to a taste-skill on existing UI", but nothing routed there: redesigning shipped UI is
+  Branch-D-shaped and Branch D never mentioned `ui-design.md`. The Branch-B KIND fork (system vs
+  experience) now exists in D as **Step 0**, with a full EXPERIENCE track: audit (skill or manual, against
+  the floor) → confirm archetype/tone → separate FLOOR fixes from SCOPE → dispatch → measurable UI DONE →
+  before-screenshots as the characterization-test equivalent.
+- **Branch D's "no measurable pain → redirect" guard was mis-firing on UI work.** For a brand-facing
+  surface, "it looks unprofessional / unusable on my phone" IS the measurable pain — the guard exists for
+  code, where tidiness has no user. Step 0 now exempts the experience track explicitly.
+- **Branch C didn't recognize visual/UX bugs.** Broken layout, unreadable contrast, no focus ring, missing
+  loading/empty/error state — the code "works", so the unit-test-first flow doesn't fit. Step 0 now routes
+  them to `ui-design.md`, redefines the repro (360px screenshot, contrast number, keyboard path), and
+  hands whole-screen cases to Branch D.
+- **No mid-work UI signal.** Same gap class as the v1.19.1 LLM-API fix: realizations that surface
+  *during* construction ("this screen only has a happy path", "this table dies at 360px", "these are emoji
+  icons") had no firing path. Added two rows to the always-loaded Mid-work signals table.
+
+### Fixed (detection — the probe could never succeed)
+- **`skill/taste` checked a path that never exists.** It tested `~/.claude/skills/taste-skill/SKILL.md`,
+  but `npx skills add <repo> --skill "X"` installs under the **sub-skill's** name
+  (`~/.claude/skills/design-taste-frontend/`) — the repo name never appears on disk. So the probe returned
+  NO even for a correct install, permanently. Also inconsistent with `ui-design.md`'s own model
+  ("taste-skill is not one skill — it is an ecosystem of 10+"). Now matches the whole family.
+- **`vercel-labs/web-design-guidelines` wasn't detected at all**, though the admin/dashboard and
+  a11y-critical paths dispatch to it. Added `skill/web-a11y` + its fallback row in the session-start table.
+- **`dataviz` / `artifact-design` ship with Claude Code** — documented so shipright stops implying they
+  need installing.
+- Registry trigger index gained the redesign, visual-defect, and chart rows; the SKILL.md index entry for
+  `ui-design.md` still described it as a bare dispatch table (pre-v1.18) — now describes the judgment layer.
+
 ## [1.19.1] — 2026-07 — Firing fixes: 3rd-party + LLM API exploration now fire
 Patch after a system-wide firing audit (does complete content actually load at the right moment?). The
 Layer-1 API-exploration mandate — call the real API → save fixtures → then Adapter + tests — was strong
