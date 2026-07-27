@@ -1,5 +1,42 @@
 # Changelog
 
+## [1.22.0] — 2026-07 — Acquisition: a missing skill is a 10-second problem, not a permanent one
+The third firing failure mode. v1.17 found knowledge that never fired. v1.20 found triggers that fired
+into names that didn't exist. This one: the trigger fires, the target is real — and it simply isn't
+installed, so shipright printed a command and resigned to its fallback. That policy rested on an
+assumption nobody had checked.
+
+### Fixed — "not installed" was being treated as permanent
+- **Claude Code watches the skill directories.** Per the docs, a skill added under `~/.claude/skills/`
+  during a session *"takes effect within the current session without restarting"* (only creating a
+  top-level skills dir that didn't exist at startup needs a restart — and it always exists when shipright
+  is personal-installed). So the useful move when a trigger fires is not "here's a command for later",
+  it's "want it? ten seconds, and I'll use it right now."
+- **Check 3 rewritten from *note it* to *offer → install on consent → use it this session*.** Verified
+  the mechanics: `npx skills add` detects an agent environment and runs non-interactively (`-y`, `-g`),
+  and `--list` prints the exact install names without installing anything. Branch A and Branch B's
+  "mention once, then proceed" lines now route to the same flow; registry gained the command recipes.
+- **Consent is mandatory and must come from shipright.** Its own `allowed-tools` pre-approves Bash, so
+  the harness shows *no* permission prompt — silence would be indistinguishable from approval. This is
+  third-party code from GitHub landing in the user's home directory, and the docs warn a skill can grant
+  itself broad tool access. Offer once per skill per session; refused → fallback, don't re-ask.
+  `-g` (user-level) is the default; project-level writes into the repo and gets committed.
+  `skills use <pkg>@<skill>` noted for borrowing a skill without installing it.
+
+### Fixed — the detection snapshot was frozen for the whole session
+- The `skill/*` values are dynamic-context injections, rendered **once** when shipright is invoked;
+  the docs are explicit that Claude Code does not re-read the skill file on later turns. So a user who
+  followed shipright's own advice and installed the skill mid-session kept getting "X not installed —
+  using the built-in fallback" for the rest of the session. shipright now re-runs the grep after any
+  install and whenever the user says they installed something, instead of trusting the stale snapshot.
+  This was a bug under the old policy too.
+
+### Changed
+- Name verification now uses `npx skills add <repo> --list` (authoritative — it prints **install** names,
+  which is what `--skill` accepts) instead of the GitHub folder listing, which shows folder names that
+  differ and fail. EVALS.md updated; the `git clone` install for vercel replaced with the `npx` form.
+- EVALS.md gains **NOT-ACQUIRED** / **STALE-SNAPSHOT** verdicts and 2 scenarios.
+
 ## [1.21.0] — 2026-07 — Capability additions, curated by trigger (the audit's second half)
 The v1.20 audit resolved every dispatched skill name against its real repo. That same pass surfaced
 capable skills shipright had **never mapped at all** — a quieter failure than a broken name, but the same

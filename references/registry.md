@@ -47,8 +47,28 @@ spec-driven-development). Loading a skill you would duplicate spends context and
 
 **Only the skills in the session-start probe list are detected automatically** — the long tail above is
 checked on demand, at the moment its trigger fires. Probing everything at every session start would cost
-more context than it saves. When a trigger fires: check, then either activate or say plainly it is not
-installed and use shipright's fallback. Never assume presence.
+more context than it saves. When a trigger fires: check, then either activate, or **offer the install and
+use it this session on consent** (SKILL.md Check 3 — a skill added mid-session works immediately, no
+restart). Never assume presence; never install without asking.
+
+### Install recipes — verify the name, install, re-verify
+
+```bash
+REPO=https://github.com/addyosmani/agent-skills     # or Leonxlnx/taste-skill · vercel-labs/agent-skills
+
+npx -y skills@latest add $REPO --list                        # exact INSTALL names — installs nothing
+npx -y skills@latest add $REPO -y -g --skill "<install-name>"  # -g = user-level (default is project-level)
+grep -rqsE '^name: *"?<install-name>"? *$' ~/.claude/skills .claude/skills --include=SKILL.md \
+  && echo INSTALLED || echo FAILED                           # re-verify — never assume it worked
+```
+
+- **Always `--list` first for taste-skill**: its folder names differ from its install names, and passing
+  the folder name fails. `--list` is the source of truth (it prints what `--skill` accepts).
+- **`-g` (user-level) is the default choice** — same place shipright lives, no repo change. Drop `-g`
+  only when the whole team should get the skill; that writes into `.claude/skills/` and gets committed.
+- **`skills use <pkg>@<skill>`** borrows a skill's guidance without installing anything — the right
+  option for a one-off when the user doesn't want another skill on disk.
+- The CLI detects an agent environment and runs non-interactively; it will not hang on a prompt.
 
 Default ladder when no specific trigger has fired yet (by lifecycle phase):
 SEED debug · VALIDATE +tdd/incremental/review · HARDEN +spec/security/observability · SCALE +specialized.

@@ -1,4 +1,4 @@
-# shipright v1.21.0
+# shipright v1.22.0
 
 > **Ship your MVP fast. Grow it right.**
 
@@ -134,6 +134,12 @@ Shipright orchestrates. These execute.
 
 **Never install all addyosmani skills at once.** Context budget is finite.
 Registry tells you exactly which skills to install for your project type.
+
+**shipright offers to install a skill the moment you need it — and uses it in the same session.**
+Claude Code watches the skill directories, so a skill added mid-session works immediately without a
+restart. When a trigger fires and the skill is missing, shipright asks once (~10s to install), then uses
+it right away. It never installs without your yes: its `allowed-tools` pre-approves Bash, so the harness
+shows no permission prompt of its own. Say no and it falls back to its built-in guidance and moves on.
 
 ---
 
@@ -283,6 +289,7 @@ shipright/
 - [x] **v1.19.0: UI/UX judgment layer + system-vs-experience balance — `ui-design.md` rebuilt into a masters-grounded hemisphere (Norman/Nielsen/Krug/Refactoring UI/Tufte/Tidwell/Wroblewski/Walter + brand archetypes + Paul Rand): principles, MVP-first floor-vs-scope, deep mobile/responsive, SVG icons (no emoji), logo, style archetypes + audience emotional tone + emotional design (anti-AI-slop), and design-brief intake. The executive layer (judgment.md §5b) now balances the SYSTEM floor vs the EXPERIENCE floor — by project shape AND per task (Branch B forks on task KIND before complexity). Wired to fire from Branch A/B + session-start**
 - [x] **v1.20.0: system-wide firing audit — (a) the UI/UX layer now actually fires: the description carried zero UI vocabulary so the whole v1.18/v1.19 hemisphere only loaded if the user said "build", Branch D had no redesign track (its "no measurable pain" guard was bouncing legitimate UI work), Branch C didn't recognize visual/UX bugs, and there was no mid-work UI signal. (b) Then the harder question — do the dispatch targets exist? **6 of 8 taste-skill install commands were broken** (folder names where the CLI wants install names) and two named skills were never in the repo at all; every skill probe encoded one install layout and returned NO forever under the other; `/shipright-version` probed a root SKILL.md that multi-skill repos don't have. Plus `boundaries.md` was DARK, stack files fired only from Branch A, and 6 registry entries had no `load:` line. EVALS.md gains a **BROKEN-TARGET** verdict — a trigger that fires into a name that doesn't exist is indistinguishable from no trigger**
 - [x] **v1.21.0: capability additions, curated by trigger — the audit's second half surfaced capable skills shipright had never mapped at all (a quieter failure than a broken name, same outcome: a real need with no executor). Added `browser-testing-with-devtools` (shipright mandated "verify at 360px with a real thumb" but had no way to actually see a page run — now wired into the mobile rule, Branch D's before/after capture, and Branch C's visual repro, with an explicit ban on calling a UI responsive/accessible from reading code), `vercel-react-best-practices` (React/Next execution detail under performance.md's stack-agnostic ladder), `documentation-and-adrs` (a one-way door nobody recorded gets re-litigated next session), `deprecation-and-migration` (the contract phase of expand→migrate→contract), `ci-cd-and-automation` (a fitness function only guards you if it runs). Explicitly NOT added, and recorded so it isn't re-proposed: code-simplification and planning-and-task-breakdown (duplicate shipright), composition-patterns (empty description — unverifiable)**
+- [x] **v1.22.0: acquisition — a missing skill is a 10-second problem, not a permanent one. shipright printed an install command and resigned to its fallback, on the untested assumption that a mid-session install wouldn't help. It does: Claude Code watches the skill directories, so a skill added under `~/.claude/skills/` takes effect immediately without a restart. Check 3 goes from *note it* to *offer → install on consent → use it this session* (verified: the CLI detects an agent environment and runs non-interactively; `--list` prints the exact install names). Consent is mandatory and must come from shipright, since its own `allowed-tools` pre-approves Bash and the harness prompts for nothing. Also fixed a bug that existed under the old policy: the `skill/*` probes are rendered **once** per session, so a user who installed the skill mid-session — as shipright told them to — kept being told it wasn't installed**
 - [ ] references/registry.md community contributions (ongoing)
 - [x] **v0.9: PreToolUse boundary-enforcement hook (blocks service→db + deep cross-module imports; opt-in, fails open, self-test)**
 

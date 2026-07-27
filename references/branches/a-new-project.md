@@ -152,12 +152,16 @@ Load that entry only. Note:
   - Project-type-specific debt signals
 ```
 
-If skills required are not installed → mention once:
+If skills required are not installed → **offer once, install on consent, use it this session**
+(SKILL.md Check 3 — a skill added mid-session works immediately, no restart):
 ```
-"Note: [skill] recommended for this project type.
- Install: [command]
- Proceeding without it — I'll guide manually for those parts."
+"This project type wants [skill] for [the specific job]. Want me to install it now (~10s, global)?
+ I'll use it right away. Otherwise I proceed with shipright's built-in guidance for those parts."
 ```
+Yes → `--list` to get the exact install name → `npx -y skills@latest add <repo> -y -g --skill "<name>"`
+→ re-verify with the grep (the session-start snapshot is stale after any install) → use it.
+No / fails → say so plainly and proceed. Never block, never install without the yes.
+Don't dump the whole registry list — offer only what this project actually needs now.
 
 ---
 

@@ -24,12 +24,12 @@ Firing is necessary but not sufficient — the target has to be real. Verdicts e
 - **BROKEN-TARGET** — the trigger fires, but the skill name / install command / detection path is wrong,
   so nothing is actually reachable. Indistinguishable from DARK at runtime, invisible to greps.
 
-Check targets against reality, not against this repo's memory of it:
+Check targets against reality, not against this repo's memory of it. The CLI's own `--list` is
+authoritative — it prints the **install names**, which is exactly what `--skill` accepts (the GitHub
+folder listing shows folder names, which differ and do not work):
 ```bash
-curl -s https://api.github.com/repos/addyosmani/agent-skills/contents/skills | grep -oP '"name": *"\K[^"]*'
-curl -s https://api.github.com/repos/Leonxlnx/taste-skill/contents/skills  | grep -oP '"name": *"\K[^"]*'
-# taste-skill: --skill takes the INSTALL NAME (SKILL.md `name:`), which differs from the folder name.
-# Its README's "Install name" column is the source of truth.
+npx -y skills@latest add https://github.com/addyosmani/agent-skills --list
+npx -y skills@latest add https://github.com/Leonxlnx/taste-skill    --list
 ```
 
 ## Scenarios + last run (v1.17)
@@ -81,6 +81,16 @@ stopped there.
 | 27 | "the React app is slow" | React/Next specifics | `performance.md` ladder only (deliberately stack-agnostic) | **NO-EXECUTOR → fixed v1.21** (`vercel-react-best-practices`) |
 | 28 | "we just decided the money type / public API shape" | a durable record | judgment.md named the one-way door; nothing recorded it | **NO-EXECUTOR → fixed v1.21** (`documentation-and-adrs` Mid-work row) |
 | 29 | "now remove the old path" (contract phase) | migration discipline | requirement-drift.md described the phase, named no executor | **NO-EXECUTOR → fixed v1.21** (`deprecation-and-migration`) |
+
+### Acquisition scenarios (v1.22) — the executor exists, is named correctly, and still isn't there
+
+| # | Situation | Before | Verdict → fix |
+|---|---|---|---|
+| 30 | trigger fires, the right skill is simply not installed | shipright printed an install command and dropped to fallback — treating "not installed" as permanent | **NOT-ACQUIRED → fixed v1.22.** Claude Code watches the skill dirs, so a skill added mid-session works immediately (no restart). Now: offer once → install on consent → use it this turn. |
+| 31 | the user installs a skill mid-session, as shipright told them to | the `skill/*` probes are rendered **once**, when shipright is invoked; Claude Code does not re-run them on later turns. shipright kept saying "not installed" for the rest of the session and kept using the fallback | **STALE-SNAPSHOT → fixed v1.22** (re-run the grep after any install or when the user says they installed something) |
+
+A third failure mode, then: the knowledge fires, the target is real — and the target isn't *present*.
+Treating absence as permanent is its own dead end when acquisition costs ten seconds.
 
 ### Finding (v1.20) — the trigger can be perfect and still dead-end
 

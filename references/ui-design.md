@@ -554,7 +554,7 @@ Install: npx skills add https://github.com/Leonxlnx/taste-skill --skill "brandki
 ```
 Judgment (design decisions): "Admin panels & dashboards" section above — shipright owns this.
 Execution rules: vercel-labs/agent-skills — web-design-guidelines
-Install: git clone https://github.com/vercel-labs/agent-skills ~/.claude/skills/vercel-skills
+Install: npx -y skills@latest add https://github.com/vercel-labs/agent-skills -y -g --skill "web-design-guidelines"
 → 100+ rules covering accessibility, performance, UX correctness
 → Focused on correctness, not aesthetic creativity
 Charts: dataviz skill (color + layout). shipright picks WHICH chart; dataviz renders it.
@@ -672,8 +672,13 @@ npx skills add https://github.com/vercel-labs/agent-skills --skill "web-design-g
 npx skills add https://github.com/Leonxlnx/taste-skill --skill "full-output-enforcement"    # output-skill
 ```
 
-Verify a name before adding it here: `curl -s https://api.github.com/repos/Leonxlnx/taste-skill/contents/skills`
-lists the folders; the repo README's "Install name" column is what `--skill` accepts. They differ.
+Verify a name before adding it here — folder names and install names differ, and only install names work:
+```bash
+npx -y skills@latest add https://github.com/Leonxlnx/taste-skill --list   # prints install names, installs nothing
+```
+Don't just print these commands at the user. When a page-type trigger fires and the skill is missing,
+**offer to install it and use it in the same session** (SKILL.md Check 3) — a skill added mid-session
+takes effect without a restart. Ask first, always.
 
 Do NOT install all taste skills at once — context budget is finite.
 Install only what your current page type needs.

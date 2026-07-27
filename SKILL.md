@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 1.21.0
+version: 1.22.0
 description: >
   Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
   sets up constitution, enforces boundaries, judges what to build now vs defer,
@@ -49,7 +49,7 @@ Tests:         !`if [ -f package.json ] && grep -q '"test":' package.json; then 
 
 ---
 
-# Shipright v1.21 — Project Brain OS
+# Shipright v1.22 — Project Brain OS
 
 An executive layer over two hemispheres. The executive decides how much of each hemisphere to
 apply, by stage × risk × reversibility (construction is ON from day one — the irreversible quadrant;
@@ -150,13 +150,44 @@ Project state section in CLAUDE.md shows where things left off last session.
 | taste (lists the INSTALLED names) | UI/UX pages, flows, forms — activate the one matching the page type (`ui-design.md` §Page type), not whichever is installed | apply ui-design.md UI/UX principles — Norman/Nielsen/Refactoring UI/WCAG + the state-floor (real judgment, not hand-waving). Charts → dataviz skill |
 | web-a11y | dashboard/admin/data-heavy UI, a11y-critical UI | apply ui-design.md §Admin patterns + §WCAG-as-correctness manually (judgment is shipright's either way; only the rule-set is missing) |
 
-When a skill = NO: say "X not installed — using shipright's built-in guidance instead." Never pretend
-it's available; never skip the step.
+When a skill = NO: never pretend it's available and never skip the step — but don't just resign to the
+fallback either. **Offer to install it (see Check 3), because a skill installed now works NOW.**
 
-**Check 3: Note missing skills**
-If registry entry requires a skill not installed → mention once at session start:
-"Note: this project type works better with [skill]. Install: [command]"
-Then proceed — never block on missing skills.
+**Check 3: Missing skill → offer once, install on consent, use it this session**
+
+Claude Code **watches the skill directories**: a skill added under `~/.claude/skills/` during a session
+takes effect immediately, no restart. So the useful move at the moment a trigger fires is not "here's a
+command, run it sometime" — it's "want it? 10 seconds, and I'll use it right now."
+
+```
+1. OFFER — one line, at the moment the trigger fires (not a wall of options at session start):
+   "This needs [skill] for [the specific job]. Install it now (~10s, global) and I'll use it —
+    or I proceed with shipright's built-in fallback. Your call."
+   Say what it does and what changes if you skip it. Offer ONCE per skill per session; if the user
+   says no, drop it and don't re-ask.
+
+2. NEVER install without that yes. shipright's own `allowed-tools` pre-approves Bash, so the harness
+   will NOT show a permission prompt — the consent has to come from shipright asking. This is
+   third-party code from GitHub landing in the user's home directory, and a skill can grant itself
+   broad tool access. Silence is not consent.
+
+3. ON YES — verify the name, then install, then re-verify:
+     npx -y skills@latest add <repo-url> --list                     # exact INSTALL names, installs nothing
+     npx -y skills@latest add <repo-url> -y -g --skill "<name>"     # -g = user-level, like shipright itself
+   The CLI detects an agent environment and runs non-interactively. Prefer `-g`; use project-level
+   (drop `-g`) only when the team should get it too — that writes into the repo and gets committed.
+   If the skill still doesn't show up afterwards, re-run with `--copy` (installs are symlinked by default).
+
+4. RE-VERIFY, then use it — do not assume the install worked:
+     grep -rqsE '^name: *"?<install-name>"? *$' ~/.claude/skills .claude/skills --include=SKILL.md
+   ⚠ The `skill/*` values in the working context above are a **snapshot taken once**, when shipright was
+   invoked — Claude Code does not re-run them on later turns. After ANY install, and whenever the user
+   says they installed something, re-run the grep above instead of trusting the stale snapshot.
+
+5. FAILS or REFUSED → say so plainly, use the fallback, continue. Never block on a missing skill.
+```
+
+Full command recipes + which skills are worth this at all: `references/registry.md`.
 
 ---
 

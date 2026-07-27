@@ -28,7 +28,8 @@ Third-party API in scope? → shipright detects it from the feature, doesn't qui
 ```
 
 If project type unknown → check registry for matching entry, load it.
-Note any required skills not installed → mention once, then proceed.
+Required skill not installed → offer it once at the moment it's needed, install on consent, and use it
+this session (SKILL.md Check 3). Refused or failed → fallback, proceed, never block.
 
 ---
 
