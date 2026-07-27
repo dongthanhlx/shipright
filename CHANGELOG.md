@@ -1,5 +1,44 @@
 # Changelog
 
+## [1.23.0] — 2026-07 — Slim the core again — by principle, and only where it was clearly waste
+Three releases of firing fixes put 56 net lines back into the always-loaded core (369 → 425), pushing it
+toward the ~460 that v1.16 deliberately cut. This pass takes back 35 lines / ~740 tokens **without
+removing a single trigger** — and deliberately leaves the thinking alone.
+
+**What was NOT touched, on purpose.** The Mid-work signals table, the L4 signal table, the executive
+question, "How shipright asks", the 5 boundaries, §When workflow is not appropriate, and every
+fallback-judgment column. That prose is where shipright *reasons* rather than checklists — compressing it
+into fragments would make the skill dumber, not lighter. v1.16's rule still governs: size is a
+consequence, not a Goodhart target. Only clear waste was cut.
+
+### Slimmed
+- **8 skill probes → 2.** Six near-identical `grep … && echo YES || echo NO` lines for the addyosmani
+  skills collapse into one probe that **lists what is present**, matching the pattern already used for
+  taste-skill; the taste and vercel probes merge into `skill/ui`. Fewer bytes, six fewer subprocesses per
+  session start, and *more* information — dispatch needs the specific name, not a boolean. Check 2's
+  table now keys on install names, so it reads directly against the probe output.
+- **Install commands lived in three places** (SKILL.md Check 3 + registry.md + ui-design.md) — exactly the
+  duplication v1.16 cut between the core and the registry, re-introduced by v1.22 a day earlier. The core
+  keeps the *rule* (offer → consent → `--list` for the exact name → install → re-verify) and the
+  stale-snapshot warning; the commands live once, in `registry.md` §Install recipes.
+- **The reference index was the single largest block in the always-loaded core** (~4.4KB) — and by
+  shipright's own doctrine (EVALS: "catalogued but no trigger = DARK") it *causes nothing to fire*. It is
+  now a map grouped by role, with descriptions that duplicated the trigger tables cut and **all 42 file
+  names kept** so nothing becomes undiscoverable. It opens by saying what it is: reach for it when a
+  situation matches none of the tables; a file appearing there is not a reason to load it.
+  `prompts.md` is now filed under **Passive** — deliberately trigger-free, not an oversight.
+
+### Verified (the point of a slim pass is proving you took nothing load-bearing)
+- All 42 reference files still named in the core. The first draft of the stacks line dropped the `.md`
+  extensions and the check caught 9 files falling off the map — fixed before commit.
+- No trigger-table row removed: every removed line is an index description, a probe, or a moved command.
+- The three instructions whose loss would re-break v1.20/v1.22 all survive: the `--list` discipline
+  (wrong install name = the whole dispatch fails), the stale-snapshot warning, and "silence is not consent".
+- Probes exercised against both install layouts, present and absent. Check 3's pointer resolves.
+
+Core: **425 → 390 lines, 6851 → 6113 tokens.** Still above v1.19.1's 5313 — the difference is the
+firing machinery those releases added, which is the part worth its weight.
+
 ## [1.22.0] — 2026-07 — Acquisition: a missing skill is a 10-second problem, not a permanent one
 The third firing failure mode. v1.17 found knowledge that never fired. v1.20 found triggers that fired
 into names that didn't exist. This one: the trigger fires, the target is real — and it simply isn't
