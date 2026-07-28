@@ -92,6 +92,22 @@ stopped there.
 A third failure mode, then: the knowledge fires, the target is real — and the target isn't *present*.
 Treating absence as permanent is its own dead end when acquisition costs ten seconds.
 
+### Runtime bugs the eval scenarios cannot catch (v1.24.1)
+
+Every scenario in this file traces *whether a trigger points at the right ref*. Neither of these was a
+trigger problem — the always-loaded block itself was broken, and only running it revealed that.
+
+| # | Symptom | Cause | Lesson |
+|---|---|---|---|
+| 36 | shipright crashed on invoke: `awk: unexpected character` | a dollar-sign followed by a digit is an **argument placeholder**, substituted before the shell runs — the awk program became `{print <a user word>}` | skill content is templated first, shelled second. No positional params in `` !`…` `` blocks. |
+| 37 | `skill/ui` reported `NONE` while three taste skills were installed | `npx skills add` **symlinks** into `~/.claude/skills`; `grep -r` skips symlinked dirs | the probe must match how the tool actually installs, not how the test fixture was built |
+
+**The verification lesson, which is the point.** v1.20 replaced a path-shaped probe with a `name:`-based
+one and verified it against a synthetic tree built with `mkdir -p`. Real directories — so the symlink
+case *could not appear*. The fixture was shaped like the fix rather than like reality, and the bug
+survived two more releases of "verified" work. **Test detection against a real install, or you are only
+testing your own assumption.**
+
 ### Backend / system / security scenarios (v1.24)
 
 | # | Situation | Before | Verdict → fix |

@@ -68,7 +68,7 @@ REPO=https://github.com/addyosmani/agent-skills     # or Leonxlnx/taste-skill ·
 
 npx -y skills@latest add $REPO --list                        # exact INSTALL names — installs nothing
 npx -y skills@latest add $REPO -y -g --skill "<install-name>"  # -g = user-level (default is project-level)
-grep -rqsE '^name: *"?<install-name>"? *$' ~/.claude/skills .claude/skills --include=SKILL.md \
+grep -RqsE '^name: *"?<install-name>"? *$' ~/.claude/skills .claude/skills --include=SKILL.md \
   && echo INSTALLED || echo FAILED                           # re-verify — never assume it worked
 ```
 
