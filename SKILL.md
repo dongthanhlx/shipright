@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 1.24.0
+version: 1.24.1
 description: >
   Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
   sets up constitution, enforces boundaries, judges what to build now vs defer,
@@ -24,7 +24,13 @@ allowed-tools: Read, Write, Bash, Glob, Grep
 ## Working context — injected every session
 
 ```
-Shipright:     !`grep "^version:" "${CLAUDE_SKILL_DIR}/SKILL.md" 2>/dev/null | awk '{print $2}'`
+# Two traps in these commands, both silent:
+#  1) A dollar-sign followed by a digit is an ARGUMENT placeholder, substituted before the shell runs —
+#     an awk positional print became `print <a word the user typed>` and crashed the skill. Use sed/cut
+#     or a named variable instead; never a positional param. (Same for the all-caps ARGUMENTS token.)
+#  2) grep -R, not -r: `npx skills add` SYMLINKS skills into ~/.claude/skills by default, and lowercase
+#     -r does not follow symlinked directories — every correctly installed skill reads as missing.
+Shipright:     !`grep "^version:" "${CLAUDE_SKILL_DIR}/SKILL.md" 2>/dev/null | sed 's/^version: *//'`
 Directory:     !`pwd`
 Git branch:    !`git branch --show-current 2>/dev/null || echo "no git"`
 Last commit:   !`git log --oneline -1 2>/dev/null || echo "no commits"`
@@ -36,8 +42,8 @@ Project state: !`grep -A3 "## Shipright state" CLAUDE.md 2>/dev/null | tail -3 |
 # path-shaped probe silently returns NO forever under the other one. Personal + project scope.
 # Each probe LISTS what is present (not YES/NO) — dispatch needs the specific name, and one grep
 # beats six. taste-skill is an ecosystem whose folder names ≠ install names; see ui-design.md.
-skill/core:  !`grep -rhsE '^name: *"?(spec-driven-development|incremental-implementation|test-driven-development|code-review-and-quality|debugging-and-error-recovery|security-and-hardening)"? *$' ~/.claude/skills .claude/skills --include=SKILL.md | sed 's/^name: *//; s/"//g' | sort -u | paste -sd',' | grep . || echo NONE`
-skill/ui:    !`grep -rhsE '^name: *"?(design-taste-frontend(-v1)?|minimalist-ui|high-end-visual-design|redesign-existing-projects|industrial-brutalist-ui|gpt-taste|image-to-code|stitch-design-taste|imagegen-frontend-(web|mobile)|brandkit|full-output-enforcement|web-design-guidelines|browser-testing-with-devtools)"? *$' ~/.claude/skills .claude/skills --include=SKILL.md | sed 's/^name: *//; s/"//g' | sort -u | paste -sd',' | grep . || echo NONE`
+skill/core:  !`grep -RhsE '^name: *"?(spec-driven-development|incremental-implementation|test-driven-development|code-review-and-quality|debugging-and-error-recovery|security-and-hardening)"? *$' ~/.claude/skills .claude/skills --include=SKILL.md | sed 's/^name: *//; s/"//g' | sort -u | paste -sd',' | grep . || echo NONE`
+skill/ui:    !`grep -RhsE '^name: *"?(design-taste-frontend(-v1)?|minimalist-ui|high-end-visual-design|redesign-existing-projects|industrial-brutalist-ui|gpt-taste|image-to-code|stitch-design-taste|imagegen-frontend-(web|mobile)|brandkit|full-output-enforcement|web-design-guidelines|browser-testing-with-devtools)"? *$' ~/.claude/skills .claude/skills --include=SKILL.md | sed 's/^name: *//; s/"//g' | sort -u | paste -sd',' | grep . || echo NONE`
 Tests:         !`if [ -f package.json ] && grep -q '"test":' package.json; then echo "npm test"; elif [ -f pytest.ini ] || [ -f pyproject.toml ] || [ -d tests ]; then echo "pytest"; else echo "none detected"; fi`
 ```
 

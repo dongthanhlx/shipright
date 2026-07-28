@@ -21,21 +21,25 @@ echo "=== Ecosystem skills ==="
 # install name, `git clone` nests under repo/skills/<name>/. A path-shaped probe breaks under one of them.
 # NOTE: neither addyosmani/agent-skills nor Leonxlnx/taste-skill has a ROOT SKILL.md — they are
 # multi-skill repos. Probing for one always reports "not installed".
-present() { grep -rqsE "^name: *\"?$1\"? *\$" ~/.claude/skills .claude/skills --include=SKILL.md; }
+# NOTE 2: no shell positional params anywhere here (that rules out helper functions) — a dollar-sign
+# followed by a digit is substituted with the invocation's arguments BEFORE the shell runs.
+# NOTE 3: grep -R, not -r — `npx skills add` symlinks into ~/.claude/skills and -r skips symlinked dirs.
+installed=$(grep -RhsE '^name: *"?[A-Za-z0-9_-]+"? *$' ~/.claude/skills .claude/skills \
+  --include=SKILL.md 2>/dev/null | sed 's/^name: *//; s/"//g' | sort -u)
 
 # addyosmani/agent-skills — the 6 shipright dispatches to
 echo "addyosmani/agent-skills (shipright dispatches to these 6):"
+missing=0
 for s in spec-driven-development incremental-implementation test-driven-development \
          code-review-and-quality debugging-and-error-recovery security-and-hardening; do
-  present "$s" && echo "  ✓ $s" || echo "  ✗ $s"
+  if printf '%s\n' "$installed" | grep -qx "$s"; then echo "  ✓ $s"; else echo "  ✗ $s"; missing=1; fi
 done
-present spec-driven-development || present test-driven-development || \
-  echo "  Install: npx skills add https://github.com/addyosmani/agent-skills"
+[ "$missing" = 1 ] && echo "  Install: npx skills add https://github.com/addyosmani/agent-skills"
 
 # taste-skill — an ECOSYSTEM, and its FOLDER names differ from its INSTALL names.
 # The values below are install names (what `--skill` accepts and what lands in the frontmatter).
 echo "taste-skill family (install names, not folder names):"
-found=$(grep -rhsE '^name: *"?(design-taste-frontend(-v1)?|minimalist-ui|high-end-visual-design|redesign-existing-projects|industrial-brutalist-ui|gpt-taste|image-to-code|stitch-design-taste|imagegen-frontend-(web|mobile)|brandkit|full-output-enforcement)"? *$' \
+found=$(grep -RhsE '^name: *"?(design-taste-frontend(-v1)?|minimalist-ui|high-end-visual-design|redesign-existing-projects|industrial-brutalist-ui|gpt-taste|image-to-code|stitch-design-taste|imagegen-frontend-(web|mobile)|brandkit|full-output-enforcement)"? *$' \
   ~/.claude/skills .claude/skills --include=SKILL.md 2>/dev/null | sed 's/^name: *//; s/"//g' | sort -u | paste -sd', ')
 if [ -n "$found" ]; then
   echo "  installed: ${found}"
@@ -46,7 +50,7 @@ else
 fi
 
 # vercel-labs/agent-skills — dashboards, admin, a11y-critical UI
-if present web-design-guidelines; then
+if printf '%s\n' "$installed" | grep -qx web-design-guidelines; then
   echo "vercel-labs web-design-guidelines: installed"
 else
   echo "vercel-labs web-design-guidelines: NOT installed"

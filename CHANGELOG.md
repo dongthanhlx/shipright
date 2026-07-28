@@ -1,5 +1,33 @@
 # Changelog
 
+## [1.24.1] — 2026-07 — Two runtime bugs found by actually using it
+Both caught in a real session, not by review — and both in the working-context block that every session
+depends on. The first crashed the skill outright; the second had been silently reporting every correctly
+installed skill as missing since v1.20.
+
+### Fixed — a dollar-sign followed by a digit is an ARGUMENT placeholder, not shell syntax
+The version probe used an `awk` positional print. Claude Code substitutes `$N` with the invocation's Nth
+argument **before the shell runs**, so invoking shipright with any arguments rewrote the awk program into
+`{print <a word the user typed>}` and the skill died with `awk: unexpected character`. Replaced with
+`sed`. Audited every dollar-digit and the ARGUMENTS token across all skill content: `/shipright-version`
+had the same latent bug in a `present()` helper whose `$1` would have been eaten the same way — the
+helper is gone, replaced by one listing grep plus membership tests on named variables. The warning
+comments themselves had to be rewritten too: written literally, they contained the very tokens that get
+substituted.
+
+### Fixed — `grep -r` does not follow symlinked directories, and `npx skills add` symlinks by default
+The bigger one. `npx skills add` installs by **symlinking** into `~/.claude/skills/` (that is what
+`--copy` exists to opt out of), and lowercase `-r` skips symlinked directories. So every skill installed
+the way shipright itself recommends read as **not installed** — `skill/ui` said `NONE` while three taste
+skills sat right there, and Check 3 would have offered to install what was already present. All five
+probes switched to `-R`.
+
+This is the third revision of this detection and the first one verified against a real install. v1.20
+replaced a path-shaped probe with a `name:`-based one; that was right, but it was tested against a
+synthetic tree built with `mkdir -p` — **real directories, so the symlink case could not appear**. The
+test was shaped like the fix instead of like reality. Both bugs are now exercised against the actual
+`~/.claude/skills` and both warnings are recorded in the block itself, where the next edit will see them.
+
 ## [1.24.0] — 2026-07 — Backend / system / architecture / security: the bundled skills, and the branches security never reached
 A firing audit of the system-side domains, run the same way as the UI one. The refs themselves came out
 well — resilience, observability, performance, error-handling, domain-thinking, team-scale,
