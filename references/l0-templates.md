@@ -33,6 +33,13 @@ The boundary rules appear in BOTH — they are never optional.
 ## Project
 [One sentence: Input → Process → Output]
 
+## Outcome — what must CHANGE, and how we'll know
+Who: [the user whose behavior or situation must be different]
+Change: [the CHANGE, not the feature]
+Signal: [the concrete observable that says it worked — real and checkable, not a vanity number]
+Riskiest assumption: [the belief that, if wrong, makes this pointless] — UNTESTED
+Check by: [date or trigger condition]
+
 ## Ubiquitous Language — shared vocabulary for this codebase
 All class names, method names, and variable names MUST use these terms.
 Claude uses ONLY these terms — never invents generic alternatives.
@@ -214,6 +221,7 @@ If any unchecked → this decision doesn't need an ADR. Document inline in code.
 Level: L0
 Active: constitution created
 Next: create L1 skeleton — [describe specific skeleton target]
+Last shipped: nothing yet          # once something ships: [what] → signal [X], check by [when]
 Last updated: [date]
 Skills active: [comma-separated list of installed skills]
 Registry: [project type from registry.md]
@@ -223,5 +231,10 @@ This section is read by shipright at every session start.
 Update after every significant milestone (L0 complete, L1 done, L2 done, feature shipped).
 Do NOT update after every single commit — only milestones.
 
+`Last shipped` is the outcome loop's memory. It carries the pending check from the session that
+shipped to the session that resumes (Branch E reads it first). Leave the signal in it until the
+check is actually answered — clearing it unasked is how a project quietly re-enters the build trap.
+
 Shipright reads this via working context injection:
-`!grep -A6 "## Shipright state" CLAUDE.md`
+`!grep -A5 "## Shipright state" CLAUDE.md | tail -5` — so `Last shipped` lands in the session-start
+context. Keep `Last shipped` within the first 5 lines of the block, or the outcome loop stops firing.

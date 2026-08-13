@@ -4,6 +4,10 @@
 > WHAT good looks like. This file tells you HOW MUCH of it to apply right now.
 > A veteran is defined by judgment, not by knowing more rules.
 >
+> **Scope:** this file assumes the thing is worth building and decides how much to invest.
+> WHETHER it's worth building — value, the four risks, the cheapest test — is the sibling file
+> `references/product-judgment.md`. Together they are the two halves of the executive question.
+>
 > **The core principle, promoted from a footnote to the top:**
 > Senior judgment = knowing when NOT to apply a pattern.
 
@@ -166,19 +170,38 @@ Done = the core journey works + the appetite is spent, NOT "every feature is bui
 need) is actually *more common* than gold-plating — and both are corrected the same way: **real user
 feedback** (the SHIP GATE). Ship to learn; don't polish in the dark.
 
+**The SHIP GATE has two halves, and only the first is answerable at ship time:**
+```
+OUTPUT check  — "are we done building?"   Answerable now, by you, from the code.
+                 It builds, tests pass, a real user can complete the journey.
+OUTCOME check — "did it actually work?"   NOT answerable now, and never from the code.
+                 Only real usage answers it, and only the user can report it.
+```
+So the outcome check is **scheduled at ship time, answered at the next session**: name the signal
+in CLAUDE.md `## Outcome`, park it in Shipright state `Last shipped`, and let Branch E Step 1b ask it
+before anything new gets built. Skipping this is the **build trap** (Melissa Perri): measuring success
+by output instead of outcome, shipping ten features that changed nothing — while every gate in this
+file passes. Note the asymmetry that makes it easy to miss: a coding agent verifies FEASIBILITY simply
+by building, so feasibility feels like the whole of "it works". VALUE cannot be verified that way, so
+it must be asked explicitly or it silently never gets asked at all. That half — the four risks, the
+riskiest assumption, the cheapest test, "should this exist?" — is `references/product-judgment.md`.
+
 **The stopping tests — ask before the next hour of work:**
 ```
 □ Does this next hour add CONFIDENCE or VALUE — or only POLISH? (Pareto: the last 20% costs the most.)
 □ Is the JOB done (the one from intake) — or am I building past it?
 □ Am I gold-plating — covering cases no real user has, "just in case"? (YAGNI / waste — §3.)
 □ Would a real user call this "a clear improvement over what they have"? If yes → ship, then iterate.
+□ Do I know what would tell me this WORKED — and is it written down where the next session will
+  find it? If not, I'm about to ship into the dark; fix the signal, not the polish.
 ```
 
 shipright already stops in many places — name them as this one discipline: **L4 is signal-driven**
 (don't optimize without data), the **tech-debt log with triggers** is a *deliberate* stop ("we stop
 here on purpose, revisit on [trigger]" — not a failure), **rule-of-three** stops premature abstraction,
-the **SHIP GATE** is the done-check, and **Beck's sequence** stops most work after "right" (make-it-fast
-only on an L4 signal). The floor holds; the scope flexes; you ship.
+the **SHIP GATE** is the done-check (output now, outcome next session), and **Beck's sequence** stops
+most work after "right" (make-it-fast only on an L4 signal). The floor holds; the scope flexes; you ship.
+And then — this is the half that was missing — you come back and find out whether it mattered.
 
 ---
 

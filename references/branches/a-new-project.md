@@ -44,6 +44,17 @@ Then dig, adaptively, toward these (shipright's INTERNAL checklist — not a bat
     to decide Y"). Separate the request from the need.
   • Who it's for, and why now.
   • What success/"done" looks like — in their terms, concretely (a story, not an opinion).
+    Push ONE step past "done" to the CHANGE and its SIGNAL: what is different for someone after
+    this exists, and what would you actually SEE if it worked? ("They stop keeping the spreadsheet"
+    — not "the export button works".) This becomes CLAUDE.md `## Outcome`, so it must be
+    concrete enough to check later. Don't demand a KPI from a weekend project; a small real
+    signal beats a metric nobody will measure.
+  • The riskiest assumption: which belief, if wrong, makes the whole thing pointless? Usually
+    it is about the USER (will they actually use it / do they actually have this pain), not the
+    tech. shipright can verify feasibility by building; it cannot verify value that way — so name
+    the assumption now, out loud, and record it UNTESTED rather than silently betting on it.
+    If the assumption is load-bearing AND the build is expensive, the cheapest-test ladder is in
+    `references/product-judgment.md` §3 — a day of asking beats a month of building the wrong thing.
   • Appetite / stakes (Shape Up): how much is this worth — a weekend throwaway, or a bet? This
     sets both the MODE and how deep to dig. It is inferred here, never asked as a cold binary.
   • Who's building it — solo, or a team where people own different parts? (This one you ASK — only
@@ -105,6 +116,10 @@ What's in scope — INFER from what you learned, and state it as an assumption t
   • Third-party APIs implied? → "This needs [provider]. Before writing integration code I'll do
     Layer 1 exploration (read docs → Bruno → call sandbox → save fixtures → then Adapter).
     references/third-party-apis.md." (Trigger it — don't ask "do you use any APIs?")
+    If it bills per call, holds PII, or creates a support obligation, raise VIABILITY once, now —
+    what it costs at 100 users (not 3), who answers the mail it generates, whether that data may
+    legally be held. It rarely kills the idea; it changes the shape, and it is cheapest to change
+    before the Adapter exists. references/product-judgment.md §1.
   • AI/LLM implied? → load the matching registry entry (rag-pipeline / chatbot / ai-agent).
   • Auth / payments / PII / untrusted input surfaced? → "This handles [X], so I'll run the L0
     threat model (Shostack's 4 questions, references/security.md) and activate security-and-hardening.
@@ -123,6 +138,7 @@ What's in scope — INFER from what you learned, and state it as an assumption t
 ### Step 2 output — synthesize into an MVP scope (this is the MVP-first anchor)
 ```
 [job] for [who]; success = [X].  Domain terms: [from the conversation].
+Outcome: [who] [changes how] → signal: [what you'd SEE]. Riskiest assumption: [the belief], UNTESTED.
 Stack: [recommended] | Mode: MVP (or production, if they said so).
 
 [MVP]  Walking skeleton = the ONE journey: "[user] does [X] to get [Y]".
@@ -182,6 +198,18 @@ Don't dump the whole registry list — offer only what this project actually nee
 [the JOB — what the user is really hiring this to do, for whom, and what success looks like.
  Distilled from discovery (Step 1), not a mechanical Input→Process→Output line.]
 
+## Outcome — what must CHANGE, and how we'll know
+<!-- The job above is the intent. This is the check. Without it, "done" can only ever mean
+     "the code runs", and a project can ship ten features that changed nothing (Perri). -->
+Who: [the user whose behavior or situation must be different]
+Change: [the CHANGE, not the feature — "they stop keeping a parallel spreadsheet",
+         not "we shipped an export button"]
+Signal: [the concrete observable that says it worked — something you could actually look at.
+         A real signal, however small ("Nam stopped emailing me the numbers"), beats a
+         metric you will never measure.]
+Riskiest assumption: [the belief that, if wrong, makes this whole thing pointless] — UNTESTED
+Check by: [a date, or a trigger condition]
+
 ## Ubiquitous Language
 | Term | Meaning | Not |
 |---|---|---|
@@ -220,6 +248,7 @@ Don't dump the whole registry list — offer only what this project actually nee
 Level: L0
 Active: constitution created
 Next: create L1 skeleton
+Last shipped: nothing yet
 Last updated: [date]
 Skills active: [installed skills]
 ```
@@ -260,15 +289,27 @@ Fix on the user's correction. A constitution the user didn't confirm won't be tr
                      domain-first for convenience (repository → service → handler) — levels.md L3
    Tests: enough to prove skeleton works. Not edge cases.
 
-3. SHIP GATE (the discipline of stopping — judgment.md §3b):
-   "Can a real user complete [the one journey] right now?"
-   YES → deploy, put in front of real users. Don't gold-plate first — the last 20% costs the most
-         and no user has asked for it. Cut remaining scope to nice-to-have; the quality floor stays.
-   NO  → not done. Cut SCOPE to reach the journey, never cut the quality floor. Then ship + learn.
+3. SHIP GATE — TWO checks, not one (the discipline of stopping — judgment.md §3b):
+
+   a) OUTPUT check — "are we done building?"
+      "Can a real user complete [the one journey] right now?"
+      YES → deploy, put in front of real users. Don't gold-plate first — the last 20% costs the most
+            and no user has asked for it. Cut remaining scope to nice-to-have; the quality floor stays.
+      NO  → not done. Cut SCOPE to reach the journey, never cut the quality floor. Then ship + learn.
+
+   b) OUTCOME check — "did it work?" — SCHEDULED here, not answered here.
+      Shipping starts the measurement; it doesn't end the work. The output check can pass in full
+      while the outcome fails completely — that gap is the entire point of `## Outcome`.
+      At ship time, write the check where the next session will trip over it:
+        → CLAUDE.md `## Outcome`: confirm Signal + Check by are still the right ones.
+        → Shipright state `Last shipped:` — what shipped, which signal, by when.
+      Say it to the user in one line: "Shipped. The thing that tells us it worked is [signal];
+      I'll ask about it next session." Then STOP — don't start the next feature to fill the wait.
 
 4. Update Shipright state in CLAUDE.md:
    Level: L1 (skeleton) or L3 (skeleton+validate)
    Next: [specific action]
+   Last shipped: [the journey] → signal [X], check by [when]
 ```
 
 ### Production mode → Full tree
@@ -287,6 +328,8 @@ L0 → L1 Skeleton → L2 Interfaces + RED tests → L3 Implement loop
 ## Gate — constitution done when:
 
 - [ ] Both files project-specific (not generic template)
+- [ ] `## Outcome` filled: who changes, the signal you'd actually SEE, the riskiest assumption
+      (marked UNTESTED), and a check-by date/trigger — not a restatement of the feature list
 - [ ] Ubiquitous Language section has 3+ domain terms
 - [ ] Boundary rules (incl. integration timeout) with project-specific banned examples
 - [ ] Core domain type defined (Entity vs Value Object — must be right)

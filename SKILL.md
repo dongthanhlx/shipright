@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 1.24.1
+version: 1.25.0
 description: >
   Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
   sets up constitution, enforces boundaries, judges what to build now vs defer,
@@ -8,11 +8,14 @@ description: >
   Use when: starting ANY project, adding features (2+ files), fixing unclear bugs,
   refactoring, resuming after break, production incidents, integrating APIs,
   adding observability/tracing/resilience, scaling, building AI/RAG/chatbot projects,
+  AND deciding WHETHER to build something / what to build next / whether what shipped worked,
   AND designing or redesigning ANY user-facing surface (page, landing, dashboard, admin,
   form, flow, mobile/responsive layout) — shipright carries the UI/UX floor and design brief.
   Triggers: "build", "start project", "add feature", "bug", "refactor",
   "production down", "back on this", "integrate API", "add tracing", "make it resilient",
   "scale this", "build chatbot",
+  "should I build", "is this worth building", "what should I build next", "did it work",
+  "nobody uses it", "is this feature worth it", "prioritize",
   "design a page/screen/UI", "landing page", "dashboard", "admin panel", "frontend",
   "redesign", "make it look better", "improve the UI/UX", "responsive", "mobile layout",
   "accessibility".
@@ -36,7 +39,9 @@ Git branch:    !`git branch --show-current 2>/dev/null || echo "no git"`
 Last commit:   !`git log --oneline -1 2>/dev/null || echo "no commits"`
 CLAUDE.md:     !`test -f CLAUDE.md && echo "EXISTS — read first" || echo "MISSING"`
 ARCHITECTURE:  !`test -f ARCHITECTURE.md && echo "EXISTS — read first" || echo "MISSING"`
-Project state: !`grep -A3 "## Shipright state" CLAUDE.md 2>/dev/null | tail -3 || echo "no state tracked"`
+# -A5, not -A3: the state block gained `Last shipped` (the pending outcome check). At -A3 it falls
+# off the end and the outcome loop never fires. Widen this if the block ever grows again.
+Project state: !`grep -A5 "## Shipright state" CLAUDE.md 2>/dev/null | tail -5 || echo "no state tracked"`
 # Granular skill detection — match the SKILL.md `name:` field, NOT a guessed path: `npx skills add`
 # (flat, by install name) and `git clone` (repo/skills/<name>/) produce different layouts, and a
 # path-shaped probe silently returns NO forever under the other one. Personal + project scope.
@@ -49,14 +54,17 @@ Tests:         !`if [ -f package.json ] && grep -q '"test":' package.json; then 
 
 ---
 
-# Shipright v1.24 — Project Brain OS
+# Shipright v1.25 — Project Brain OS
 
 An executive layer over two hemispheres. The executive decides how much of each hemisphere to
 apply, by stage × risk × reversibility (construction is ON from day one — the irreversible quadrant;
-operation turns on by signal). The roster grows — the reference files are the source of truth, not a count.
+operation turns on by signal), and it closes the loop after shipping: build right → ship → find out
+whether it mattered. The roster grows — the reference files are the source of truth, not a count.
 
 ```
-EXECUTIVE  — Bezos (one-way/two-way doors) + the discipline of stopping   → references/judgment.md
+EXECUTIVE  — HOW MUCH: Bezos (doors) + the discipline of stopping       → references/judgment.md
+             WHETHER:  Cagan (4 risks) · Perri (output≠outcome) · Torres
+                       (riskiest assumption) · Rumelt (diagnosis)       → references/product-judgment.md
 CONSTRUCTION (day one) — Evans · Uncle Bob · Ousterhout · Fowler · Kent Beck
              → code-quality.md · code-health.md · testing.md
 OPERATION (on signal)  — Nygard (resilience.md) · SRE/Majors (observability.md)
@@ -105,6 +113,12 @@ boundaries that block, not just advise. Opt-in, fails open. See `references/enfo
 ## The executive question — ask before every non-trivial decision
 
 ```
+Before you BUILD it at all:  "Is the need real — and what happens if we DON'T?"
+  Real need                → proceed to the door question below.
+  "Nothing much, it'd be nice" → that IS the answer. Log it, don't build it.
+  Unproven AND expensive   → STOP. Cheapest test first (`references/product-judgment.md`).
+  Unproven AND cheap       → build it; the build is the test. Then check the outcome.
+
 Before you BUILD it:  "Is this a one-way door, and is the need real today?"
   One-way + real      → do it right, now (domain model, boundaries, data identity, money units)
   One-way + not yet   → design the seam so it stays reversible, defer the rest
@@ -114,12 +128,20 @@ Before you BUILD it:  "Is this a one-way door, and is the need real today?"
 Before you keep POLISHING it:  "Is this good enough for the appetite — or am I gold-plating?"
   Job done + core works → SHIP, get feedback. Cut SCOPE to nice-to-have; never cut the quality FLOOR
   (boundaries, one-way doors, the quality gate). Ship a smaller COMPLETE thing, not a bigger broken one.
+
+After you SHIP it:  "Did it work — and how would I know?"
+  The OUTPUT check (it builds, tests pass, a user can complete the journey) is not the OUTCOME check.
+  Both can diverge completely. Name the signal AT ship time (CLAUDE.md `## Outcome` + Shipright state
+  `Last shipped`), and ANSWER it at the next session — before the next feature (Branch E Step 1b).
 ```
 
-This defeats both failure modes: over-engineering (treating a two-way door as one-way, or polishing
-past "good enough") and architecture rot (treating a one-way door as two-way, or cutting the quality
-floor to ship). Full matrix + the discipline of stopping + "when to break each rule":
-`references/judgment.md`. Load it at L0 and at every "should I add X?" / "am I done?" moment.
+This defeats three failure modes: over-engineering (two-way door treated as one-way, or polishing past
+"good enough"), architecture rot (one-way door treated as two-way, or cutting the quality floor to
+ship), and the **build trap** — feature after feature that changes nothing, while every quality gate
+passes (Perri). Building verifies feasibility for free; it never verifies value, so value must be
+asked on purpose. Matrix + stopping + "when to break each rule": `references/judgment.md` (load at L0
+and at every "should I add X?" / "am I done?"). Value, the four risks, the cheapest test:
+`references/product-judgment.md`.
 
 ---
 
@@ -129,6 +151,10 @@ One model; the older vocabularies (L0–L4, Stage 1–3, MVP/Production, Tractio
 it. Construction ramps up early (irreversible quadrant); operation turns on by signal. Full phase
 table + which masters/dial per phase: `references/levels.md` + `references/judgment.md`.
 
+⚠ **"VALIDATE" here validates the CODE, not the need** — tests GREEN, boundaries clean. A project can
+reach SCALE having never once checked that anyone wants it. Value runs on its own loop, orthogonal to
+this spine: `## Outcome` → the SHIP GATE's outcome half → Branch E Step 1b.
+
 ---
 
 ## Session start — 3 checks before anything else
@@ -136,6 +162,8 @@ table + which masters/dial per phase: `references/levels.md` + `references/judgm
 **Check 1: Read existing constitution**
 If CLAUDE.md and ARCHITECTURE.md exist → read both completely before asking anything.
 Project state section in CLAUDE.md shows where things left off last session.
+**`Last shipped` carrying an unanswered outcome check → ask it before starting anything new**
+(Branch E Step 1b). Read `## Outcome` too: it outranks `Next` when the two disagree.
 
 **Check 2: Read the skill lists above, then adapt precisely** — a skill counts as available only if its
 name appears in `skill/core` or `skill/ui`.
@@ -287,6 +315,7 @@ This survives across sessions. Working context above reads it automatically.
 Level: L3
 Active: [module name]
 Next: [specific action — verb + object + acceptance criteria]
+Last shipped: [what shipped] → signal [X], check by [when]   (or "nothing yet")
 Last updated: [date]
 Skills active: [comma-separated list]
 ```
@@ -294,6 +323,9 @@ Skills active: [comma-separated list]
 When state exists: skip intake, start from "Next" action.
 When state missing: full intake flow.
 Branch E (resume) uses this to re-orient in seconds instead of minutes.
+
+`Last shipped` is the **outcome loop's memory**: it carries a pending "did it work?" to the next
+session (Branch E Step 1b asks it). Only the user can answer it — carry it forward until they do.
 
 ---
 
@@ -329,6 +361,7 @@ them here: when the thought below crosses your mind while building, load the ref
 | "What's the right shape for this domain concept — entity, value object, aggregate? Where does this invariant live?" | `references/domain-thinking.md` (Evans tactical: aggregate roots, invariants, domain events, "DDD or not?") |
 | "I'm writing the failure path — what should this return / throw / retry / roll back?" | `references/error-handling.md` (taxonomy, Result type, saga, race conditions, idempotency) — decide it while writing, not after an incident |
 | "I'm touching auth, a session, a permission check, money, PII, file paths, or anything a user controls" — **in ANY branch, not just a new feature** | `references/security.md` (Saltzer & Schroeder, OWASP → layer map). Then EXECUTE the review: `/security-review` (bundled, free) and `security-and-hardening` if installed. Refactoring auth or fixing a payment bug is exactly when this gets skipped — and exactly when it costs most. |
+| "Should this feature exist at all?" · "nobody has said why they want this" · an outcome check came back NO / DON'T KNOW · we've shipped a lot and nothing changed for anyone | `references/product-judgment.md` — the OTHER half of the executive question. Cagan's four risks (building proves feasibility for free and value never), the riskiest assumption + the cheapest test that could kill it, cost-of-NOT and opportunity cost, Rumelt's diagnosis. **Skip it for a bug fix, a config change, or a request the user already reasoned about** — asking there is friction, not judgment. |
 | "This decision is irreversible, security-sensitive, or I'm confident in unfamiliar code" | `references/judgment.md` (one-way door) — and if `doubt-driven-development` is installed, that IS the adversarial second opinion the one-way door deserves |
 | "A settled decision / the domain model is wrong — it must change" | `references/evolutionary-architecture.md` (evolve under guard, recovery path). A fitness function only guards you if it RUNS on every commit → `ci-cd-and-automation` |
 | "The requirements changed under us mid-build" | `references/requirement-drift.md` (expand → migrate → contract). Removing the old path / moving users off it is the contract phase → `deprecation-and-migration` |
@@ -338,7 +371,7 @@ them here: when the thought below crosses your mind while building, load the ref
 | "I keep threading the same 3 fields / a string stands in for a domain concept" | `references/code-quality.md` (smells → extract) |
 | "I'm about to write / touch a user-facing surface — a page, screen, form, table, dashboard" | `references/ui-design.md` — the EXPERIENCE floor is not optional and not an afterthought: a11y + responsive/mobile + IA + the state-floor (loading / empty / error / success are *designed*). Then dispatch execution (taste-skill / vercel-labs / dataviz). |
 | "This screen only has a happy path / this table is unusable at 360px / these are emoji icons" | `references/ui-design.md` (state-floor · §Mobile & responsive · §Icons — SVG, never emoji) |
-| "I'm about to call / integrate a NEW 3rd-party API (YouTube, Stripe, **or an LLM API**, …)" | `references/third-party-apis.md` §Layer-1 — MANDATORY before the Adapter: call the real API/sandbox → save real responses as `tests/fixtures/` → THEN write the Adapter + unit tests (fixtures) + a contract test. Never code an Adapter from docs alone. **LLM APIs count** — also capture token-usage / cost / streaming / error shapes (`references/stacks/ai-projects.md`). |
+| "I'm about to call / integrate a NEW 3rd-party API (YouTube, Stripe, **or an LLM API**, …)" | `references/third-party-apis.md` §Layer-1 — MANDATORY before the Adapter: call the real API/sandbox → save real responses as `tests/fixtures/` → THEN write the Adapter + unit tests (fixtures) + a contract test. Never code an Adapter from docs alone. **LLM APIs count** — also capture token-usage / cost / streaming / error shapes (`references/stacks/ai-projects.md`). Anything carrying an ONGOING cost or obligation (per-call billing, PII, a support burden) also raises **viability**, which is not an architecture question and has no other trigger: what does this bill at 100 users, not 3 · who answers the mail it generates · may we legally hold this data → `references/product-judgment.md` §1. |
 
 ---
 
@@ -400,7 +433,8 @@ reason to load it. All paths under `references/`.
 e-resume · f-incident · **`registry.md`** — trigger index + project-type packs + install recipes (one entry).
 
 **Executive & construction** — `judgment.md` (one-way/two-way doors, MVP matrix, when to break each rule,
-system-vs-experience floors) · `code-quality.md` (Fowler smells, Clean Code, the quality gate) ·
+system-vs-experience floors) · `product-judgment.md` (is the need real: 4 risks, riskiest assumption +
+cheapest test, value fork, Rumelt) · `code-quality.md` (Fowler smells, Clean Code, the quality gate) ·
 `code-health.md` (SOLID + Ousterhout deep modules) · `testing.md` (strategy: pyramid, test through the
 public interface, mock only at seams) · `domain-thinking.md` (Evans tactical: aggregates, invariants,
 "DDD or not?") · `error-handling.md` (taxonomy, Result, saga, idempotency) · `boundaries.md` (the 5 rules

@@ -1,6 +1,120 @@
 # Changelog
 
-## [1.24.1] — 2026-07 — Two runtime bugs found by actually using it
+## [1.25.0] — 2026-08 — The outcome loop: shipright could tell you the code was right, never that it mattered
+A product-management audit of shipright, against Cagan (the four risks), Perri (build trap), Torres
+(riskiest assumption) and Rumelt (diagnosis before policy). The finding was structural, not cosmetic.
+
+shipright's executive question is *"is this a one-way door, and **is the need real today**?"* — and it
+only ever answered the first half. The need was taken on faith at intake and never revisited. Of
+Cagan's four risks it hard-covers **feasibility** (the whole construction hemisphere) and part of
+**usability** (`ui-design.md`); **value** and **viability** were absent. The reason is worth naming,
+because it is specific to an agent: a coding agent verifies feasibility *simply by building*, so
+feasibility feels like the whole of "it works". Value cannot be verified that way — so it has to be
+asked explicitly, or it silently never gets asked. shipright was, in Perri's exact sense, a very
+sophisticated feature factory: superb at *build it right*, one thin moment of *build the right thing*
+at intake, and **no feedback loop closing back**.
+
+Concretely, before this release: the CLAUDE.md template had no outcome field (success lived in `##
+Project` prose — unmeasurable, never re-read); the SHIP GATE asked *"can a user complete the journey?"*,
+an **output** check dressed as a done-check; Branch B went straight from "what's the job" to tiering;
+and Branch E — the resume branch, the one moment the loop could close — re-oriented on git, level and
+tests and never once asked whether the last thing shipped had worked.
+
+### Added — `## Outcome` in CLAUDE.md, a durable field with a riskiest assumption
+Who changes · what CHANGE (not what feature) · the **signal you would actually SEE** · the **riskiest
+assumption, marked UNTESTED** · a check-by date or trigger. Deliberately not a KPI: a small real signal
+("ops stopped asking in Slack") beats a metric nobody will measure. Filled from intake — Branch A Step 1
+now pushes one step past "done" to the change and its signal, and asks which belief being wrong would
+make the whole thing pointless (usually about the user, not the tech). In the constitution gate, the
+MVP + Production templates, and the orders-api example worked through end to end.
+
+### Added — the SHIP GATE is now two checks, and the second is scheduled, not answered
+`OUTPUT` (it builds, tests pass, the journey completes) is answerable at ship time, by you, from the
+code. `OUTCOME` (did it work) is answerable by neither — only real usage answers it, and only the user
+can report it. So it is **scheduled at ship time and answered at the next session**: the signal goes into
+`## Outcome`, the pending check parks in Shipright state as `Last shipped`, and Branch E asks it.
+Applies to Branch B too — most shipping happens there, and Step 6 now refuses to set `Next:` to another
+feature while the previous check is unanswered. That rule is the build trap in its exact mechanical form.
+
+### Added — Branch E Step 1b, where the loop actually closes
+Before `Next`, not after: *"Last session shipped X. What we said would tell us it worked was Y. Did it?"*
+Three routed answers — **yes** → mark the assumption VALIDATED and proceed; **no** → stop, do not build
+the next feature on an invalidated one, and route by *why* (nobody used it → value, re-open intent;
+used but didn't help → the job was misread; couldn't use it → usability, not value); **don't know** →
+the signal was unmeasurable, so fix the signal before building anything. Passing tests, a clean build
+and a green deploy all report on the output; none of them report on the outcome.
+
+### Fixed — the working-context state probe would have truncated the new field
+`grep -A3 … | tail -3` cut off at `Next`, so `Last shipped` never reached session-start context and the
+loop would have silently never fired. Widened to `-A5 | tail -5`, with the constraint recorded in the
+block itself and in `l0-templates.md`: keep `Last shipped` inside the first 5 lines of the state block.
+
+### Added — `references/product-judgment.md`, the WHETHER half of the executive layer
+The loop above closes after shipping; this closes the gap before it. Not a new hemisphere — the
+executive layer splits into **HOW MUCH** (`judgment.md`: doors, MVP matrix, stopping — it assumes the
+thing is worth building) and **WHETHER** (`product-judgment.md`: is the need real). Contents: the
+asymmetry in §0 that makes the whole file necessary; **Cagan's four risks** with shipright's honest
+coverage marked per row, including the **viability** questions a solo builder always skips (who answers
+the support mail, what does the API bill look like at 100 users, can you legally hold this data —
+these rarely kill an idea, they change its shape); **Perri** on output≠outcome with the mechanical tell;
+the **riskiest assumption as a product one-way door** plus a four-rung cheapest-test ladder that
+explicitly excludes A/B tests and funnels (they need traffic an MVP doesn't have) and one rule that
+makes it a test at all — *it must be able to come back NO*; the value fork in full; and **Rumelt's
+kernel** mapped onto what shipright already produces (the 5 boundaries and the mode ARE a guiding
+policy; ARCHITECTURE.md, ADRs and the debt triggers ARE coherent action — what's missing is one line
+of **diagnosis**, since `## Project` is a goal statement, Rumelt's #2 bad-strategy tell).
+
+Every section carries its own "don't apply this here": the file opens by refusing bug fixes, config
+changes and decisions the user already reasoned about. Interrogating the value of a 30-minute fix is
+the same failure as over-architecting a landing page.
+
+### Added — Branch B Step 2b, the value fork
+The last point at which the answer can still be *don't*. Placed after the health check and **before**
+tiering, because everything from Step 3 onward answers *how to build it well* — previously Branch B
+went from "what's the job" straight to sizing, which is where the build trap enters an existing
+project. Four questions (which outcome · **what happens if we DON'T** · the cheapest test · what we're
+not building instead), and a routing table where exactly one quadrant refuses to proceed: **unproven
+value + expensive build**. Unproven + cheap proceeds — the build *is* the test. Skipped entirely for
+Tier-S-shaped work. shipright must state a verdict rather than hide behind a question, and must drop
+it once the user answers.
+
+### Firing — the v1.20 lesson applied preemptively
+That release's finding was that a whole hemisphere sat dark because the skill description carried none
+of its vocabulary. So the description now covers deciding *whether* to build, what to build next, and
+whether what shipped worked ("should I build", "is this worth building", "what should I build next",
+"did it work", "nobody uses it", "prioritize"), and `product-judgment.md` is reachable from five
+places: a Mid-work row, the executive question, Branch A (assumption is load-bearing + build is
+expensive), Branch B Step 2b, and Branch E's NO route. Core grew ~30 lines, nearly all of it trigger.
+
+### Caught in the pre-commit audit — three of them, and one was this release's own failure mode
+Reviewing the release against the repo's own verdicts before committing, rather than after:
+- **BROKEN-TARGET, self-inflicted.** EVALS #44 claimed viability was "fixed v1.25 → `product-judgment.md`
+  §1" — and **nothing routed there**. `grep -n "viability"` across the core, Branch A and
+  `third-party-apis.md` returned zero. The section existed; no trigger reached it, which by v1.20's own
+  definition is indistinguishable from not having written it. Now fires at the moment it's actionable
+  (Branch A's third-party bullet + the Mid-work API row), gated on *ongoing cost / PII / support
+  obligation* so it stays quiet for an ordinary read-only API. Writing the eval row before verifying the
+  trigger is precisely the trap this file has documented three times.
+- **The spine says VALIDATE and never validates the need.** SEED → **VALIDATE** → HARDEN → SCALE, where
+  VALIDATE = L2–L3 = tests GREEN. A reader would reasonably conclude value validation was already
+  covered — the phase name actively argues against the release. Disambiguated in both the core and
+  `levels.md`: a project can reach SCALE having never once checked that anyone wants it. Also added
+  `## Outcome` to L0's "what done looks like", which was defined in two places and updated in one.
+- **`prompts.md` would have generated the old shape.** The passive copy-paste L0 prompt emitted a
+  CLAUDE.md with no `## Outcome` and a state block with no `Last shipped` — so anyone using the prompts
+  instead of the branches got a silently dead loop. Fixed. Passive files still have to be correct;
+  "deliberately has no trigger" is not "deliberately unmaintained".
+
+### Deliberately NOT added
+RICE, WSJF, Cost of Delay as a formula, Kano, MoSCoW — org-scale backlog-triage artifacts; for a solo
+or small builder they are ceremony producing a number nobody trusts, and a scoring rubric is exactly
+the over-engineering shipright warns about everywhere else. The useful residue is kept as *questions*:
+cost-of-NOT and opportunity cost. Also out: full opportunity solution trees (need a product trio and
+weekly interviews — the reasoning chain is kept, the diagram isn't), the Amazon PR/FAQ (Branch A Step
+2a's playback already is the light version, and `## Outcome` is its durable half), and pre-mortems as a
+standing ritual (Branch A's "the risk I see" plus the riskiest-assumption question already are one, at
+the moment it's useful). Recorded in `product-judgment.md` §6 so none of it gets re-proposed. And no
+new master roster — what was missing was a **loop and a gate**, not more frameworks.
 Both caught in a real session, not by review — and both in the working-context block that every session
 depends on. The first crashed the skill outright; the second had been silently reporting every correctly
 installed skill as missing since v1.20.

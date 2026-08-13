@@ -8,7 +8,7 @@
 ## Step 1 — Read state first
 
 ```bash
-grep -A6 "## Shipright state" CLAUDE.md 2>/dev/null
+grep -A7 "## Shipright state" CLAUDE.md 2>/dev/null
 ```
 
 **If state exists:**
@@ -24,6 +24,34 @@ Ready to continue? Or has something changed?"
 ```
 
 Skip steps 2-5 if developer confirms → go directly to next action.
+
+### Step 1b — the outcome check (ask BEFORE the next action, not after)
+
+`Last shipped` in the state carries a pending outcome check from the session that shipped it.
+Read it, and read CLAUDE.md `## Outcome`. **If a check is unanswered, that question comes first —
+ahead of `Next`.** Resuming is the one moment the loop can close; skip it and it never closes.
+
+```
+"Last session shipped [X]. What we said would tell us it worked: [signal].
+ Did that happen?"
+
+→ YES  → record it: mark the riskiest assumption in `## Outcome` VALIDATED (with the date and what
+         you actually saw), clear `Last shipped`, proceed to Next. A validated assumption is now a
+         fact the project can build on — that is what makes the next scope decision cheap.
+→ NO   → STOP. Do not proceed to Next. The riskiest assumption has evidence AGAINST it, and the
+         next feature would stack on an unvalidated one. **Load `references/product-judgment.md`** —
+         the diagnosis and the cheapest next test are there. Ask what actually happened, then route:
+         nobody used it → the value assumption was wrong → re-open intent (Branch A Step 1–2a),
+         don't build more; they used it but it didn't help → the job was misread → re-open the job;
+         they couldn't use it → usability, not value → Branch B on the UI (references/ui-design.md).
+→ DON'T KNOW → the signal was unmeasurable, so fix the signal before building anything else.
+         Replace it in `## Outcome` with something you can actually observe this week. An outcome
+         you cannot check is the same as not having one.
+```
+
+**Only the user can answer this — never guess it, and never infer it from the code.** Tests passing,
+a clean build, and a successful deploy say the OUTPUT worked; none of them say the outcome did.
+If `Last shipped: nothing yet` or the field is absent (project predates this), skip to Step 2.
 
 **If no state → continue to Step 2 (full orient)**
 
@@ -99,6 +127,7 @@ Bad:  "Continue the orders thing" / "Fix remaining stuff"
 Level: [detected level]
 Active: [module]
 Next: [specific action]
+Last shipped: [carry forward unchanged if its check is still unanswered; clear it once answered]
 Last updated: [today]
 ```
 
