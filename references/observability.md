@@ -8,6 +8,7 @@ When adding observability to a project, update CLAUDE.md Shipright state:
 Level: L4
 Active: observability setup
 Next: verify Correlation ID flows end-to-end (curl request → check logs → find requestId)
+Last shipped: [carry forward UNCHANGED — never drop this line when rewriting the state block]
 Last updated: [date]
 ```
 

@@ -12,6 +12,12 @@ whenever a doc says "L2" / "Stage 1" / "Traction" / "Growth" — translate to a 
 | **HARDEN** | Growth | L4 | Stage 1–2 | + Nygard, SRE | FULL on signal (resilience.md, SLO) |
 | **SCALE** | Scale | L4 | Stage 3 | + Ousterhout (deep modules) | + bulkheads, backpressure |
 
+> ⚠ **"VALIDATE" here means the CODE works — not that anyone wants it.** L2–L3 validate correctness
+> (tests GREEN, boundaries clean). They say nothing about value, and reaching VALIDATE is not evidence
+> that the thing is worth building. That second validation runs on its own loop, orthogonal to this
+> spine: `## Outcome` → SHIP GATE's outcome half → Branch E Step 1b (`references/product-judgment.md`).
+> A project can be at SCALE and have never validated the need once. Don't let the phase name imply it.
+
 - The **construction** masters (Evans/Bob/Fowler/Beck) ramp up early — their work is in the
   irreversible quadrant, cheap now and expensive later (see `references/judgment.md`).
 - The **operation** masters (Nygard/SRE) turn on by *signal*, not by reaching a phase label.
@@ -49,6 +55,8 @@ ARCHITECTURE.md    # modules + boundaries + domain model + ADR
 - You can explain every module's job in one sentence
 - You can name 3 things that are explicitly forbidden
 - Every tech debt shortcut has a trigger condition that is a real metric
+- `## Outcome` names the CHANGE, a signal you could actually observe, and the riskiest assumption
+  (marked UNTESTED) — so "done" later can mean something other than "the code runs"
 
 ---
 

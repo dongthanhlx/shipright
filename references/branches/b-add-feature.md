@@ -18,6 +18,8 @@ does it do?" — read it). Then ask only what you can't read:
 Ask the user (the intent only they know):
   "What should a user be able to do after this feature — and why does it matter?" (the job)
   → Dig one level if the ask is a solution ("add a dashboard") rather than a need ("see X to decide Y").
+  → Whether it's worth building at all is Step 2b, AFTER you've read the code and know the effort.
+    Ask the job here; don't litigate the value twice.
 
 DO NOT ask "new module or extend existing?" — that is shipright's call. Decide it AFTER the
 codebase report (Step 1) and PROPOSE it: "I'll extend [module] / add module [X] because […] — ok?"
@@ -74,6 +76,48 @@ Verdict: SAFE / TIER1-BLOCKER / TIER2-CAUTION
 ```
 
 TIER1-BLOCKER effort > 20% deadline → workaround + TODO[fix-before-scale], proceed.
+
+---
+
+## Step 2b — The value fork: should this exist? (before sizing HOW to build it)
+
+Everything below this line answers *how to build it well*. This is the last point at which the
+answer can still be **don't**. Ask it here, once, in the user's words — not as a form.
+
+```
+SKIP entirely (just build it — asking would be friction, not judgment):
+  a bug fix · config / copy / rename · anything Tier-S shaped · an explicit request the user has
+  already reasoned about · a change the user reaffirmed after you raised a concern.
+RUN it for: a new capability — a new endpoint, screen, integration, or 2+ files of new behavior.
+```
+
+```
+1. Which OUTCOME does this serve? (CLAUDE.md ## Outcome)
+   → serves none: not automatically wrong, but say so — "this doesn't serve [outcome];
+     new direction, or a detour?"
+2. What happens if we DON'T build it?
+   → "nothing much, it'd be nice" → THAT IS THE ANSWER. Log it in the tech-debt/idea list, don't build.
+3. If value is unproven AND the build is expensive → what's the cheapest thing that would tell us
+   it's worth it? (talk to one user · look at the workaround they already built · do it by hand once)
+   → build cheap? then the build IS the test. Skip the ceremony, build, and check the outcome after.
+4. What are we NOT building by building this? Name the runner-up.
+```
+
+**Then route:**
+```
+Clear value                      → proceed to Step 3. Don't add ceremony to an easy yes.
+Unproven value + CHEAP build     → proceed. Ship it, then answer it (Step 6 schedules the check).
+Unproven value + EXPENSIVE build → STOP and say so. Propose the cheap test first. This is the only
+                                   answer that doesn't proceed — and the one that saves the most.
+```
+
+**Not obvious from the four questions above?** → `references/product-judgment.md` (Cagan's four
+risks — including the viability questions a solo builder skips; the riskiest-assumption ladder;
+opportunity cost). Also load it if a previous outcome check came back NO — the diagnosis is there.
+
+**Then STATE the verdict, don't hide it in a question:** "This serves [outcome]; if we skip it,
+[cost]. Building it." Or: "I'd hold this one — [reason]. Cheaper first: [test]. Your call." The
+user decides; shipright is obliged to have an opinion, and obliged to drop it once they answer.
 
 ---
 
@@ -241,16 +285,30 @@ npx tsc --noEmit 2>/dev/null || python -m mypy src/  # must pass
 
 ---
 
-## Step 6 — Update state
+## Step 6 — Update state, and schedule the outcome check
 
-After feature complete, update CLAUDE.md Shipright state:
+A feature that ships gets the same two-part SHIP GATE as the first one (a-new-project.md Step 5):
+the quality gate above is the OUTPUT check — it says the code is right, never that the feature
+worked. Before moving on, name the signal:
+
+```
+"Shipped [feature]. What would tell us it actually helped: [signal]. I'll ask next session."
+```
+
+Then update CLAUDE.md Shipright state:
 ```markdown
 ## Shipright state
 Level: L3
 Active: [module just completed]
 Next: [next feature or "validate with users"]
+Last shipped: [feature] → signal [X], check by [when]
 Last updated: [date]
 ```
+
+**Do not set `Next:` to another feature while the previous `Last shipped` check is unanswered** —
+that is the build trap in its exact mechanical form (Perri), and it is how a project ships ten
+features that changed nothing. If the last check is still open, `Next:` is that check.
+Also update CLAUDE.md `## Outcome` if this feature changed what the project is actually for.
 
 ---
 

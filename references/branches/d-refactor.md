@@ -166,6 +166,8 @@ Add new rules to CLAUDE.md or .claude/rules/ from patterns discovered.
 Level: L3 (post-refactor)
 Active: [module refactored]
 Next: [verify DONE condition met / run perf test / next feature]
+Last shipped: [carry forward UNCHANGED — a refactor changes no user outcome, so it never clears
+              or answers a pending check. Dropping the line silently kills the outcome loop.]
 Last updated: [date]
 ```
 

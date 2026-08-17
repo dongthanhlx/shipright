@@ -26,6 +26,8 @@ Third-party APIs: [list or none]
 Generate:
 1. CLAUDE.md — include:
    - Ubiquitous Language table (3-5 domain terms extracted during intake)
+   - ## Outcome — who changes, what CHANGE (not what feature), the signal you could actually
+     observe, the riskiest assumption marked UNTESTED, and a check-by date/trigger
    - The boundary rules specific to this project with banned examples
    - Clean Code rules (functions max 20 lines, no AND/OR names)
    - Tech stack
@@ -33,7 +35,8 @@ Generate:
    - Tech debt log with TODO[trigger]
    - Registry entry loaded: [project type]
    - Shipright state section at end:
-     Level: L0 | Active: constitution | Next: L1 skeleton | Skills active: [list]
+     Level: L0 | Active: constitution | Next: L1 skeleton | Last shipped: nothing yet |
+     Skills active: [list]
 2. ARCHITECTURE.md — ASCII flow diagram, 2-3 modules max,
    core domain type with comments, 1 ADR for hardest decision
 

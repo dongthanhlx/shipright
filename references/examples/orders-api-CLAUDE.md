@@ -22,6 +22,20 @@ gateway (idempotently), and exposes order status — built to stay correct from 
 
 ---
 
+## Outcome — what must CHANGE, and how we'll know
+Who: the two ops staff who currently reconcile orders against the payment dashboard by hand.
+Change: they stop doing the daily manual reconciliation — order status is trustworthy enough
+        that they read it instead of the gateway dashboard.
+Signal: after 2 weeks live, the shared reconciliation spreadsheet has no new rows, and ops stops
+        asking us "did payment X go through?" in Slack. (Both observable this month. Neither is
+        a KPI, and that is fine — a signal you will actually check beats one you won't.)
+Riskiest assumption: that ops trusts an order status derived from OUR record of the gateway call
+        rather than the gateway's own dashboard. If they don't, the API is correct and useless.
+        — UNTESTED. Cheapest test: show one day of statuses side by side before building the UI.
+Check by: 2 weeks after the first real order goes through.
+
+---
+
 ## Architecture rules — NEVER violate
 
 ### Module boundaries
@@ -162,6 +176,7 @@ LOG_LEVEL               # default: info
 Level: L0
 Active: constitution created
 Next: create L1 skeleton — modules/{orders,payments,inventory} + compiles with npx tsc --noEmit
+Last shipped: nothing yet
 Last updated: 2026-06
 Skills active: debugging-and-error-recovery
 Registry: web-api

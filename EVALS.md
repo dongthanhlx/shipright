@@ -122,6 +122,34 @@ free, and always present, and shipright reached past it for a third-party skill.
 v1.22 taught shipright to *offer installs*: an unnecessary install is now an active cost, not just a
 missed shortcut. Before dispatching anywhere, check the bundled set.
 
+### Product / outcome scenarios (v1.25) — the loop that never closed
+
+| # | Situation | Before | Verdict → fix |
+|---|---|---|---|
+| 38 | user resumes after shipping the MVP two weeks ago | Branch E re-oriented on git, level and tests, and never asked whether the shipped thing worked. Nothing anywhere asked. | **NO-LOOP → fixed v1.25.** `Last shipped` in state + Branch E **Step 1b**, asked before `Next`. |
+| 39 | "add feature X" on an existing project | Branch B went from "what's the job" straight to tiering; `Next:` could become another feature while the previous one's outcome was unknown | **NO-LOOP → fixed v1.25.** Step 6 schedules the check and blocks stacking on an unanswered one. |
+| 40 | constitution generated at L0 | "success" lived in `## Project` prose — unmeasurable, and no session ever re-read it | **DARK → fixed v1.25.** `## Outcome` is a durable field with a signal, a riskiest assumption (UNTESTED) and a check-by; it is in the L0 gate. |
+| 41 | shipright reports "done — tests pass, journey works" | that is an **output** check presented as a done-check; value was never assessed at all | **HALF-ANSWERED → fixed v1.25.** SHIP GATE split: output now, outcome next session. |
+| 42 | "add a notifications system" on a project with 3 users | Branch B went from "what's the job" straight to tiering — the expensive-and-unproven case had no gate at all | **NO-GATE → fixed v1.25.** Step 2b value fork, before sizing. Only that one quadrant refuses to proceed. |
+| 43 | user asks "should I build X?" without saying "build" or "add feature" | the skill description carried no *whether-to-build* vocabulary — the same failure v1.20 found for the UI hemisphere | **DARK → fixed v1.25.** Description + a Mid-work row + 4 more entry points. |
+| 44 | integration that costs money per call, on a free product | viability was nowhere in shipright — not in intake, not in the registry, not in `third-party-apis.md` | **DARK → fixed v1.25.** `product-judgment.md` §1, reached from Branch A's third-party bullet + the Mid-work API row, gated on ongoing cost / PII / support obligation. |
+
+**Row 44 was written before the trigger existed** — the section was there, nothing routed to it, and the
+row said "fixed". Caught in the pre-commit audit by grepping for the *word* rather than re-reading the
+file, which is the only check that would have found it. **A verdict of "fixed" is a claim about a
+firing path, not about a section existing.** Write the row after the grep, not before.
+
+**NO-LOOP** — a sixth failure mode, and the only one that is invisible from inside a single session:
+every trigger fires, every ref is correct, every gate passes, and the project still ships things that
+change nothing. It is invisible precisely *because* the machinery works. The tell is a state block whose
+`Next` is always another feature.
+
+**Why this class was structurally easy to miss, and worth writing down.** An agent verifies
+**feasibility** simply by building — the proof arrives for free, as a side effect of the work. **Value**
+has no such side effect: nothing about a green test suite reports on it, so unless it is asked
+explicitly, it is never asked at all, and its absence produces no error. Every other verdict in this
+file describes a trigger that failed to fire. This one describes a question that was never in the file.
+
 ### Finding (v1.20) — the trigger can be perfect and still dead-end
 
 v1.17's lesson was *retrieval + timing*. v1.20 adds: **the target must exist**. shipright's UI dispatch
