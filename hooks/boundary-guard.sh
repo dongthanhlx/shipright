@@ -78,7 +78,7 @@ inspect() {
       echo "  file: $file"
       echo "  line: $(printf '%s' "$line" | sed 's/^[[:space:]]*//')"
       echo "  fix:  inject a repository interface (I${curmod^}Repository) via the constructor;"
-      echo "        the only path to the DB is through a repository. (references/boundaries.md Rule 2)"
+      echo "        the only path to the DB is through a repository. (references/boundaries.md Rule 2a)"
       echo "  bypass (only with a real reason): add a 'shipright-ignore' comment on this line."
       return 1
     fi

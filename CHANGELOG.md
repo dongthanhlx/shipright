@@ -1,5 +1,55 @@
 # Changelog
 
+## [1.25.1] — 2026-09 — Consistency pass: renamed probes, dead targets, and a gate Branch B never closed
+A full read of every live file against the core. No new ideas — every fix brings a ref back in line with
+what SKILL.md already says. Two of them are the repo's own documented failure modes, recurring.
+
+### Fixed — BROKEN-TARGET, again
+- `registry.md` `full-stack-web` dispatched product UI to `minimalist-skill` — the folder name, which
+  `--skill` rejects. v1.20 fixed every other occurrence and missed this one. Now `minimalist-ui`.
+- `performance.md` sent Core Web Vitals to `agent-skills:webperf` / web-performance-auditor. Neither
+  exists in any repo's `--list`. Now: measure first (Lighthouse, or `browser-testing-with-devtools`), run
+  the same ladder, then `vercel-react-best-practices` (React/Next) or `vercel-optimize` (on Vercel) —
+  both confirmed against `--list`. `vercel-optimize` in the core was checked the same way and is real.
+
+### Fixed — branches still read probe names v1.23 removed
+v1.23 collapsed eight probes into `skill/core` and `skill/ui`. Branch B (`skill/tdd`, `skill/review`,
+`skill/spec-driven`, `skill/incremental`), Branch C and D and `ui-design.md` (`skill/taste`) still branched
+on the old names — which nothing emits any more, so every condition read as "not installed". Rewritten to
+test for the skill's install name inside the list the core actually produces.
+
+### Fixed — Branch B's merge gate never closed with a real review
+The core and v1.24 say Tier M+ closes with `/security-review` (when auth/payments/untrusted input was
+touched) and by asking the user to run `/code-review`, which is user-invoke-only. Branch B — where most
+merges happen — mentioned neither. Step 5 gains "Close the gate", and both tier paths point to it.
+
+### Fixed — boundary numbering disagreed with the core
+`boundaries.md` numbered Rule 2 = "services never touch the DB" and Rule 3 = "repositories hide
+persistence"; the core's Rule 2 is "each layer has one job" and Rule 3 is "modules do not share
+databases" — which had no worked example anywhere. Now 2a/2b under Rule 2, plus a real Rule 3 with a
+correct/wrong pair and a test. Hook message, `levels.md`, `judgment.md`, `browser-extension.md` follow.
+`judgment.md`'s "4 boundaries → essentially never" became "the 5 boundaries", with Boundary 5's
+phase-dialled *depth* stated explicitly — "1–4" would have read as permission to skip timeouts.
+
+### Fixed — the CI grep in `code-quality.md`
+Used a lookahead `grep` doesn't support, labelled the two checks with each other's numbers, and flagged
+repositories for importing the DB (which they must). Now the same suffix pattern as `boundary-guard.sh`,
+honouring `shipright-ignore`, verified against a fixture: `'../payments'` and `'../payments/index'` pass,
+`'../payments/payment.service'` fails. A first draft of this fix false-positived on intra-module
+sub-folders — caught in review; a guard that false-positives gets disabled (`enforcement.md`).
+
+### Smaller
+- Restored the `## [1.24.1]` heading, lost when v1.25 was written above it.
+- `code-health.md` had two H1s; `debug-intermittent.md` still used Branch C's retired `[B][C][D]` labels
+  and had one untranslated line; `resilience.md` said sagas were out of scope while `error-handling.md`
+  covers them (only orchestration *at scale* is out); Branch E's `-A7` vs the core's `-A5` documented as
+  deliberate (whole block vs. up to `Last shipped`), so nobody "fixes" it.
+
+### Noted, not changed
+`composition-patterns` (rejected in v1.21 for an empty description) now ships as
+`vercel-composition-patterns` with a real one. Worth re-evaluating on its own merits — not in a
+consistency pass.
+
 ## [1.25.0] — 2026-08 — The outcome loop: shipright could tell you the code was right, never that it mattered
 A product-management audit of shipright, against Cagan (the four risks), Perri (build trap), Torres
 (riskiest assumption) and Rumelt (diagnosis before policy). The finding was structural, not cosmetic.
@@ -115,6 +165,8 @@ weekly interviews — the reasoning chain is kept, the diagram isn't), the Amazo
 standing ritual (Branch A's "the risk I see" plus the riskiest-assumption question already are one, at
 the moment it's useful). Recorded in `product-judgment.md` §6 so none of it gets re-proposed. And no
 new master roster — what was missing was a **loop and a gate**, not more frameworks.
+
+## [1.24.1] — 2026-07 — Two runtime bugs found by actually using it
 Both caught in a real session, not by review — and both in the working-context block that every session
 depends on. The first crashed the skill outright; the second had been silently reporting every correctly
 installed skill as missing since v1.20.

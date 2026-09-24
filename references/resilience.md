@@ -203,7 +203,9 @@ Steady state: [resource] capped by [rotation/TTL/eviction/LIMIT].
 
 ```
 ✗ Distributed consensus / quorum (Raft, Paxos) — specialized, consult an expert.
-✗ Saga / distributed transaction orchestration — needs dedicated study + tooling.
+✗ Saga ORCHESTRATION at scale (workflow engines, durable execution, cross-service compensation
+  infrastructure) — needs dedicated study + tooling. The basic saga shape (compensating actions in
+  code) IS covered: references/error-handling.md §Saga Pattern.
 ✗ Multi-region failover, chaos engineering platforms (Gremlin) — SRE org practice.
 ✗ Service mesh retry/circuit config (Istio/Linkerd) — infrastructure, not app code.
 ```

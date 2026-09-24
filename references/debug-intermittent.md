@@ -1,15 +1,16 @@
 # Debug: Intermittent & Production-Only Bugs
 
-For bugs that don't reproduce consistently. Loaded from Branch C (c-fix-bug.md) for cases [B][C][D].
+For bugs that don't reproduce consistently. Loaded from Branch C (c-fix-bug.md) Step 0 when the bug is
+intermittent, production-only, or grows over time (a resource leak) — pick the matching section below.
 
 ---
 
-## Type [B] — Intermittent (happens sometimes, unknown trigger)
+## Intermittent (happens sometimes, unknown trigger)
 
 ### Step 1 — Add structured logging, don't guess
 
 ```
-Thêm log context tại mọi entry point liên quan:
+Add log context at every relevant entry point:
   logger.info({ userId, input, timestamp, requestId }, 'operation started')
   logger.info({ result, duration }, 'operation completed')
   logger.error({ error, context }, 'operation failed')
@@ -64,7 +65,7 @@ async function processItem(id: string) {
 
 ---
 
-## Type [C] — Production-only bugs
+## Production-only bugs
 
 ### Likely causes (check in order)
 
@@ -107,7 +108,7 @@ Read traces → find exact execution path that led to error.
 
 ---
 
-## Type [D] — Resource leak (memory growth, connection leak)
+## Resource leak (memory growth, connection leak)
 
 ### Step 1 — Confirm it's actually a leak
 

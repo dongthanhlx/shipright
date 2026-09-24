@@ -150,6 +150,19 @@ has no such side effect: nothing about a green test suite reports on it, so unle
 explicitly, it is never asked at all, and its absence produces no error. Every other verdict in this
 file describes a trigger that failed to fire. This one describes a question that was never in the file.
 
+### Consistency pass (v1.25.1) — the old failure modes, recurring in files nobody re-read
+
+| # | Situation | Before | Verdict → fix |
+|---|---|---|---|
+| 45 | full-stack product UI, dispatched from the registry | `full-stack-web` named `minimalist-skill` — the folder name, which `--skill` rejects. v1.20 fixed every other occurrence | **BROKEN-TARGET → fixed v1.25.1** (`minimalist-ui`) |
+| 46 | "Core Web Vitals are bad" | `performance.md` handed off to `agent-skills:webperf` / web-performance-auditor — absent from every repo's `--list` | **BROKEN-TARGET → fixed v1.25.1** (measure first, then `vercel-react-best-practices` / `vercel-optimize`, both verified) |
+| 47 | Branch B Tier M+ merge gate | the core and v1.24 said the gate closes with `/security-review` + asking for `/code-review`; Branch B — where most merges happen — mentioned neither | **BUNDLED-IGNORED → fixed v1.25.1** (Step 5 "Close the gate") |
+| 48 | Branch B/C/D dispatch on an installed skill | branches still read `skill/tdd`, `skill/review`, `skill/taste` — probes v1.23 collapsed into `skill/core` / `skill/ui`. Nothing emits those names any more, so every condition read as absent | **STALE-SNAPSHOT (by name) → fixed v1.25.1** |
+
+Row 48 is the v1.23 slim's own leftover: the probes were renamed in the core and never in the files that
+branch on them. **When you rename a probe, grep for its old name across every ref** — the same lesson
+as v1.20's install names, one level up.
+
 ### Finding (v1.20) — the trigger can be perfect and still dead-end
 
 v1.17's lesson was *retrieval + timing*. v1.20 adds: **the target must exist**. shipright's UI dispatch

@@ -86,7 +86,7 @@ my-extension/
 
 ---
 
-## Extension boundary rules (adapted from shipright's 4 rules)
+## Extension boundary rules (adapted from shipright's boundaries 1–4)
 
 ```
 Rule 1: Content script NEVER calls external APIs directly

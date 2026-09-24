@@ -355,8 +355,13 @@ Action: refactoring session (Branch D) — characterization tests first, always
 
 ```bash
 # Boundary checks (Shipright original)
-grep -r "shared/db" src/modules/ && exit 1      # Boundary Rule 1
-grep -r "from.*modules/.*/(?!index)" src/ && exit 1  # Boundary Rule 2
+grep -rn "shared/db" src/modules/ --include='*.service.ts' | grep -v shipright-ignore && exit 1  # Boundary 2
+grep -rEn "from ['\"]\.\./[^'\"]*\.(service|repository|controller|store|gateway|usecase)['\"]" src/modules/ \
+  | grep -v shipright-ignore && exit 1          # Boundary 1: deep import into another module's internals
+# Same pattern as hooks/boundary-guard.sh: key on internal-file suffixes so '../payments' and
+# '../payments/index' pass. grep can't do lookahead, so this is a tripwire, not the full rule — for that
+# use dependency-cruiser / import-linter (scaling-guide.md Stage 1). If a module has sub-folders that
+# import each other's .repository/.service, mark those lines `shipright-ignore`, as with the hook.
 npx tsc --noEmit                                # Type safety
 
 # SOLID + Clean Code checks

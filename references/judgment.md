@@ -220,8 +220,10 @@ TDD test-first      → break it for a genuine spike/exploration where you don't
                        shape. Spike to learn → THROW IT AWAY → re-do test-first. Never ship
                        the spike. (Never break test-first for code with side effects/money.)
 
-4 boundaries        → essentially never. If you think you must, you've found a missing module,
+The 5 boundaries    → essentially never. If you think you must, you've found a missing module,
                        not a reason to break the rule. The cost of breaking compounds silently.
+                       (Boundary 5's DEPTH is dialled by phase — timeout + idempotency on day one,
+                       circuit breakers on signal — but the timeout itself is never skipped.)
 
 Layered architecture → skip it entirely for the "not appropriate" cases below.
 

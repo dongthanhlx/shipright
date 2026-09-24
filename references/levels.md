@@ -272,7 +272,7 @@ Ask first:
   - Or is it tech diversity? (one module needs different language/runtime)
 
 Most teams that "need microservices" actually need:
-  - Better module boundaries (shipright's 3 rules)
+  - Better module boundaries (shipright's 5 boundaries)
   - Better team ownership (signal above)
   - Better deployment automation
 

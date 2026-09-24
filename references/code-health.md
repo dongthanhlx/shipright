@@ -1,10 +1,9 @@
-# Code Health — SOLID + TDD Tactical Enforcement
+# Code Health — SOLID + Ousterhout Tactical Enforcement
 
 > **Kent Beck (TDD):** Write the failing test FIRST. Code exists to make tests pass.
 > "Red → Green → Refactor" — never skip Red.
 > Shipright enforces this at L1 (skeleton test), L2 (interface contracts), L3 (per feature).
-
-# Code Health — SOLID Tactical Enforcement
+> Test strategy (what to test, where to mock): `references/testing.md`.
 
 > **Relationship to code-quality.md:**
 > `code-quality.md` = strategic: Evans + Uncle Bob + Fowler as unified system
