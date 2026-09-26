@@ -38,6 +38,8 @@ the default heuristic (a payment MVP needs security on day one; a read-only Grow
 | A one-way door was just decided / a public API changed | `documentation-and-adrs` (shipright decides WHAT is irreversible; the skill records it properly) | addyosmani |
 | Removing/sunsetting an old API, migrating users off an implementation | `deprecation-and-migration` | addyosmani + references/requirement-drift.md |
 | A fitness function / arch test must actually run on every commit | `ci-cd-and-automation` | addyosmani + references/evolutionary-architecture.md |
+| Building / packaging a desktop app (Qt/Tk window, .exe, installer, auto-update) | (shipright built-in) | references/stacks/python-desktop.md |
+| Driving many accounts / browser sessions from one PC | (shipright built-in) — official API first; automation only as a fallback, raised as viability | references/stacks/python-desktop.md §Multi-account + references/product-judgment.md §1 |
 | RAG retrieval/prompt change to evaluate | RAGAS | `pip install ragas` |
 | Agent trajectory to evaluate | DeepEval / Confident-AI | — |
 | LLM tracing needed | LangSmith / Arize Phoenix | — |
@@ -389,6 +391,43 @@ shipright-adds-to-CLAUDE:
   debt-signals:
     - "TODO[commands>10]: extract command registry pattern"
     - "TODO[shared-logic>3-commands]: extract shared service"
+```
+
+---
+
+## desktop-app
+Windows desktop application in Python (PySide6/Qt by default) — local tools, multi-account managers,
+anything whose job needs the machine: local files, a local browser, offline, per-machine state.
+
+```
+install:
+  required:
+    - addyosmani/agent-skills
+      skills: [incremental-implementation, test-driven-development]
+  when-secrets-or-accounts:
+    - addyosmani/agent-skills
+      skills: [security-and-hardening]      # plus /security-review (bundled) on every such diff
+  libraries (decide at L0, record the licence):
+    - PySide6 (LGPLv3)  — default. PyQt6 is GPL/commercial: a licence one-way door for closed source.
+    - pytest-qt, keyring / pywin32 (DPAPI), cryptography, Nuitka (or PyInstaller --onedir), tufup
+    - playwright — ONLY if no official API covers the job (stacks/python-desktop.md §Multi-account)
+
+tested-with: Python 3.12–3.13, PySide6 6.x, Nuitka 2.x, Playwright 1.x
+load: references/stacks/python.md (the language) AND references/stacks/python-desktop.md (GUI thread,
+      data locations, DPAPI secrets, supervision, packaging, signing). A desktop app with a UI owes the
+      experience floor too → references/ui-design.md (a11y, keyboard, states; judgment.md §5b).
+
+shipright-adds-to-CLAUDE:
+  gui-thread: "The GUI thread never blocks (> ~16 ms → worker). Workers never touch widgets; signals only."
+  ui-boundary: "ui/ is the handler layer. Services/repositories never import PySide6."
+  data: "All runtime data under %LOCALAPPDATA%\\<Vendor>\\<App> via QStandardPaths. Never the install dir."
+  secrets: "Envelope-encrypted; key via DPAPI/keyring. No plaintext secret on disk, in logs, or in QSettings."
+  isolation: "One isolated session per account. One account's failure pauses that account only."
+  ship: "Nuitka standalone + signed exe/installer + TUF-verified updates. CI launches the frozen build."
+  debt-signals:
+    - "TODO[freeze>100ms]: profile the GUI thread"
+    - "TODO[first-external-user]: code signing + signed auto-update"
+    - "TODO[rss-grows-daily]: release pages/contexts/signals"
 ```
 
 ---

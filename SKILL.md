@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 1.25.1
+version: 1.26.0
 description: >
   Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
   sets up constitution, enforces boundaries, judges what to build now vs defer,
@@ -10,7 +10,8 @@ description: >
   adding observability/tracing/resilience, scaling, building AI/RAG/chatbot projects,
   AND deciding WHETHER to build something / what to build next / whether what shipped worked,
   AND designing or redesigning ANY user-facing surface (page, landing, dashboard, admin,
-  form, flow, mobile/responsive layout) — shipright carries the UI/UX floor and design brief.
+  form, flow, mobile/responsive layout) — shipright carries the UI/UX floor and design brief,
+  AND desktop apps (Windows, Python/Qt, many accounts on one PC).
   Triggers: "build", "start project", "add feature", "bug", "refactor",
   "production down", "back on this", "integrate API", "add tracing", "make it resilient",
   "scale this", "build chatbot",
@@ -18,7 +19,7 @@ description: >
   "nobody uses it", "is this feature worth it", "prioritize",
   "design a page/screen/UI", "landing page", "dashboard", "admin panel", "frontend",
   "redesign", "make it look better", "improve the UI/UX", "responsive", "mobile layout",
-  "accessibility".
+  "accessibility", "desktop app", "Windows app", "PySide6", "multi-account".
   Skip for: single-line fixes, knowledge questions, mid-implementation steps.
   Manual invoke: /shipright — always reliable.
 allowed-tools: Read, Write, Bash, Glob, Grep
@@ -54,7 +55,7 @@ Tests:         !`if [ -f package.json ] && grep -q '"test":' package.json; then 
 
 ---
 
-# Shipright v1.25 — Project Brain OS
+# Shipright v1.26 — Project Brain OS
 
 An executive layer over two hemispheres. The executive decides how much of each hemisphere to
 apply, by stage × risk × reversibility (construction is ON from day one — the irreversible quadrant;
@@ -367,6 +368,7 @@ them here: when the thought below crosses your mind while building, load the ref
 | "The requirements changed under us mid-build" | `references/requirement-drift.md` (expand → migrate → contract). Removing the old path / moving users off it is the contract phase → `deprecation-and-migration` |
 | "I just decided a ONE-WAY door (public interface, data identity, money, persisted state)" | Record it before it becomes folklore — shipright decides *what* is irreversible, `documentation-and-adrs` records it properly (ARCHITECTURE.md / ADR). An unrecorded one-way door gets re-litigated by the next session. |
 | "We're exposing tools/data to an AI host (MCP server/client)" | `references/stacks/mcp.md` (lethal-trifecta boundary) |
+| "This runs as a desktop app on the user's PC" — a window, an .exe, an installer, or many accounts/browser sessions on one machine | `references/stacks/python-desktop.md` (GUI thread never blocks · DPAPI secrets · supervised workers · signed build). Many accounts on a third-party platform → official API first; UI automation is a viability question (`product-judgment.md` §1), and evasion (anti-detect, captcha bypass) is out of scope. |
 | "This module got too big for one person to hold in their head" | `references/team-scale.md` (cognitive load → split) |
 | "I keep threading the same 3 fields / a string stands in for a domain concept" | `references/code-quality.md` (smells → extract) |
 | "I'm about to write / touch a user-facing surface — a page, screen, form, table, dashboard" | `references/ui-design.md` — the EXPERIENCE floor is not optional and not an afterthought: a11y + responsive/mobile + IA + the state-floor (loading / empty / error / success are *designed*). Then dispatch execution (taste-skill / vercel-labs / dataviz). |
@@ -452,7 +454,8 @@ as real code) · `enforcement.md` (the blocking hook) · `l0-templates.md` · `l
 
 **Stacks** — `stacks/`: `nodejs.md` · `python.md` · `go.md` (`internal/`, context timeouts) · `php.md`
 (PHPStan, Deptrac, footguns) · `browser-extension.md` · `ai-projects.md` (the LLM boundary) · `ai-rag.md` ·
-`mcp.md` (lethal trifecta) · `ai-agent.md` · `chatbot-platforms.md` · `blockchain.md`.
+`mcp.md` (lethal trifecta) · `ai-agent.md` · `chatbot-platforms.md` · `blockchain.md` ·
+`python-desktop.md` (Windows GUI apps: GUI thread, DPAPI secrets, packaging, multi-account).
 
 **Passive** — `prompts.md` (copy-paste prompts; pulled by hand, deliberately has no trigger) ·
 `examples/` orders-api-CLAUDE.md · orders-api-ARCHITECTURE.md.`

@@ -67,6 +67,11 @@ Contrast ≥ 4.5:1; every interactive element keyboard-reachable with a visible 
 the ONLY signal; semantic HTML (real `<button>` / `<label>`), alt text, form labels. Treat an a11y
 regression like a red test.
 
+**Desktop apps owe the same floor, in native terms:** full keyboard operation with a logical tab order,
+accessible names on every control (Qt `setAccessibleName` — Narrator reads them), crisp at 150–200%
+Windows scaling (high-DPI), and a window that never freezes — a blocked GUI thread is the desktop's
+missing loading state. Platform mechanics: `references/stacks/python-desktop.md`.
+
 **The UX floor every screen owes (beyond the happy path).** Loading, empty, error, and success states are
 *designed*, not afterthoughts. Destructive actions confirm. Forms validate inline with recoverable
 messages. This is where "UX" (not just "UI") lives — and exactly what landing-page skills stay silent on.

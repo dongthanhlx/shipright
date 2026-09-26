@@ -121,6 +121,10 @@ What's in scope — INFER from what you learned, and state it as an assumption t
     legally be held. It rarely kills the idea; it changes the shape, and it is cheapest to change
     before the Adapter exists. references/product-judgment.md §1.
   • AI/LLM implied? → load the matching registry entry (rag-pipeline / chatbot / ai-agent).
+  • Runs on the user's own PC (a Windows app, an .exe, "manage N accounts from one machine")? → registry
+    `desktop-app` + references/stacks/python-desktop.md. If it drives a third-party platform, ask FIRST
+    whether an official API covers the job — automating someone else's UI is a viability question
+    (ToS, breakage, suspended accounts), references/product-judgment.md §1.
   • Auth / payments / PII / untrusted input surfaced? → "This handles [X], so I'll run the L0
     threat model (Shostack's 4 questions, references/security.md) and activate security-and-hardening.
     Insecure Design is cheapest to fix now." (Triggered by what you learned — not a cold quiz.)
@@ -158,8 +162,8 @@ Ready to generate CLAUDE.md and ARCHITECTURE.md?
 
 ```
 Identify project type from references/registry.md:
-  web-api | rag-pipeline | chatbot-telegram-discord |
-  browser-extension | ai-agent | full-stack-web | cli-tool
+  web-api | rag-pipeline | chatbot-telegram-discord | browser-extension |
+  ai-agent | mcp-server | full-stack-web | desktop-app | cli-tool | blockchain-dapp
 
 Load that entry only. Note:
   - Required skills to install

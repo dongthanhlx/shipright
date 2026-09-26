@@ -1,5 +1,67 @@
 # Changelog
 
+## [1.26.0] — 2026-09 — Windows desktop apps in Python: a whole project shape with no home
+Prompted by a concrete ask — *"a Python app to manage many TikTok accounts on one PC"*. Tracing it
+through shipright the v1.17 way found it DARK end to end: no registry type, no stack file, no description
+vocabulary. shipright would wake on "build", then route a desktop app through web-api defaults — no rule
+about the GUI thread, secrets in a `.env` beside the exe, nothing about packaging, signing or updates. And
+nothing at all about the question that decides whether such a product survives: is automating someone
+else's platform permitted?
+
+### Added — `references/stacks/python-desktop.md`
+Grounded in the masters for each concern, not in a framework tutorial:
+- **The Qt threading contract** (Qt Project, *Threads and QObjects*; Fitzpatrick; Summerfield): the GUI
+  thread never waits, workers never touch widgets, results return via signals. Framed as Boundary 5 inside
+  the process — the GUI thread is an integration point with a human, and its timeout is one frame.
+- **Concurrency chosen by what the work waits on** (Beazley): asyncio for many I/O waits (QtAsyncio or
+  qasync, one loop), a thread pool for a few blocking calls, processes for CPU and for crash isolation.
+  Free-threaded 3.14 noted as supported-but-not-default, with the silent-GIL caveat — measure, don't assume.
+- **Framework as a door**: PySide6 (LGPL) by default; PyQt6's GPL/commercial licence is a *licence*
+  one-way door for closed source, so it's decided at L0, not at release.
+- **Data on the user's machine** (Microsoft Learn, Raymond Chen): %LOCALAPPDATA% via QStandardPaths, never
+  the install dir; SQLite WAL, one writer, a connection per thread, migrations from release one.
+- **Security where the trust boundary is the user's PC**: envelope encryption with the key under DPAPI /
+  keyring — *and a plain statement that this does not stop malware running as the same user*; OAuth
+  refresh tokens over passwords; signed exe + installer (Azure Artifact Signing, formerly Trusted
+  Signing, or OV/EV); TUF-verified updates (tufup); per-user, un-elevated install; DLL planting; log redaction.
+- **Resilience for a process that runs for days** (Armstrong's supervision + Nygard's bulkheads):
+  capped restarts, per-unit bulkheads, Windows Job Objects so browsers die with the app, graceful
+  shutdown, crash capture for worker threads, idempotent jobs.
+- **Performance, measure first**: `-X importtime`, virtualised model/view tables, coalesced UI updates,
+  and the browser cost model — a *process* is expensive, a *context* is cheap; size concurrency from
+  measured memory.
+- **Packaging**: Nuitka standalone (compiled, faster start, far fewer AV false positives), PyInstaller
+  `--onedir` for internal tools, never `--onefile` (unpacks to %TEMP% every launch — exactly what AV
+  heuristics flag). CI launches the *frozen* build, because missing hidden imports only exist there.
+
+### Added — multi-account apps, with the product question first
+- **Official API before automation.** Where the platform has one (TikTok for Developers — Content Posting
+  API, Login Kit), each account authorises the app via OAuth and gets its own tokens; that is a normal
+  Adapter under third-party-apis.md Layer 1. UI automation is a fallback, raised as a **viability**
+  question (`product-judgment.md` §1): what happens when the page changes, or the accounts are suspended?
+- **The domain model**: Account aggregate keyed by your own UUID (never the handle), a status machine with
+  **NEEDS_ATTENTION as a human-in-the-loop state** — a verification prompt stops that account and waits
+  for the person; retrying a challenge is how accounts get locked. Jobs with idempotency keys.
+- **Isolation**: one session per account, a bounded pool, per-account rate budgets and bulkheads.
+- **Stated boundary**: fingerprint spoofing / anti-detect browsers, captcha or verification bypass, ban or
+  rate-limit evasion, mass account creation, fake engagement — out of scope, with the reason given (terms,
+  legal exposure, an arms race the product loses), and the permitted path offered instead. Retry jitter
+  stays (it's resilience); randomising activity to look human is named as evasion.
+
+### Wired to fire (the ref is not done until something reaches it)
+Description vocabulary ("desktop app", "Windows app", "PySide6", "multi-account" — kept to ~1.5k chars so the tail isn't truncated in the skill listing), a Mid-work row
+in the always-loaded core, registry trigger-index rows + a `desktop-app` entry with `load:` lines, Branch A
+scope inference (with the official-API question up front), a pointer from `python.md`, a desktop row in
+`judgment.md` §5b (both floors in one process), the desktop experience floor in `ui-design.md`, and a line
+in `security.md` §5. Branch A's project-type list also gained the `mcp-server` and `blockchain-dapp`
+entries it had been missing. EVALS rows 49–53, written after the grep.
+
+### Deliberately NOT added
+A separate "browser automation" stack file (it lives inside the multi-account section — on its own it
+invites building on automation first); Electron/Tauri (not Python, and not this shape); a GUI component
+library or theming system (scope, not floor — ui-design.md); anything that helps an account look like
+something it isn't.
+
 ## [1.25.1] — 2026-09 — Consistency pass: renamed probes, dead targets, and a gate Branch B never closed
 A full read of every live file against the core. No new ideas — every fix brings a ref back in line with
 what SKILL.md already says. Two of them are the repo's own documented failure modes, recurring.

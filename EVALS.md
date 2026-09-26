@@ -163,6 +163,20 @@ Row 48 is the v1.23 slim's own leftover: the probes were renamed in the core and
 branch on them. **When you rename a probe, grep for its old name across every ref** — the same lesson
 as v1.20's install names, one level up.
 
+### Desktop scenarios (v1.26) — a whole project shape with no home
+
+| # | Situation | Before | Verdict → fix |
+|---|---|---|---|
+| 49 | "build a Windows app in Python to manage 10 TikTok accounts" | no registry type, no stack file, no description vocabulary — shipright woke only on "build", then routed a desktop app through web-api defaults (no GUI thread rule, secrets in `.env`, no packaging or signing) | **DARK → fixed v1.26.** Description + Mid-work row + registry `desktop-app` + Branch A scope bullet → `stacks/python-desktop.md` |
+| 50 | "the window freezes when I click Start" (existing project, Branch C/B) | nothing named the GUI-thread rule anywhere | **DARK → fixed v1.26.** Mid-work row (always loaded) + `python.md` pointer → §GUI thread |
+| 51 | "store each account's login so it stays signed in" | secrets guidance was server-shaped (vault/env); nothing for a secret that must live on the user's disk | **DARK → fixed v1.26.** §Security: DPAPI/keyring envelope, prefer OAuth refresh tokens, honest limits; `security.md` §5 line |
+| 52 | "automate posting because there's no button for it" | no viability gate on automating a third-party UI; evasion requests had no stated boundary | **NO-GATE → fixed v1.26.** Official-API-first fork → `product-judgment.md` §1; NEEDS_ATTENTION as a human-in-the-loop state; evasion listed as out of scope with the reason |
+| 53 | "ship it to the client as an exe" | no packaging, signing or update guidance — onefile + unsigned was the silent default | **DARK → fixed v1.26.** §Packaging: Nuitka standalone, signed exe + installer, TUF-verified updates, CI launches the frozen build |
+
+Verified by grep before writing these rows: `python-desktop.md` is referenced from SKILL.md (description
+vocabulary + Mid-work row + map), registry (trigger index + entry), Branch A, `python.md`, `judgment.md`
+§5b, `ui-design.md` and `security.md`.
+
 ### Finding (v1.20) — the trigger can be perfect and still dead-end
 
 v1.17's lesson was *retrieval + timing*. v1.20 adds: **the target must exist**. shipright's UI dispatch

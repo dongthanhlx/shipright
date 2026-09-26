@@ -1,5 +1,9 @@
 # Stack Reference: Python (FastAPI recommended — see Framework)
 
+> Building a **desktop GUI app** (PySide6/Tkinter, an .exe for Windows)? Load
+> `references/stacks/python-desktop.md` as well — the GUI thread, on-disk secrets, packaging and
+> signing are specific to a long-running process on the user's machine.
+
 ## Mapping: generic → Python specific
 ```
 public boundary file    → __init__.py (explicit exports with __all__)
