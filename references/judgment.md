@@ -272,7 +272,7 @@ Static / marketing / landing / brochure→ Experience floor IS the job. The back
 Desktop app (window on the user's PC)  → BOTH floors in one process: the services/adapters get the 5
                                          boundaries, the window gets the experience floor (keyboard, focus,
                                          states, high-DPI) — and the GUI thread never blocks, which is where
-                                         the two meet (references/stacks/python-desktop.md).
+                                         the two meet (references/desktop.md).
 Full-stack product (SaaS, marketplace) → BOTH floors, integrated. The API gets the 5 boundaries; the UI
                                          gets the experience floor; the API contract is the seam where they
                                          meet. Neither is a bolt-on to the other.

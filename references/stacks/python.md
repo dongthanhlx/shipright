@@ -1,8 +1,7 @@
 # Stack Reference: Python (FastAPI recommended — see Framework)
 
-> Building a **desktop GUI app** (PySide6/Tkinter, an .exe for Windows)? Load
-> `references/stacks/python-desktop.md` as well — the GUI thread, on-disk secrets, packaging and
-> signing are specific to a long-running process on the user's machine.
+> Building a **desktop GUI app** (PySide6/Tkinter, an .exe)? Load `references/desktop.md` (the rules for
+> any desktop app) and `references/stacks/python-desktop.md` (where they land in Python).
 
 ## Mapping: generic → Python specific
 ```

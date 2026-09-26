@@ -11,7 +11,7 @@ description: >
   AND deciding WHETHER to build something / what to build next / whether what shipped worked,
   AND designing or redesigning ANY user-facing surface (page, landing, dashboard, admin,
   form, flow, mobile/responsive layout) — shipright carries the UI/UX floor and design brief,
-  AND desktop apps (Windows, Python/Qt, many accounts on one PC).
+  AND desktop/PC apps in any stack.
   Triggers: "build", "start project", "add feature", "bug", "refactor",
   "production down", "back on this", "integrate API", "add tracing", "make it resilient",
   "scale this", "build chatbot",
@@ -19,7 +19,7 @@ description: >
   "nobody uses it", "is this feature worth it", "prioritize",
   "design a page/screen/UI", "landing page", "dashboard", "admin panel", "frontend",
   "redesign", "make it look better", "improve the UI/UX", "responsive", "mobile layout",
-  "accessibility", "desktop app", "Windows app", "PySide6", "multi-account".
+  "accessibility", "desktop app", "Windows app", "Electron", "Tauri", "WPF", "multi-account".
   Skip for: single-line fixes, knowledge questions, mid-implementation steps.
   Manual invoke: /shipright — always reliable.
 allowed-tools: Read, Write, Bash, Glob, Grep
@@ -368,7 +368,7 @@ them here: when the thought below crosses your mind while building, load the ref
 | "The requirements changed under us mid-build" | `references/requirement-drift.md` (expand → migrate → contract). Removing the old path / moving users off it is the contract phase → `deprecation-and-migration` |
 | "I just decided a ONE-WAY door (public interface, data identity, money, persisted state)" | Record it before it becomes folklore — shipright decides *what* is irreversible, `documentation-and-adrs` records it properly (ARCHITECTURE.md / ADR). An unrecorded one-way door gets re-litigated by the next session. |
 | "We're exposing tools/data to an AI host (MCP server/client)" | `references/stacks/mcp.md` (lethal-trifecta boundary) |
-| "This runs as a desktop app on the user's PC" — a window, an .exe, an installer, or many accounts/browser sessions on one machine | `references/stacks/python-desktop.md` (GUI thread never blocks · DPAPI secrets · supervised workers · signed build). Many accounts on a third-party platform → official API first; UI automation is a viability question (`product-judgment.md` §1), and evasion (anti-detect, captcha bypass) is out of scope. |
+| "This runs as a desktop app on the user's PC" — a window, an .exe, an installer, or many accounts/browser sessions on one machine | `references/desktop.md` — any stack: choose it at L0 by team skill (a rewrite to change) · the UI thread never blocks · risky work in supervised processes · OS secret store · signed build + verified updates. Then the stack file (e.g. `stacks/python-desktop.md`). Many accounts on a third-party platform → official API first; UI automation is a viability question (`product-judgment.md` §1), and evasion (anti-detect, captcha bypass) is out of scope. |
 | "This module got too big for one person to hold in their head" | `references/team-scale.md` (cognitive load → split) |
 | "I keep threading the same 3 fields / a string stands in for a domain concept" | `references/code-quality.md` (smells → extract) |
 | "I'm about to write / touch a user-facing surface — a page, screen, form, table, dashboard" | `references/ui-design.md` — the EXPERIENCE floor is not optional and not an afterthought: a11y + responsive/mobile + IA + the state-floor (loading / empty / error / success are *designed*). Then dispatch execution (taste-skill / vercel-labs / dataviz). |
@@ -450,12 +450,13 @@ as real code) · `enforcement.md` (the blocking hook) · `l0-templates.md` · `l
 `requirement-drift.md` (expand → migrate → contract) · `team-scale.md` (boundary = team API) ·
 `third-party-apis.md` (Adapter + 3-layer testing).
 
-**Experience** — `ui-design.md` (the UI/UX floor + judgment hemisphere, then dispatch by page type).
+**Experience & platform** — `ui-design.md` (the UI/UX floor + judgment hemisphere, then dispatch by page type) ·
+`desktop.md` (PC apps in any stack: choosing it, UI thread, process model, secrets, signing, updates, multi-account).
 
 **Stacks** — `stacks/`: `nodejs.md` · `python.md` · `go.md` (`internal/`, context timeouts) · `php.md`
 (PHPStan, Deptrac, footguns) · `browser-extension.md` · `ai-projects.md` (the LLM boundary) · `ai-rag.md` ·
 `mcp.md` (lethal trifecta) · `ai-agent.md` · `chatbot-platforms.md` · `blockchain.md` ·
-`python-desktop.md` (Windows GUI apps: GUI thread, DPAPI secrets, packaging, multi-account).
+`python-desktop.md` (Python/PySide6 mechanics — the rules live in `desktop.md`).
 
 **Passive** — `prompts.md` (copy-paste prompts; pulled by hand, deliberately has no trigger) ·
 `examples/` orders-api-CLAUDE.md · orders-api-ARCHITECTURE.md.`

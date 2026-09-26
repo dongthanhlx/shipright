@@ -167,15 +167,23 @@ as v1.20's install names, one level up.
 
 | # | Situation | Before | Verdict → fix |
 |---|---|---|---|
-| 49 | "build a Windows app in Python to manage 10 TikTok accounts" | no registry type, no stack file, no description vocabulary — shipright woke only on "build", then routed a desktop app through web-api defaults (no GUI thread rule, secrets in `.env`, no packaging or signing) | **DARK → fixed v1.26.** Description + Mid-work row + registry `desktop-app` + Branch A scope bullet → `stacks/python-desktop.md` |
-| 50 | "the window freezes when I click Start" (existing project, Branch C/B) | nothing named the GUI-thread rule anywhere | **DARK → fixed v1.26.** Mid-work row (always loaded) + `python.md` pointer → §GUI thread |
-| 51 | "store each account's login so it stays signed in" | secrets guidance was server-shaped (vault/env); nothing for a secret that must live on the user's disk | **DARK → fixed v1.26.** §Security: DPAPI/keyring envelope, prefer OAuth refresh tokens, honest limits; `security.md` §5 line |
-| 52 | "automate posting because there's no button for it" | no viability gate on automating a third-party UI; evasion requests had no stated boundary | **NO-GATE → fixed v1.26.** Official-API-first fork → `product-judgment.md` §1; NEEDS_ATTENTION as a human-in-the-loop state; evasion listed as out of scope with the reason |
-| 53 | "ship it to the client as an exe" | no packaging, signing or update guidance — onefile + unsigned was the silent default | **DARK → fixed v1.26.** §Packaging: Nuitka standalone, signed exe + installer, TUF-verified updates, CI launches the frozen build |
+| 49 | "build a PC app to manage 10 TikTok accounts" | no registry type, no desktop ref, no description vocabulary — shipright woke only on "build" and routed a desktop app through web-api defaults (no UI-thread rule, secrets in `.env`, no packaging/signing/updates) | **DARK → fixed v1.26.** Description + Mid-work row + registry `desktop-app` + Branch A → `references/desktop.md` |
+| 50 | "which stack for our desktop app?" | nothing — the choice would default to whatever the model reached for first, though it's a rewrite to change | **DARK → fixed v1.26.** `desktop.md` §1: decided at L0, team skill first, then OS/UI/footprint; recorded as ADR-001 |
+| 51 | "the window freezes when I click Start" (existing project) | the UI-thread contract appeared nowhere | **DARK → fixed v1.26.** Mid-work row (always loaded) + `python.md` / `nodejs.md` pointers → `desktop.md` §2 |
+| 52 | "keep each account signed in" | secrets guidance was server-shaped (vault/env); nothing for secrets on the user's disk | **DARK → fixed v1.26.** `desktop.md` §4 (OS secret store + envelope, honest limits) + `security.md` §5 line |
+| 53 | "automate posting — there's no button for it" | no viability gate on automating a third-party UI; evasion requests had no stated boundary | **NO-GATE → fixed v1.26.** `desktop.md` §10: official API first → `product-judgment.md` §1; NEEDS_ATTENTION as a human-in-the-loop state; evasion out of scope with the reason |
+| 54 | "ship it to the client as an exe" | no packaging, signing or update guidance — unsigned, self-extracting, hand-rolled updates were the silent default | **DARK → fixed v1.26.** `desktop.md` §7 per stack + CI launches the packaged build |
 
-Verified by grep before writing these rows: `python-desktop.md` is referenced from SKILL.md (description
-vocabulary + Mid-work row + map), registry (trigger index + entry), Branch A, `python.md`, `judgment.md`
-§5b, `ui-design.md` and `security.md`.
+Verified by grep before writing these rows: `references/desktop.md` is reached from SKILL.md (description
+vocabulary, a Mid-work row, the map), registry (trigger rows + `desktop-app` entry), Branch A, `python.md`,
+`nodejs.md`, `judgment.md` §5b, `ui-design.md` and `security.md`; `python-desktop.md` from SKILL.md,
+registry, `desktop.md` and `python.md`.
+
+**A first draft of this release was Python-only** — a whole desktop stack file written as if the language
+were given. It wasn't: the user asked for desktop apps and gave one example that happened to be in Python.
+The fix was structural, the same shape as `judgment.md` vs the stack files: the *rules* live in a
+language-agnostic `desktop.md`, and each stack gets only its mechanics. Choosing the stack is itself the
+first desktop decision, so it cannot live inside one stack's file.
 
 ### Finding (v1.20) — the trigger can be perfect and still dead-end
 

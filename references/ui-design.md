@@ -70,7 +70,7 @@ regression like a red test.
 **Desktop apps owe the same floor, in native terms:** full keyboard operation with a logical tab order,
 accessible names on every control (Qt `setAccessibleName` — Narrator reads them), crisp at 150–200%
 Windows scaling (high-DPI), and a window that never freezes — a blocked GUI thread is the desktop's
-missing loading state. Platform mechanics: `references/stacks/python-desktop.md`.
+missing loading state. Platform rules: `references/desktop.md` §8.
 
 **The UX floor every screen owes (beyond the happy path).** Loading, empty, error, and success states are
 *designed*, not afterthoughts. Destructive actions confirm. Forms validate inline with recoverable

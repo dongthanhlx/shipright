@@ -2,6 +2,9 @@
 
 Use these concrete names when SKILL.md says generic terms.
 
+> Building a **desktop app with Electron** (or a Tauri app's web front end)? Load `references/desktop.md`
+> — the main/preload/renderer split, the Electron security baseline, signing and signed updates are there.
+
 ## Mapping: generic → Node.js specific
 ```
 public boundary file    → index.ts (barrel export)

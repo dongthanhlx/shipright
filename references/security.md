@@ -97,7 +97,7 @@ Python   — SQLAlchemy text(f"...{x}") / raw % SQL → SQLi (bind params). pick
 Go       — text/template for HTML → XSS (use html/template — it auto-escapes contextually).
            fmt.Sprintf into SQL → SQLi (use parameterized database/sql / sqlc). os/exec with a shell.
            Supply chain: govulncheck; go.sum committed; minimal-version selection.
-Desktop  — see python-desktop.md: secrets at rest on the user's disk (DPAPI/keyring envelope, and say
+Desktop  — see desktop.md §4: secrets at rest on the user's disk (OS secret store + envelope, and say
            honestly it doesn't stop same-user malware); unsigned exe/updates; running elevated; DLL
            planting from user-writable dirs; tokens and cookies leaking into support-bundle logs.
 Browser  — see browser-extension.md: content script trusts a hostile DOM; innerHTML XSS; chrome.storage
