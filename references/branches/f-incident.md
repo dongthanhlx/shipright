@@ -70,6 +70,10 @@ Never:
   □ Edit prod DB directly without backup
   □ Deploy a hotfix > 10 lines without staging verification
   □ Merge to main without at least one reviewer
+  □ Undo a bad deploy by resetting + force-pushing main — `git revert` the commit (a new commit, history
+    intact, reviewable). Rewriting shared history mid-incident loses the evidence you need for Step 5.
+  □ Push, merge or deploy on the agent's own initiative — pressure raises the stakes of every door;
+    each one is the user's explicit call (references/git.md Tier 3–4), stated in one line so it's fast.
 ```
 
 ---

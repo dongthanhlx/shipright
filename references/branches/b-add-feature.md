@@ -164,8 +164,8 @@ Full-stack feature (spans both)                      → BOTH, at their seam: de
 **Tier S — Trivial (1 file, < 30 min)**
 ```
 Does change affect business logic?
-  NO (config change, copy update, rename) → implement → commit
-  YES → write test first (RED) → implement → GREEN → commit
+  NO (config change, copy update, rename) → implement → commit (per the Git policy — git.md)
+  YES → write test first (RED) → implement → GREEN → commit (per the Git policy)
 
 No external skills needed for Tier S.
 Exception: bug → activate debugging-and-error-recovery if installed.
@@ -236,7 +236,7 @@ IMPLEMENT the pieces domain-first for convenience: repository → service → ha
 **New module:**
 ```
 1. Update ARCHITECTURE.md: module name, job, public API, forbidden deps
-2. Commit: "docs: add [module] to ARCHITECTURE.md"
+2. Commit (per the Git policy): "docs: add [module] to ARCHITECTURE.md" — structure before behaviour (Tidy First)
 3. Create module skeleton (index.ts + types.ts + stubs)
 4. L2: define interface + write RED tests
 5. L3: implement
@@ -305,6 +305,15 @@ worked. Before moving on, name the signal:
 ```
 "Shipped [feature]. What would tell us it actually helped: [signal]. I'll ask next session."
 ```
+
+**Getting it out — every step here is a git door (references/git.md):**
+```
+commit     at green, one logical change each, message in the repo's style  → Tier 1: per the Git policy
+push       the feature branch                                             → Tier 3: ask unless the policy grants it
+PR         small, self-reviewed, description = what · why · tested · risks → Tier 3: ask unless the policy grants it
+merge      into main                                                      → Tier 4: ALWAYS the user's explicit call
+```
+Ask with the evidence attached (the commit list, the target branch), and a "yes" covers that step only.
 
 Then update CLAUDE.md Shipright state:
 ```markdown

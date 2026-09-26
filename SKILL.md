@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 1.26.0
+version: 1.27.0
 description: >
   Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
   sets up constitution, enforces boundaries, judges what to build now vs defer,
@@ -11,14 +11,14 @@ description: >
   AND deciding WHETHER to build something / what to build next / whether what shipped worked,
   AND designing or redesigning ANY user-facing surface (page, landing, dashboard, admin,
   form, flow, mobile/responsive layout) — shipright carries the UI/UX floor and design brief,
-  AND desktop/PC apps (Electron, Python).
+  AND desktop/PC apps (Electron, Python), AND git (commit, push, PR, merge — when to ask first).
   Triggers: "build", "start project", "add feature", "bug", "refactor",
   "production down", "back on this", "integrate API", "add tracing", "make it resilient",
-  "scale this", "build chatbot",
+  "build chatbot",
   "should I build", "is this worth building", "what should I build next", "did it work",
-  "nobody uses it", "is this feature worth it", "prioritize",
+  "nobody uses it", "prioritize",
   "design a page/screen/UI", "landing page", "dashboard", "admin panel", "frontend",
-  "redesign", "make it look better", "improve the UI/UX", "responsive", "mobile layout",
+  "redesign", "make it look better", "improve the UI/UX", "responsive",
   "accessibility", "desktop app", "Windows app", "Electron", "PySide6", "multi-account".
   Skip for: single-line fixes, knowledge questions, mid-implementation steps.
   Manual invoke: /shipright — always reliable.
@@ -43,6 +43,9 @@ ARCHITECTURE:  !`test -f ARCHITECTURE.md && echo "EXISTS — read first" || echo
 # -A5, not -A3: the state block gained `Last shipped` (the pending outcome check). At -A3 it falls
 # off the end and the outcome loop never fires. Widen this if the block ever grows again.
 Project state: !`grep -A5 "## Shipright state" CLAUDE.md 2>/dev/null | tail -5 || echo "no state tracked"`
+# Consent for git lives in the project, not in the model's mood: read the recorded policy every session.
+Git policy:    !`grep -A7 "## Git policy" CLAUDE.md 2>/dev/null | tail -7 | grep . || echo "none recorded — propose commits; ask before push/PR/merge (references/git.md §2)"`
+Uncommitted:   !`git status --porcelain 2>/dev/null | wc -l | tr -d ' '` file(s) — never discard without asking (git.md Tier 2)
 # Granular skill detection — match the SKILL.md `name:` field, NOT a guessed path: `npx skills add`
 # (flat, by install name) and `git clone` (repo/skills/<name>/) produce different layouts, and a
 # path-shaped probe silently returns NO forever under the other one. Personal + project scope.
@@ -55,7 +58,7 @@ Tests:         !`if [ -f package.json ] && grep -q '"test":' package.json; then 
 
 ---
 
-# Shipright v1.26 — Project Brain OS
+# Shipright v1.27 — Project Brain OS
 
 An executive layer over two hemispheres. The executive decides how much of each hemisphere to
 apply, by stage × risk × reversibility (construction is ON from day one — the irreversible quadrant;
@@ -298,7 +301,8 @@ Enforced across the lifecycle; the detail lives in the refs (load on demand):
   lines? Feature Envy / Primitive Obsession? Full gate: `references/code-quality.md` + `code-health.md`.
   On Tier M+, close it with a real review, not a self-assessment: run `/security-review` if the change
   touched auth/payments/untrusted input, and ask the user to run `/code-review` (it is user-invoke-only).
-  Both are bundled — recommending an install here would be wrong.
+  Both are bundled — recommending an install here would be wrong. Committing, pushing and opening the PR
+  follow the Git policy and the consent ladder (`references/git.md`) — a passing gate is not consent.
 
 **Compound engineering**: a repeated mistake → a rule that prevents it. Durable architectural rule →
 CLAUDE.md / `.claude/rules/`; incidental learning (build cmd, debug insight) → Claude Code's native
@@ -369,6 +373,7 @@ them here: when the thought below crosses your mind while building, load the ref
 | "I just decided a ONE-WAY door (public interface, data identity, money, persisted state)" | Record it before it becomes folklore — shipright decides *what* is irreversible, `documentation-and-adrs` records it properly (ARCHITECTURE.md / ADR). An unrecorded one-way door gets re-litigated by the next session. |
 | "We're exposing tools/data to an AI host (MCP server/client)" | `references/stacks/mcp.md` (lethal-trifecta boundary) |
 | "This runs as a desktop app on the user's PC" — a window, an .exe, an installer, or many accounts/browser sessions on one machine | `references/desktop.md` — modern Node/Python only: Electron+TS by default, Python via PySide6 or a sidecar; choose the shape at L0 (a rewrite to change) · OPERATE (N live sessions in one window) vs ACT (the app acts via API) · the UI thread never blocks · risky work in supervised processes · OS secret store · signed build + verified updates. Mechanics: `stacks/electron.md` / `stacks/python-desktop.md`. Many accounts on a third-party platform → official API first; UI automation is a viability question (`product-judgment.md` §1), and evasion (anti-detect, captcha bypass) is out of scope. |
+| "I'm about to commit, push, open/merge a PR, tag a release, discard changes, rewrite history, or resolve a conflict" | `references/git.md` — the **consent ladder**: read-only = just do it · local + recoverable = per the project's Git policy · destroys uncommitted work = ALWAYS ask, with what would be lost · outward (push/PR/tag) = ask unless the policy grants it · shared history (merge to main, force-push) = ALWAYS explicit confirmation. A "yes" covers that action on that branch, not the next one. No policy recorded → offer to write `## Git policy` into CLAUDE.md once. |
 | "This module got too big for one person to hold in their head" | `references/team-scale.md` (cognitive load → split) |
 | "I keep threading the same 3 fields / a string stands in for a domain concept" | `references/code-quality.md` (smells → extract) |
 | "I'm about to write / touch a user-facing surface — a page, screen, form, table, dashboard" | `references/ui-design.md` — the EXPERIENCE floor is not optional and not an afterthought: a11y + responsive/mobile + IA + the state-floor (loading / empty / error / success are *designed*). Then dispatch execution (taste-skill / vercel-labs / dataviz). |
@@ -440,7 +445,8 @@ cheapest test, value fork, Rumelt) · `code-quality.md` (Fowler smells, Clean Co
 `code-health.md` (SOLID + Ousterhout deep modules) · `testing.md` (strategy: pyramid, test through the
 public interface, mock only at seams) · `domain-thinking.md` (Evans tactical: aggregates, invariants,
 "DDD or not?") · `error-handling.md` (taxonomy, Result, saga, idempotency) · `boundaries.md` (the 5 rules
-as real code) · `enforcement.md` (the blocking hook) · `l0-templates.md` · `levels.md` (lifecycle + gates).
+as real code) · `enforcement.md` (the blocking hook) · `l0-templates.md` · `levels.md` (lifecycle + gates) ·
+`git.md` (the consent ladder, Git policy, commits, branches, PRs, merges, recovery).
 
 **Operation** — `resilience.md` (Nygard, Boundary 5) · `observability.md` (Correlation ID, SLO) ·
 `performance.md` (measure-first ladder) · `scaling-guide.md` (Stage 1→2→3, Strangler Fig) ·

@@ -163,6 +163,16 @@ LOG_LEVEL               # default: info
 
 ---
 
+## Git policy
+Default branch: main — protected; never commit or push to it directly
+Commit:   auto on feature branches at green
+Push:     ask first
+PR:       auto-open as draft after the push is approved
+Merge:    always ask
+Strategy: squash · Style: Conventional Commits — type(scope): imperative summary
+
+---
+
 ## When to ask before doing
 - Changing any `index.ts` public exports (e.g. `IPaymentService` signature)
 - Adding a new npm dependency

@@ -38,6 +38,7 @@ the default heuristic (a payment MVP needs security on day one; a read-only Grow
 | A one-way door was just decided / a public API changed | `documentation-and-adrs` (shipright decides WHAT is irreversible; the skill records it properly) | addyosmani |
 | Removing/sunsetting an old API, migrating users off an implementation | `deprecation-and-migration` | addyosmani + references/requirement-drift.md |
 | A fitness function / arch test must actually run on every commit | `ci-cd-and-automation` | addyosmani + references/evolutionary-architecture.md |
+| About to commit / push / open or merge a PR / tag / discard changes / rewrite history / resolve a conflict | (shipright built-in: the consent ladder + the project's Git policy) — `git-workflow-and-versioning` may execute the mechanics if installed; it never decides when to ask | references/git.md |
 | Building / packaging a desktop (PC) app (Electron / Python) — choosing the shape, the window, .exe/installer, auto-update | (shipright built-in) | references/desktop.md (+ stacks/electron.md or stacks/python-desktop.md) |
 | Driving many accounts / browser sessions from one PC | (shipright built-in) — official API first; automation only as a fallback, raised as viability | references/desktop.md §10 + references/product-judgment.md §1 |
 | RAG retrieval/prompt change to evaluate | RAGAS | `pip install ragas` |
