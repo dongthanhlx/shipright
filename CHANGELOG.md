@@ -1,76 +1,67 @@
 # Changelog
 
-## [1.26.0] — 2026-09 — Desktop apps, any stack: a whole project shape with no home
-Prompted by a concrete ask — *"an app to manage many TikTok accounts on one PC"*. Traced through shipright
-the v1.17 way it was DARK end to end: no registry type, no desktop reference, no description vocabulary.
-shipright would wake on "build" and route a desktop app through web-api defaults — nothing about the UI
-thread, secrets in a `.env` beside the binary, nothing about packaging, signing or updates. Nothing about
-which stack to use, though changing it later is a rewrite. And nothing about the question that decides
+## [1.26.0] — 2026-09 — Desktop apps, built the way today's flagship apps are
+Prompted by a concrete ask — *"a TikTok Account Manager on a PC, 10–50–100 accounts in one interface"*.
+Traced through shipright the v1.17 way it was DARK end to end: no registry type, no desktop reference, no
+description vocabulary. shipright would wake on "build" and route a desktop app through web-api defaults —
+nothing about the UI thread, secrets in a `.env` beside the binary, nothing about packaging, signing or
+updates, nothing about which stack (a rewrite to change), and nothing about the question that decides
 whether such a product survives: is automating someone else's platform permitted?
 
-### Added — `references/desktop.md`, the rules for a desktop app in any language
-Grounded in the masters for each concern, not in one framework's tutorial:
-- **Choosing the stack** as an L0 one-way door: team skill first, then target OS, UI kind and footprint,
-  across WPF / WinUI 3 / Avalonia, Tauri 2, Electron, Qt (C++ or Python), Flutter and MAUI — each with
-  "pick when" and "watch out for", plus defaults for when the constraints don't decide. Recorded as ADR-001.
-- **The UI-thread contract** (Petzold's message loop) stated once for every framework — Dispatcher,
-  DispatcherQueue, Qt signals, Electron main + renderers, Tauri async commands, Flutter isolates — and
-  framed as Boundary 5 inside the process: the UI thread's timeout is one frame.
-- **MVVM / Presentation Model** (Gossman, Fowler) as the handler layer; **the process model** (Gamma's VS
-  Code extension host, Chromium) for anything that can hang, crash or be hostile; IPC as a validated contract.
-- **Data on the machine**: per-user app-data dirs per OS, SQLite with versioned migrations, settings ≠ secrets.
-- **Security where the trust boundary is the user's PC**: OS secret store + envelope encryption — and a
-  plain statement that it doesn't stop same-user malware; the Electron baseline (contextIsolation,
-  sandbox, no nodeIntegration, a narrow preload API, validated IPC, CSP) and Tauri capabilities; deep links,
-  file associations and IPC as untrusted input; signing (Azure Artifact Signing — formerly Trusted Signing
-  — or OV/EV; Developer ID + notarization on macOS); TUF-grade verified updates; per-user, un-elevated.
-- **Resilience for a process that runs for days** (Armstrong + Nygard): supervision, bulkheads, Job
-  Objects, graceful shutdown, crash reporting with personal data scrubbed, idempotent jobs, single instance.
-- **Performance budgets** (Gregg): cold start, the 16 ms UI-thread rule, idle memory and idle CPU.
-- **Packaging and updates per stack** (MSIX / Velopack, Tauri bundler + updater, electron-builder,
-  Nuitka + tufup) and a CI job that launches the *packaged* build.
-- **The experience floor, desktop edition** (Fluent / HIG): keyboard, UI Automation / VoiceOver names,
-  high-DPI, native conventions.
-- **Stack mechanics** (§9) mapping the rules onto .NET, Tauri, Electron, Qt C++, Python and Flutter, and
-  the questions to ask for a stack not listed.
+**Scope, as decided by the user:** modern Node.js / Python only — the stack VS Code, Claude desktop and
+Slack ship on (Electron on Chromium), with Python via PySide6 or as a sidecar. .NET, Qt C++, Flutter, Tauri
+(Rust core) and Tkinter are recorded as deliberately not covered.
 
-### Added — multi-account apps, with the product question first (`desktop.md` §10)
-- **Official API before automation.** Where the platform has one (TikTok for Developers — Content Posting
-  API, Login Kit), each account authorises the app via OAuth and gets its own tokens; that's a normal
-  Adapter under third-party-apis.md Layer 1. UI automation is a fallback, raised as a **viability** question.
-- **The domain model**: an Account aggregate keyed by your own UUID, a status machine where
-  **NEEDS_ATTENTION is a human-in-the-loop state** (a verification prompt stops that account and waits for
-  the person — retrying a challenge is how accounts get locked), idempotent persisted Jobs.
-- **Stated boundary**: fingerprint spoofing / anti-detect browsers, captcha or verification bypass, ban or
-  rate-limit evasion, mass account creation, fake engagement — out of scope, with the reason, and the
-  permitted path offered. Retry jitter stays (resilience); randomising activity to look human is evasion.
+### Added — `references/desktop.md`, the rules
+- **Three shapes, chosen at L0 as a one-way door (ADR-001):** Electron + TypeScript (default), Electron UI
+  + Python sidecar (Python's libraries, a web UI), Python + PySide6 (native Qt UI, Python-first).
+- **OPERATE vs ACT** — the fork that decides a multi-account app's architecture: a person using N live
+  sessions in one window (Electron partitions + WebContentsView + hibernation) versus the app acting on the
+  accounts (official API first). Found by tracing the user's own prompt, not by review.
+- **The UI-thread contract** (Petzold's message loop) — including Electron's second trap: a blocked MAIN
+  process freezes every window.
+- **The process model** (Chromium; Gamma's VS Code extension host): what can hang, crash or be hostile
+  runs in a supervised process; IPC is a validated contract. In Electron the process split *is* the layering.
+- **Data on the machine**, **security** where the trust boundary is the user's PC (safeStorage / keyring,
+  honest about same-user malware; the Electron baseline; fuses + ASAR integrity; deep links and sidecar
+  messages as untrusted input; signing + notarization; verified updates), **resilience** (Armstrong +
+  Nygard), **performance budgets** (Gregg; session hibernation), **packaging/updates per shape**, the
+  **desktop experience floor** (Fluent / HIG), and **testing** down to launching the packaged build.
+- **Multi-account apps (§10):** official API first (TikTok Content Posting API: per-account OAuth, no
+  agency token); automation only as a raised viability question; an Account aggregate with
+  **NEEDS_ATTENTION as a human-in-the-loop state**; evasion (anti-detect, captcha bypass, ban evasion,
+  mass accounts, fake engagement) out of scope, with the reason and the permitted path.
 
-### Added — `references/stacks/python-desktop.md`, one stack's mechanics
-Where desktop.md's rules land in Python: PySide6 vs PyQt6 as a licence door, the Qt threading contract,
-asyncio via QtAsyncio/qasync, the GIL and free-threaded 3.14 (supported, not default, silent-GIL caveat),
-QStandardPaths, sqlite3 per thread, keyring + cryptography, pywin32 Job Objects, Nuitka `--standalone`
-(never `--onefile`: it unpacks to %TEMP% every launch — the AV-heuristic trigger), tufup, pytest-qt.
+### Added — `references/stacks/electron.md` (the default shape's mechanics)
+Main / preload / renderer as composition root / bridge / view; a shared zod-validated IPC contract with
+sender checks; utilityProcess workers; partitions + WebContentsView for account sessions; safeStorage;
+better-sqlite3 rebuilt for Electron's ABI; CSP, navigation and permission handlers; fuses; Electron Forge
+or electron-builder; signed updates; Vitest + Playwright `_electron`.
+
+### Added — `references/stacks/python-desktop.md`
+PySide6 (licence as a one-way door, the Qt threading contract, asyncio via QtAsyncio/qasync, the GIL and
+free-threaded 3.14 with its silent-GIL caveat, Nuitka `--standalone`, tufup, pytest-qt) — and **Python as
+a sidecar behind Electron**: frozen with Nuitka, supervised, a versioned newline-delimited JSON-RPC over
+stdio (stdout is protocol only), validated on both sides, treated as an Adapter.
 
 ### Wired to fire (the ref is not done until something reaches it)
-Description vocabulary ("desktop app", "Windows app", "Electron", "Tauri", "WPF", "multi-account" — kept
-to ~1.5k characters so the tail isn't truncated in the skill listing), a Mid-work row in the always-loaded
-core, the reference map, registry trigger rows + a stack-agnostic `desktop-app` entry, Branch A scope
-inference (with the official-API question up front), pointers from `python.md` and `nodejs.md` so
-existing projects reach it too, a desktop row in `judgment.md` §5b (both floors in one process), the
-desktop floor in `ui-design.md`, and a line in `security.md` §5. Branch A's project-type list also gained
-the `mcp-server` and `blockchain-dapp` entries it had been missing. EVALS rows 49–54, written after the grep.
+Description vocabulary ("desktop app", "Windows app", "Electron", "PySide6", "multi-account" — kept under
+~1.5k characters so the tail isn't truncated in the skill listing), a Mid-work row in the always-loaded
+core, the reference map, registry trigger rows + a `desktop-app` entry, Branch A scope inference (official
+API question up front), pointers from `nodejs.md` and `python.md` so existing projects reach it too, a
+desktop row in `judgment.md` §5b, the desktop floor in `ui-design.md`, and `security.md` §5. Branch A's
+project-type list also gained the `mcp-server` and `blockchain-dapp` entries it was missing. EVALS 49–55,
+written after the grep.
 
-### Caught before merge — the first draft was Python-only
-The first cut of this release wrote everything into a Python stack file, treating the language of one
-example as a requirement. Choosing the stack is itself the first desktop decision, so it can't live inside
-one stack's file. Restructured the way `judgment.md` relates to the stack files: rules in `desktop.md`,
-mechanics per stack.
+### Caught before merge — scope, twice
+First draft: Python-only (the example's language taken as a requirement). Second: every desktop stack
+there is (a catalogue the user didn't want). Scope belongs to the user — now recorded in the file itself.
 
 ### Deliberately NOT added
-Full language stack files for C# and Rust (§9 maps the rules; add a file when a real project needs the
-depth — the same rule-of-three shipright applies to code); a separate browser-automation stack file (it
-lives inside §10 — on its own it invites building on automation first); a component library or theming
-system (scope, not floor); anything that helps an account look like something it isn't.
+.NET, Qt C++, Flutter, Tauri, Tkinter/pywebview (out of scope by the user's decision); a separate
+browser-automation stack file (it lives inside §10 — on its own it invites building on automation first);
+a component library or theming system (scope, not floor); anything that helps an account look like
+something it isn't.
 
 ## [1.25.1] — 2026-09 — Consistency pass: renamed probes, dead targets, and a gate Branch B never closed
 A full read of every live file against the core. No new ideas — every fix brings a ref back in line with

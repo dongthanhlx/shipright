@@ -9,8 +9,11 @@
 > Python and Qt* — model/view); **David Beazley** (threads vs processes vs async in Python);
 > **Kay Hayen** (Nuitka).
 
-Choose Python for a desktop app when the job leans on its ecosystem (data, ML, automation, scientific
-libraries) or the team is Python-first. If neither is true, desktop.md §1 probably points elsewhere.
+Python enters a desktop app in one of two shapes (desktop.md §1):
+- **PySide6** — a native Qt 6 UI, in-process with Python. Python-first team, data-heavy screens, no
+  embedded web content.
+- **A Python sidecar behind an Electron UI** — the job needs Python's libraries (data, ML, automation),
+  the UI should be modern web. Electron owns the window; Python is a supervised worker process.
 
 ---
 
@@ -20,8 +23,21 @@ PySide6 (Qt for Python, official) — default. LGPLv3: closed-source commercial 
          linking. Widgets for data-heavy tools; QML for fluid UI.
 PyQt6 — the same Qt under GPLv3 or a paid licence. For a closed-source product that is a LICENCE
          one-way door — decide it at L0, not at release.
-Tkinter / ttk — built in; fine for a small internal tool, hits its ceiling on tables and theming.
-pywebview / Flet — a web UI in a native window, for web-first teams.
+Not covered (desktop.md scope): Tkinter, wxPython, pywebview/Flet — shipright builds on the two shapes above.
+```
+
+## The sidecar shape — Python behind Electron
+```
+Process   Electron main spawns the frozen sidecar (Nuitka --standalone, shipped as an extraResource),
+          puts it under supervision (restart with backoff + cap) and kills it on quit.
+Protocol  newline-delimited JSON-RPC over stdio: {id, method, params} → {id, result | error}. Versioned —
+          the first message is a handshake with the protocol version; mismatch = refuse and report.
+          Every message validated on both sides (pydantic in Python, zod in TypeScript).
+          stdout is the protocol ONLY — logs go to stderr / a file, or they corrupt the stream.
+Boundary  the sidecar is an ADAPTER (Boundary 4): the renderer never talks to it; main's services do.
+Timeouts  every request carries a deadline; a sidecar that stops answering is restarted, not waited on.
+Why stdio over a local HTTP port: no port to collide with or expose, no firewall prompt, and the pipe
+          dies with the process.
 ```
 
 ## The UI-thread contract in Qt

@@ -122,7 +122,8 @@ What's in scope — INFER from what you learned, and state it as an assumption t
     before the Adapter exists. references/product-judgment.md §1.
   • AI/LLM implied? → load the matching registry entry (rag-pipeline / chatbot / ai-agent).
   • Runs on the user's own PC (a Windows app, an .exe, "manage N accounts from one machine")? → registry
-    `desktop-app` + references/desktop.md (the stack is chosen there, by team skill first). If it drives a third-party platform, ask FIRST
+    `desktop-app` + references/desktop.md (the shape is chosen there — Electron + TypeScript by default,
+    Python via PySide6 or a sidecar; OPERATE vs ACT). If it drives a third-party platform, ask FIRST
     whether an official API covers the job — automating someone else's UI is a viability question
     (ToS, breakage, suspended accounts), references/product-judgment.md §1.
   • Auth / payments / PII / untrusted input surfaced? → "This handles [X], so I'll run the L0

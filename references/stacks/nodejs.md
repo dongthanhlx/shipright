@@ -2,8 +2,8 @@
 
 Use these concrete names when SKILL.md says generic terms.
 
-> Building a **desktop app with Electron** (or a Tauri app's web front end)? Load `references/desktop.md`
-> — the main/preload/renderer split, the Electron security baseline, signing and signed updates are there.
+> Building a **desktop app with Electron**? Load `references/desktop.md` (the rules) and
+> `references/stacks/electron.md` (main/preload/renderer, typed IPC, the security baseline, packaging).
 
 ## Mapping: generic → Node.js specific
 ```

@@ -1,6 +1,6 @@
 # Stack Reference: Python (FastAPI recommended — see Framework)
 
-> Building a **desktop GUI app** (PySide6/Tkinter, an .exe)? Load `references/desktop.md` (the rules for
+> Building a **desktop app** with Python (PySide6, or a sidecar behind Electron)? Load `references/desktop.md` (the rules for
 > any desktop app) and `references/stacks/python-desktop.md` (where they land in Python).
 
 ## Mapping: generic → Python specific

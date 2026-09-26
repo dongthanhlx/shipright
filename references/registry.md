@@ -38,7 +38,7 @@ the default heuristic (a payment MVP needs security on day one; a read-only Grow
 | A one-way door was just decided / a public API changed | `documentation-and-adrs` (shipright decides WHAT is irreversible; the skill records it properly) | addyosmani |
 | Removing/sunsetting an old API, migrating users off an implementation | `deprecation-and-migration` | addyosmani + references/requirement-drift.md |
 | A fitness function / arch test must actually run on every commit | `ci-cd-and-automation` | addyosmani + references/evolutionary-architecture.md |
-| Building / packaging a desktop (PC) app in any stack — choosing it, the window, .exe/installer, auto-update | (shipright built-in) | references/desktop.md (+ the stack file, e.g. stacks/python-desktop.md) |
+| Building / packaging a desktop (PC) app (Electron / Python) — choosing the shape, the window, .exe/installer, auto-update | (shipright built-in) | references/desktop.md (+ stacks/electron.md or stacks/python-desktop.md) |
 | Driving many accounts / browser sessions from one PC | (shipright built-in) — official API first; automation only as a fallback, raised as viability | references/desktop.md §10 + references/product-judgment.md §1 |
 | RAG retrieval/prompt change to evaluate | RAGAS | `pip install ragas` |
 | Agent trajectory to evaluate | DeepEval / Confident-AI | — |
@@ -396,13 +396,13 @@ shipright-adds-to-CLAUDE:
 ---
 
 ## desktop-app
-A desktop (PC) application in any stack — .NET (WPF / WinUI 3 / Avalonia), Tauri, Electron, Qt (C++ or
-Python), Flutter. Local tools, multi-account managers, anything whose job needs the machine: local files,
+A desktop (PC) application built the modern way — Electron + TypeScript by default, or Python (PySide6, or a
+Python sidecar behind Electron). Local tools, multi-account managers — anything whose job needs the machine: local files,
 a local browser engine, offline work, per-machine state, OS integration.
 
 ```
 decide-at-L0 (one-way door — record ADR-001):
-  the stack, by team skill FIRST, then target OS, UI kind, footprint  → references/desktop.md §1
+  the shape: Electron+TS (default) | Electron + Python sidecar | PySide6 — and OPERATE vs ACT → desktop.md §1
   the UI-framework licence (e.g. Qt LGPL vs commercial, PyQt GPL)     → a licence is a one-way door too
 
 install:
@@ -414,14 +414,14 @@ install:
       skills: [security-and-hardening]      # plus /security-review (bundled) on every such diff
   per-stack tooling: desktop.md §7 (packaging + signed updates) and §9 (mechanics)
 
-tested-with: .NET 10, Windows App SDK 1.x, Tauri 2.x, Electron (current), Qt 6.x, Python 3.12–3.13
+tested-with: Electron (current stable), Node 22 LTS, TypeScript 5.x, Python 3.12–3.13, PySide6 6.x, Nuitka 2.x
 load: references/desktop.md — ALWAYS (stack choice, UI-thread contract, process model, secrets, signing,
-      updates, resilience, multi-account apps). Then the language file if shipright has one
-      (stacks/nodejs.md for Electron, stacks/python.md + stacks/python-desktop.md for Python).
+      updates, resilience, multi-account apps). Then the shape's mechanics:
+      Electron → stacks/electron.md + stacks/nodejs.md; Python → stacks/python-desktop.md + stacks/python.md.
       The window owes the experience floor too → references/ui-design.md (judgment.md §5b).
 
 shipright-adds-to-CLAUDE:
-  stack-adr: "Stack = [X] because [team skill / OS / footprint] (ADR-001). Changing it is a rewrite."
+  stack-adr: "Shape = [Electron+TS | +Python sidecar | PySide6] because [reason] (ADR-001). A rewrite to change."
   ui-thread: "The UI thread never blocks (> ~16 ms → worker). Workers never touch UI objects."
   ui-boundary: "view-models are the handler layer. Services/repositories never import the UI framework."
   processes: "Hang-prone or untrusted work runs in supervised worker processes; IPC is validated."
