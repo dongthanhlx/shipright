@@ -69,7 +69,7 @@ Create project skeleton — module list from ARCHITECTURE.md:
 - Each module: index.ts (public API only), types.ts, [name].service.ts (stubs throw NotImplementedError)
 - shared/: db.ts (pg.Pool), logger.ts (pino), errors.ts (AppError hierarchy), http-client.ts (axios + axios-retry)
 - config/env.ts: zod schema, throws on startup if required vars missing
-- package.json, tsconfig.json (strict: true), jest.config.ts (80% coverage threshold)
+- package.json, tsconfig.json (strict: true), vitest.config.ts (80% coverage threshold)
 - docker-compose.yml: app + postgres
 
 Gate: npx tsc --noEmit must pass with zero errors.
@@ -83,7 +83,7 @@ Read CLAUDE.md and ARCHITECTURE.md.
 Create project skeleton:
 - Each module: __init__.py (explicit __all__), types.py (Pydantic models), [name]_service.py (stubs raise NotImplementedError)
 - shared/: db.py (SQLAlchemy async), logger.py (structlog), errors.py (exception hierarchy), http_client.py (httpx + tenacity)
-- config/settings.py: pydantic BaseSettings, fails on startup if required vars missing
+- config/settings.py: pydantic-settings BaseSettings, fails on startup if required vars missing
 - pyproject.toml, mypy.ini (strict), pytest.ini
 
 Gate: mypy --strict src/ must pass with zero errors.

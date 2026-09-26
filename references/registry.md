@@ -38,6 +38,8 @@ the default heuristic (a payment MVP needs security on day one; a read-only Grow
 | A one-way door was just decided / a public API changed | `documentation-and-adrs` (shipright decides WHAT is irreversible; the skill records it properly) | addyosmani |
 | Removing/sunsetting an old API, migrating users off an implementation | `deprecation-and-migration` | addyosmani + references/requirement-drift.md |
 | A fitness function / arch test must actually run on every commit | `ci-cd-and-automation` | addyosmani + references/evolutionary-architecture.md |
+| Building / packaging a desktop (PC) app (Electron / Python) — choosing the shape, the window, .exe/installer, auto-update | (shipright built-in) | references/desktop.md (+ stacks/electron.md or stacks/python-desktop.md) |
+| Driving many accounts / browser sessions from one PC | (shipright built-in) — official API first; automation only as a fallback, raised as viability | references/desktop.md §10 + references/product-judgment.md §1 |
 | RAG retrieval/prompt change to evaluate | RAGAS | `pip install ragas` |
 | Agent trajectory to evaluate | DeepEval / Confident-AI | — |
 | LLM tracing needed | LangSmith / Arize Phoenix | — |
@@ -218,36 +220,35 @@ shipright-adds-to-CLAUDE:
 ---
 
 ## browser-extension
-Chrome/Firefox extension using Manifest V3.
+Chrome / Firefox / Safari extension, Manifest V3, TypeScript.
 
 ```
 install:
   required:
     - addyosmani/agent-skills
       skills: [incremental-implementation, test-driven-development]
+  framework:
+    - WXT (Vite-based, generates the per-browser manifest): npx wxt@latest init
   testing:
-    - jest-webextension-mock: npm install --save-dev jest-webextension-mock
+    - Vitest + WXT's fakeBrowser (unit) · Playwright launchPersistentContext (end-to-end, built extension)
 
-tested-with: Chrome MV3, Firefox MV3 (via Extension.js)
-load: references/stacks/browser-extension.md — MV3 architecture, message passing, storage boundaries,
-      and the content-script security model (a content script trusts a hostile DOM — see security.md)
-
-tooling:
-  recommended: Extension.js (Chrome + Firefox from same source)
-  install: npx extension create my-extension
+tested-with: Chrome MV3, Firefox MV3, WXT 0.x (current), Vitest 4, Playwright (current)
+load: references/stacks/browser-extension.md — MV3 contexts, typed messaging, storage boundaries, and the
+      content-script security model (a content script trusts a hostile DOM — see security.md)
 
 shipright-adds-to-CLAUDE:
-  boundary-sw: "Service Worker: NO DOM, NO module variables (state lost on terminate)"
-  boundary-content: "Content Script: NO external fetch → message to service worker"
-  boundary-state: "All state via chrome.storage.local/sync. Never in JS variables."
+  boundary-sw: "Background (service worker): NO DOM, NO module-level state (it is stopped when idle)"
+  boundary-content: "Content script: NO network calls → typed message to the background"
+  boundary-state: "State via browser.storage (session for ephemeral tokens, local for data). Never JS variables."
+  messaging: "One typed message contract; sender + payload validated on every receipt"
   mv3-gotchas:
-    - "ALL listeners registered SYNCHRONOUSLY at top level of background.js"
-    - "No setTimeout/setInterval → use chrome.alarms API"
-    - "Async message response: return true from onMessage listener"
-    - "No inline scripts in HTML (CSP violation)"
+    - "Listeners registered SYNCHRONOUSLY at the top level of the background"
+    - "No long-lived timers → browser.alarms (min 30 s period)"
+    - "Promise-based `browser` API for replies (raw chrome.runtime.onMessage needs `return true`)"
+    - "No remote code; keep the default extension-page CSP"
   debt-signals:
-    - "TODO[publish]: add privacy policy URL to manifest"
-    - "TODO[v2]: request minimal permissions audit"
+    - "TODO[publish]: privacy policy URL + least-privilege permission review before store submission"
+    - "TODO[broad-host-permission]: move to optional_host_permissions requested at the moment of use"
 ```
 
 ---
@@ -377,7 +378,7 @@ install:
       skills: [test-driven-development]
       when: complex business logic exists
 
-tested-with: Node.js 20+, Python 3.11+
+tested-with: Node.js 24 LTS, Python 3.13+
 load: references/stacks/<language>.md — the CLI's language file. A CLI has no UI/UX floor but still
       owes the system floor when it grows past a script (judgment.md §5)
 
@@ -389,6 +390,48 @@ shipright-adds-to-CLAUDE:
   debt-signals:
     - "TODO[commands>10]: extract command registry pattern"
     - "TODO[shared-logic>3-commands]: extract shared service"
+```
+
+---
+
+## desktop-app
+A desktop (PC) application built the modern way — Electron + TypeScript by default, or Python (PySide6, or a
+Python sidecar behind Electron). Local tools, multi-account managers — anything whose job needs the machine: local files,
+a local browser engine, offline work, per-machine state, OS integration.
+
+```
+decide-at-L0 (one-way door — record ADR-001):
+  the shape: Electron+TS (default) | Electron + Python sidecar | PySide6 — and OPERATE vs ACT → desktop.md §1
+  the UI-framework licence (e.g. Qt LGPL vs commercial, PyQt GPL)     → a licence is a one-way door too
+
+install:
+  required:
+    - addyosmani/agent-skills
+      skills: [incremental-implementation, test-driven-development]
+  when-secrets-or-accounts:
+    - addyosmani/agent-skills
+      skills: [security-and-hardening]      # plus /security-review (bundled) on every such diff
+  per-stack tooling: desktop.md §7 (packaging + signed updates) and §9 (mechanics)
+
+tested-with: Electron (current stable), Node.js 24 LTS, TypeScript 7, Python 3.13–3.14, PySide6 6.x, Nuitka 2.x
+load: references/desktop.md — ALWAYS (stack choice, UI-thread contract, process model, secrets, signing,
+      updates, resilience, multi-account apps). Then the shape's mechanics:
+      Electron → stacks/electron.md + stacks/nodejs.md; Python → stacks/python-desktop.md + stacks/python.md.
+      The window owes the experience floor too → references/ui-design.md (judgment.md §5b).
+
+shipright-adds-to-CLAUDE:
+  stack-adr: "Shape = [Electron+TS | +Python sidecar | PySide6] because [reason] (ADR-001). A rewrite to change."
+  ui-thread: "The UI thread never blocks (> ~16 ms → worker). Workers never touch UI objects."
+  ui-boundary: "view-models are the handler layer. Services/repositories never import the UI framework."
+  processes: "Hang-prone or untrusted work runs in supervised worker processes; IPC is validated."
+  data: "Runtime data under the per-user app-data dir via the OS API. Never the install dir."
+  secrets: "OS secret store holds the key; data envelope-encrypted. Nothing sensitive in settings or logs."
+  isolation: "One isolated session per account. One account's failure pauses that account only."
+  ship: "Signed binaries + installer, verified auto-update, per-user install. CI launches the packaged build."
+  debt-signals:
+    - "TODO[freeze>100ms]: profile the UI thread"
+    - "TODO[first-external-user]: code signing + signed auto-update"
+    - "TODO[rss-grows-daily]: release sessions/pages/handles/listeners"
 ```
 
 ---

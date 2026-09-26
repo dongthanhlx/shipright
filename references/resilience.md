@@ -167,7 +167,7 @@ describe('PaymentService resilience', () => {
 
   it('circuit open → returns fallback, makes zero downstream calls', async () => {
     breaker.forceOpen()
-    const spy = jest.spyOn(gateway, 'charge')
+    const spy = vi.spyOn(gateway, 'charge')
     const r = await service.pay(order)
     expect(r.status).toBe('queued_for_retry')             // graceful degradation
     expect(spy).not.toHaveBeenCalled()                    // no load on sick dependency

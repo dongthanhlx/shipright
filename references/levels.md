@@ -83,7 +83,7 @@ src/
     db.ts, logger.ts, errors.ts, http-client.ts
   config/
     env.ts            ← zod schema, throws on startup if missing
-package.json, tsconfig.json, jest.config.ts
+package.json, tsconfig.json, vitest.config.ts
 docker-compose.yml
 ```
 

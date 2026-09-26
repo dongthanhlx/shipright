@@ -163,6 +163,30 @@ Row 48 is the v1.23 slim's own leftover: the probes were renamed in the core and
 branch on them. **When you rename a probe, grep for its old name across every ref** — the same lesson
 as v1.20's install names, one level up.
 
+### Desktop scenarios (v1.26) — a whole project shape with no home
+
+| # | Situation | Before | Verdict → fix |
+|---|---|---|---|
+| 49 | "build a PC app to manage 10–100 TikTok accounts" | no registry type, no desktop ref, no description vocabulary — shipright woke only on "build" and routed a desktop app through web-api defaults (no UI-thread rule, secrets in `.env`, no packaging/signing/updates) | **DARK → fixed v1.26.** Description + Mid-work row + registry `desktop-app` + Branch A → `references/desktop.md` |
+| 50 | "what should we build it with?" | nothing — the choice would default to whatever the model reached for, though it's a rewrite to change | **DARK → fixed v1.26.** `desktop.md` §1: three shapes (Electron+TS default · Electron + Python sidecar · PySide6), decided at L0, ADR-001 |
+| 51 | "one window where I can switch between all my logged-in accounts" | the OPERATE case (N live web sessions) was indistinguishable from the ACT case (the app acts via API) — and they need different architectures | **FOUND BY DOGFOODING → fixed v1.26.** `desktop.md` §1 + §10: partitions + WebContentsView + hibernation; `stacks/electron.md` |
+| 52 | "the window freezes when I click Start" (existing project) | the UI-thread contract appeared nowhere — and Electron's second trap, a blocked MAIN process freezing every window, was unknown | **DARK → fixed v1.26.** Mid-work row + `nodejs.md` / `python.md` pointers → `desktop.md` §2 |
+| 53 | "keep each account signed in" | secrets guidance was server-shaped (vault/env) | **DARK → fixed v1.26.** `desktop.md` §4 (safeStorage / keyring, honest limits) + `security.md` §5 |
+| 54 | "automate posting — there's no button for it" | no viability gate on automating a third-party UI; evasion requests had no stated boundary | **NO-GATE → fixed v1.26.** Official API first → `product-judgment.md` §1; NEEDS_ATTENTION; evasion out of scope with the reason |
+| 55 | "ship it to the client as an exe" | no packaging, signing, fuses or update guidance | **DARK → fixed v1.26.** `desktop.md` §7 + `stacks/electron.md` (Forge, fuses, signed updates) + CI launches the packaged build |
+
+Verified by grep before writing these rows: `desktop.md` is reached from SKILL.md (description, Mid-work row,
+map), registry (trigger rows + `desktop-app`), Branch A, `nodejs.md`, `python.md`, `judgment.md` §5b,
+`ui-design.md`, `security.md`; `electron.md` from SKILL.md, registry, `desktop.md`, `nodejs.md`;
+`python-desktop.md` from SKILL.md, registry, `desktop.md`, `python.md`.
+
+**Two scope corrections before merge — both the same mistake in opposite directions.** The first draft
+was Python-only: the language of one example taken as a requirement. The second was a survey of every
+desktop stack (.NET, Qt C++, Flutter, Tauri…), which the user didn't want either — they build with
+Node/Python and wanted shipright expert in the path today's flagship apps take. **Scope is the user's
+decision, not the example's and not the catalogue's.** Row 51 came from tracing the user's own prompt
+through the files, not from review — the v1.17 method still finds what reading doesn't.
+
 ### Finding (v1.20) — the trigger can be perfect and still dead-end
 
 v1.17's lesson was *retrieval + timing*. v1.20 adds: **the target must exist**. shipright's UI dispatch

@@ -2,16 +2,21 @@
 
 Use these concrete names when SKILL.md says generic terms.
 
+> Building a **desktop app with Electron**? Load `references/desktop.md` (the rules) and
+> `references/stacks/electron.md` (main/preload/renderer, typed IPC, the security baseline, packaging).
+
 ## Mapping: generic → Node.js specific
 ```
 public boundary file    → index.ts (barrel export)
 schema validation       → zod
-test runner             → jest + ts-jest
-build check             → tsc --noEmit
+runtime                 → Node.js 24 LTS (active LTS; 26 becomes LTS late Oct 2026). Never an EOL line (20 ended Apr 2026)
+test runner             → Vitest (TS/ESM-native; same API shape as Jest)
+build check             → tsc --noEmit (TypeScript 7 — the native compiler)
+dev runner              → tsx watch
 http validation         → zod + express/fastify
-db client               → pg (node-postgres) or Prisma
-migration tool          → db-migrate (SQL files) or Prisma migrate
-http client             → axios + axios-retry
+db client               → Drizzle ORM or Kysely (type-safe SQL) · Prisma · plain pg
+migration tool          → drizzle-kit · Prisma migrate (versioned SQL, committed)
+http client             → built-in fetch + AbortSignal.timeout() (Boundary 5 in one line); axios + axios-retry if you want interceptors/retry built in
 structured logging      → pino
 env validation          → zod (parse process.env at startup)
 scheduler               → node-cron
@@ -36,13 +41,13 @@ Boundary 2 violation — and it also nails you to the framework (a one-way door 
 Read CLAUDE.md and ARCHITECTURE.md.
 Create Node.js + TypeScript project skeleton:
 - tsconfig.json: strict: true, noUncheckedIndexedAccess: true, exactOptionalPropertyTypes: true
-- package.json: scripts: build (tsc), test (jest), dev (ts-node-dev), lint (eslint)
-- jest.config.ts: ts-jest preset, coverage threshold 80%
-- .eslint.config.js: @typescript-eslint/recommended + no-floating-promises rule
+- package.json: "type": "module"; engines.node ">=24"; scripts: build (tsc), test (vitest run), dev (tsx watch src/index.ts), lint (eslint .)
+- vitest.config.ts: coverage (v8) threshold 80%
+- eslint.config.js (flat config): typescript-eslint recommendedTypeChecked + no-floating-promises
 - Each module: index.ts, types.ts, [name].service.ts (stub — throws NotImplementedError)
-- shared/: db.ts (pg Pool singleton), logger.ts (pino), errors.ts (error hierarchy), http-client.ts (axios + axios-retry 3x exp backoff)
+- shared/: db.ts (Drizzle/pg pool singleton), logger.ts (pino), errors.ts (error hierarchy), http-client.ts (fetch + AbortSignal.timeout + retry with backoff+jitter on transient errors only)
 - config/env.ts: zod schema, z.object({...}).parse(process.env) at top — throws on startup
-- docker-compose.yml: app (node:20-alpine) + postgres:16
+- docker-compose.yml: app (node:24-alpine) + postgres:18
 Gate: npx tsc --noEmit must pass.
 ```
 
@@ -89,7 +94,7 @@ async function runWithLock(lockId: number, fn: () => Promise<void>) {
 grep -r "from.*shared/db" src/modules/ && echo "VIOLATION: service importing db directly"
 grep -rE "from.*\.(service|repository)" src/modules/*/index.ts && echo "VIOLATION: bypassing index.ts"
 npx tsc --noEmit && echo "Type check passed"
-npx jest --passWithNoTests && echo "Tests passed"
+npx vitest run --passWithNoTests && echo "Tests passed"
 ```
 
 ## Circular dependency check

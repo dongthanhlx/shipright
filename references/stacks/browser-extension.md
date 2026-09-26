@@ -1,293 +1,196 @@
-# Stack Reference: Browser Extension (Manifest V3)
+# Stack Reference: Browser Extension (Manifest V3, TypeScript)
 
-MV3 is mandatory for all Chrome extensions in 2026. Firefox supports MV3 but keeps
-non-persistent event pages. Use Extension.js to target both from the same source.
+MV3 is the only format Chrome runs; Firefox and Safari support it too (Firefox keeps event-page
+background *scripts* instead of a service worker). Build once, target all three with a framework that
+generates the per-browser manifest. See `references/stacks/nodejs.md` for the language baseline.
 
 ---
 
 ## Mapping: generic → extension specific
 
 ```
-public boundary file     → index.js (re-exported from each component)
-schema validation        → zod (in service worker for API responses)
-test runner              → Jest + jsdom (popup), WebExtension polyfill for unit tests
-build check              → tsc --noEmit (if TypeScript)
-http client              → fetch (built-in, called from service worker only)
-structured logging       → console with requestId (service worker context)
-scheduler                → chrome.alarms API (NOT setTimeout — dies with SW)
-state storage            → chrome.storage.local / chrome.storage.sync
-cross-component comms    → chrome.runtime.sendMessage / sendResponse
+framework / build        → WXT (Vite-based; file-based entrypoints → generated per-browser manifest;
+                           dev mode with HMR; zips per store). Actively maintained — the 2026 default.
+                           Minimal alternative: CRXJS (a Vite plugin over your own manifest.json).
+language                 → TypeScript, strict
+public boundary file     → one module per feature, imported via its index.ts
+schema validation        → zod (every message, every API response, everything read from a page)
+extension API            → `browser` from WXT (promise-based, typed, cross-browser) — not raw callback `chrome.*`
+unit tests               → Vitest + WXT's fakeBrowser (in-memory storage/runtime — no hand mocks)
+end-to-end tests         → Playwright: chromium.launchPersistentContext with the built extension loaded
+build check              → tsc --noEmit (TypeScript 7)
+http client              → fetch + AbortSignal.timeout(), from the background only
+structured logging       → console with a requestId (per context) — never log page data or tokens
+scheduler                → browser.alarms (survives the service worker being stopped)
+state                    → browser.storage (local / session / sync) — WXT's storage wrapper for typed keys
+messaging                → a typed message contract (e.g. @webext-core/messaging), validated on receipt
+UI                       → popup / options / side panel pages — React or plain TS, bundled by Vite
 ```
 
 ---
 
-## Component model (MV3) — the 4 contexts
+## Component model (MV3) — the contexts, and what each may do
 
 ```
-my-extension/
-  manifest.json          # blueprint: permissions, components, CSP
-  background.js          # SERVICE WORKER: events, API calls, state mgmt
-  content.js             # CONTENT SCRIPT: DOM access, page interaction
-  popup/
-    popup.html           # no inline scripts (CSP)
-    popup.js             # POPUP UI: user input, display results
-  offscreen/
-    offscreen.html       # OFFSCREEN DOC: persistent state, WebSocket, audio
-    offscreen.js
-  options/
-    options.html
-    options.js
-  icons/
-    icon-16.png
-    icon-48.png
-    icon-128.png
+entrypoints/
+  background.ts          SERVICE WORKER (Firefox: event page). Events, network calls, state coordination.
+                         No DOM. Stopped when idle (~30 s) — nothing in memory survives.
+  content.ts             CONTENT SCRIPT — runs INSIDE the web page. DOM access; a hostile environment.
+  popup/                 POPUP — short-lived UI opened from the toolbar.
+  options/               OPTIONS page.
+  sidepanel/             SIDE PANEL (Chrome) — persistent UI beside the page.
+  offscreen.html         OFFSCREEN DOCUMENT (Chrome) — only when you need a DOM API the worker lacks
+                         (clipboard, audio, DOMParser). Not web-accessible.
+wxt.config.ts            manifest fields: permissions, host_permissions, name, icons
+```
+WXT turns `entrypoints/` into the manifest; you declare intent, it emits the right shape per browser.
+
+---
+
+## Extension boundary rules (shipright's boundaries 1–4, extension edition)
+
+```
+Rule 1: The content script NEVER calls your backend or third-party APIs
+  It lives in the page's origin — CORS, the page's CSP, and a hostile page watching.
+  → send a typed message to the background, which does the network call.
+
+Rule 2: The background NEVER touches a page's DOM
+  → it messages the content script (tabs.sendMessage), which reads/writes the DOM.
+
+Rule 3: State lives in browser.storage — NEVER in module variables
+  The service worker is stopped when idle; `let cache = {}` at top level is lost.
+  storage.local (large, per device) · storage.session (in-memory, cleared on browser restart — right
+  place for short-lived tokens) · storage.sync (small, synced across the user's browsers).
+  IndexedDB is available in the background too, for large structured data.
+
+Rule 4: External responses pass an Adapter in the background
+  Raw API response → validate + normalise in the background → send the domain object to UI/content.
+  Popup, options and content scripts never see raw external responses.
 ```
 
 ---
 
-## manifest.json — MV3 required structure
-
-```json
-{
-  "manifest_version": 3,
-  "name": "[extension-name]",
-  "version": "0.1.0",
-  "description": "[what it does]",
-
-  "permissions": ["storage", "activeTab", "alarms"],
-  "host_permissions": ["https://api.example.com/*"],
-
-  "background": {
-    "service_worker": "background.js",
-    "type": "module"
-  },
-
-  "content_scripts": [{
-    "matches": ["<all_urls>"],
-    "js": ["content.js"],
-    "run_at": "document_idle"
-  }],
-
-  "action": {
-    "default_popup": "popup/popup.html",
-    "default_icon": {
-      "16": "icons/icon-16.png",
-      "48": "icons/icon-48.png",
-      "128": "icons/icon-128.png"
-    }
-  },
-
-  "web_accessible_resources": [{
-    "resources": ["offscreen/offscreen.html"],
-    "matches": ["<all_urls>"]
-  }]
-}
-```
-
----
-
-## Extension boundary rules (adapted from shipright's boundaries 1–4)
-
-```
-Rule 1: Content script NEVER calls external APIs directly
-  Wrong: fetch('https://api.example.com') in content.js
-  Right: chrome.runtime.sendMessage({ type: 'FETCH_DATA', url }) → service worker fetches
-
-Rule 2: Service worker NEVER accesses DOM
-  Wrong: document.querySelector('#price') in background.js
-  Right: chrome.tabs.sendMessage(tabId, { type: 'GET_PRICE' }) → content script reads DOM
-
-Rule 3: State lives in chrome.storage — NEVER in module variables
-  Wrong: let userData = {} at top of background.js (lost when SW terminates)
-  Right: chrome.storage.local.set({ userData }) / chrome.storage.local.get(['userData'])
-
-Rule 4: External API responses always pass through Adapter in service worker
-  Raw API response → normalize in background.js → send normalized data to popup/content
-  Popup and content script never see raw external API responses
-```
-
----
-
-## L1 skeleton prompt (extension)
-
-```
-Create browser extension skeleton (Manifest V3):
-
-manifest.json: permissions=[storage, activeTab], service_worker=background.js
-background.js: register ALL listeners at top level synchronously (not inside async callbacks)
-  - chrome.runtime.onInstalled listener
-  - chrome.runtime.onMessage listener
-  - chrome.alarms.onAlarm listener (if using alarms)
-content.js: single listener for chrome.runtime.onMessage
-popup/popup.html: no inline scripts, link to popup.js
-popup/popup.js: sends messages to service worker, displays results
-icons/: placeholder 16/48/128 PNG files
-
-Critical MV3 rules in the skeleton:
-  - State stored via chrome.storage.local, never module variables
-  - setTimeout/setInterval NOT used — chrome.alarms instead
-  - All listeners registered synchronously at module top level
-  - No DOM access in background.js
-  - No fetch calls in content.js
-
-Gate: extension loads in chrome://extensions without errors
-```
-
----
-
-## L2 test patterns (extension)
-
-```typescript
-// Unit test service worker logic (no real chrome.* calls needed)
-// Mock chrome.* APIs with jest-webextension-mock
-
-import 'jest-webextension-mock'
-
-describe('background message handler', () => {
-  it('fetches data and stores result', async () => {
-    // Arrange
-    const mockResponse = { price: '99.99', currency: 'USD' }
-    global.fetch = jest.fn().mockResolvedValue({
-      json: () => Promise.resolve(mockResponse)
-    })
-
-    // Act
-    await handleMessage({ type: 'FETCH_PRICE', url: 'https://...' }, null, jest.fn())
-
-    // Assert
-    expect(chrome.storage.local.set).toHaveBeenCalledWith({
-      priceData: { price: 99.99, currency: 'USD' }  // normalized, not raw
-    })
-  })
-})
-```
-
----
-
-## Critical MV3 gotchas — add to CLAUDE.md
+## MV3 lifecycle rules — add to CLAUDE.md
 
 ```markdown
-## Browser Extension (MV3) rules
-
-### Service worker (background.js)
-- NO DOM access (window, document do not exist)
-- NO module-level state (let/const at top = lost when SW terminates)
-- ALL state via chrome.storage.local.set/get
-- ALL listeners registered SYNCHRONOUSLY at top level of file
-- NO setTimeout/setInterval → use chrome.alarms API
-- Async message response: must return true from onMessage listener
-  chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-    doAsyncThing().then(sendResponse)
-    return true  // ← required to keep channel open
-  })
-
-### Content script (content.js)
-- NO external fetch calls → send message to service worker
-- NO chrome.storage access (use messaging instead)
-- Runs in isolated context — cannot access page's JS variables directly
-
-### State management
-- chrome.storage.local: large data, device only
-- chrome.storage.sync: small data (<8KB), syncs across user's devices
-- IndexedDB: large structured data, use via offscreen document
-
-### Permissions (minimal permission principle)
-- Request only what you need — extra permissions = Chrome Web Store rejection risk
-- activeTab: access current tab on user gesture (less invasive than tabs)
-- host_permissions: only domains you actually call
+## Browser extension (MV3) rules
+- Register every event listener SYNCHRONOUSLY at the top level of the background (WXT's defineBackground
+  main runs synchronously — keep it that way). A listener added after an await misses the wake-up event.
+- No long-lived timers in the background — it will be stopped. Use browser.alarms (minimum period 30 s);
+  setTimeout is fine only for delays of a few seconds inside one event.
+- All state via browser.storage (session for ephemeral secrets, local for data). Never module variables.
+- Message handlers: use the promise-based `browser` API (return a promise) or a typed messaging library.
+  With raw chrome.runtime.onMessage, an async reply needs `return true`.
+- Content scripts may read browser.storage, but NEVER do network calls — message the background.
+- No remote code: everything executable ships in the package (MV3 policy — and a security rule).
 ```
 
 ---
 
 ## Security — the MV3 threat model (see references/security.md for the spine)
 
-An extension runs with the user's authority inside pages it doesn't control. Its threat model is
-specific — least privilege (Saltzer & Schroeder) is the whole game here.
+An extension runs with the user's authority inside pages it doesn't control. Least privilege (Saltzer &
+Schroeder) is the whole game.
 
 ```
-Content script runs in a HOSTILE page
-  ✗ trust scraped DOM values as safe / eval page-provided data / build queries from them
-  ✓ treat everything read from the page as untrusted input. Sanitize before use or storage.
+The content script runs in a HOSTILE page
+  ✗ trust scraped DOM values, eval page-provided data, build queries from them
+  ✓ everything read from the page is untrusted input — validate with zod before use or storage.
 
-Message passing is an entry point (other pages/extensions can message you)
-  ✗ chrome.runtime.onMessage handler that acts on any message
-  ✓ validate sender: check sender.id (your extension), sender.origin/url against an allow-list
-    before doing anything privileged. Keep externally_connectable narrow or absent.
+Messaging is an entry point (other extensions — and web pages via externally_connectable — can reach you)
+  ✗ an onMessage handler that acts on any message
+  ✓ check sender.id (and sender.url / origin) against an allow-list before anything privileged;
+    keep externally_connectable absent or narrow; validate every payload with the shared schema.
 
-XSS in popup / options / injected UI
-  ✗ el.innerHTML = untrustedData  → XSS in an extension = access to your privileged APIs
-  ✓ el.textContent = data; build DOM nodes; MV3 CSP already forbids inline scripts — don't relax it.
+XSS in popup / options / side panel / injected UI
+  ✗ el.innerHTML = untrustedData  → XSS in an extension page = access to your privileged APIs
+  ✓ textContent / framework rendering; keep the default MV3 CSP; inject UI into pages with a shadow root
+    (WXT's createShadowRootUi) so the page can't restyle or read it.
 
 Secrets do not belong in an extension
-  ✗ API keys/tokens in the bundle or in chrome.storage → it ships to users; storage is NOT encrypted
-  ✓ put secrets behind YOUR backend; the extension calls your backend, which holds the key.
+  ✗ API keys in the bundle or storage.local → they ship to every user; storage is NOT encrypted
+  ✓ secrets stay behind YOUR backend. A user's own short-lived token → storage.session.
 
-Least privilege (Chrome will also reject over-broad extensions)
-  ✓ activeTab over <all_urls>; request host_permissions only for domains you actually call.
-  ✓ web_accessible_resources: expose the minimum — each entry is reachable by web pages.
+Least privilege (stores reject over-broad extensions)
+  ✓ activeTab + optional_host_permissions requested at the moment of use, over <all_urls> up front.
+  ✓ host_permissions only for domains you actually call; content-script `matches` as narrow as the feature.
+  ✓ web_accessible_resources: the minimum, each scoped by `matches` — every entry is reachable by web pages.
 
 Remote code is banned in MV3 — keep it that way
-  ✗ fetch a script/string and eval it, or load remote JS  → policy violation + RCE risk
-  ✓ all executable code ships in the package and is reviewed.
+  ✗ fetch a script/string and eval it, or load remote JS → policy violation + RCE risk
+
+Supply chain
+  ✓ lockfile committed, npm audit in CI; review what each dependency injects into the page bundle.
 ```
 
-Add to CLAUDE.md: "Validate message sender before privileged actions. No secrets in the extension —
-call a backend. No innerHTML with untrusted data. host_permissions = only domains actually used."
+Add to CLAUDE.md: "Validate message sender and payload before privileged actions. No secrets in the
+extension. No innerHTML with untrusted data; injected UI in a shadow root. Permissions requested at the
+moment of use; host_permissions = only domains actually called."
 
 ---
 
-## Recommended tooling (2026)
-
-```
-Framework: Extension.js — targets Chrome (MV3) and Firefox from same source
-TypeScript: yes, strongly recommended for message type safety
-Build: Extension.js handles bundling, manifest generation, hot reload
-Testing: jest + jest-webextension-mock for unit tests
-E2E: Playwright + chrome-launcher for real browser testing
-Linting: eslint + eslint-plugin-webextensions
-```
+## Tooling
 
 ```bash
-# Start new extension with Extension.js
-npx extension create my-extension
+npx wxt@latest init my-extension     # pick a template (vanilla / React / Vue / Svelte / Solid)
 cd my-extension
-npm run dev  # opens Chrome with extension loaded + hot reload
+npm run dev                          # opens a browser with the extension loaded + HMR
+npm run dev:firefox                  # same, Firefox
+npm run zip                          # per-store zips for Chrome Web Store / Firefox Add-ons
 ```
+Linting: ESLint flat config (typescript-eslint). Store submission: least-privilege permissions and a
+privacy policy URL are review requirements, not polish.
 
 ---
 
-## Walking skeleton for extension MVP — test-first
+## Testing — test-first, at two levels
 
-> **Test before deploying to Chrome.** Extensions can't be "hot-fixed" once published.
-> Write failing test first → implement → test passes → then load in Chrome.
+**Unit (Vitest + fakeBrowser)** — the background's handlers and the services behind them, with
+in-memory `browser.storage` / `runtime` instead of hand-written mocks:
+```typescript
+import { describe, it, expect, beforeEach } from 'vitest'
+import { fakeBrowser } from 'wxt/testing/fake-browser'   // vitest.config: plugins: [WxtVitest()] from 'wxt/testing/vitest-plugin'
+import { handleFetchPrice } from '@/features/pricing'
 
-### Test-first skeleton flow
+describe('pricing background handler', () => {
+  beforeEach(() => fakeBrowser.reset())            // no state leaks between tests
+
+  it('stores the NORMALISED price, not the raw response', async () => {
+    const api = { getPrice: async () => ({ price: '99.99', currency: 'USD' }) }  // the Adapter seam
+    await handleFetchPrice({ url: 'https://shop.example/p/1' }, api)
+    expect(await fakeBrowser.storage.local.get('priceData'))
+      .toEqual({ priceData: { amount: 9999, currency: 'USD' } })               // integer minor units
+  })
+})
 ```
-1. Write failing test (jest-webextension-mock):
-   it('popup sends message → background responds with data', async () => {
-     chrome.runtime.onMessage.addListener.mockImplementation(
-       (listener) => listener({ type: 'GET_DATA' }, null, mockSendResponse)
-     )
-     expect(mockSendResponse).toHaveBeenCalledWith({ data: expect.any(Array) })
-   })
-   → Test FAILS (nothing implemented)
 
-2. Implement background.js handler until test passes
-3. Load unpacked extension in Chrome
-4. Verify: popup → message → response works in real browser
+**End-to-end (Playwright)** — load the BUILT extension; MV3 extensions need a persistent context:
+```typescript
+const context = await chromium.launchPersistentContext('', {
+  channel: 'chromium',   // Playwright's bundled Chromium — branded Chrome/Edge removed the side-loading flags
+  args: [`--disable-extensions-except=${dist}`, `--load-extension=${dist}`],
+})
+const [worker] = context.serviceWorkers().length
+  ? context.serviceWorkers() : [await context.waitForEvent('serviceworker')]
+const extensionId = new URL(worker.url()).host
+const popup = await context.newPage()
+await popup.goto(`chrome-extension://${extensionId}/popup.html`)
 ```
+Remember the worker is stopped after ~30 s idle: a test that passes only because the worker stayed warm
+is testing the wrong thing — include one test that waits past the idle timeout.
 
-The minimal extension that proves the architecture works end-to-end:
+---
+
+## Walking skeleton for an extension MVP
 
 ```
-User clicks toolbar icon
-  → popup.html opens
-  → popup.js sends { type: 'GET_DATA' } to service worker
-  → background.js receives message, fetches from API
-  → background.js stores result in chrome.storage.local
-  → background.js sendResponse({ data: normalizedData })
-  → popup.js displays data
+User clicks the toolbar icon
+  → popup sends a typed { type: 'GET_DATA' } message
+  → background validates the sender, calls the API through its Adapter (with a timeout)
+  → background stores the normalised result in browser.storage.local
+  → background replies with the domain object
+  → popup renders it (loading, empty and error states included — references/ui-design.md)
 
-Gate: this full flow works without errors in Chrome DevTools
-Do NOT add more features until this gate passes.
+Gate: this flow passes as a Vitest test (fakeBrowser) AND as a Playwright test against the built
+extension, in Chrome and Firefox. Don't add features until it does.
 ```

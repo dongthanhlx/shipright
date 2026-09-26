@@ -1,5 +1,104 @@
 # Changelog
 
+## [1.26.0] — 2026-09 — Desktop apps, built the way today's flagship apps are
+Prompted by a concrete ask — *"a TikTok Account Manager on a PC, 10–50–100 accounts in one interface"*.
+Traced through shipright the v1.17 way it was DARK end to end: no registry type, no desktop reference, no
+description vocabulary. shipright would wake on "build" and route a desktop app through web-api defaults —
+nothing about the UI thread, secrets in a `.env` beside the binary, nothing about packaging, signing or
+updates, nothing about which stack (a rewrite to change), and nothing about the question that decides
+whether such a product survives: is automating someone else's platform permitted?
+
+**Scope, as decided by the user:** modern Node.js / Python only — the stack VS Code, Claude desktop and
+Slack ship on (Electron on Chromium), with Python via PySide6 or as a sidecar. .NET, Qt C++, Flutter, Tauri
+(Rust core) and Tkinter are recorded as deliberately not covered.
+
+### Added — `references/desktop.md`, the rules
+- **Three shapes, chosen at L0 as a one-way door (ADR-001):** Electron + TypeScript (default), Electron UI
+  + Python sidecar (Python's libraries, a web UI), Python + PySide6 (native Qt UI, Python-first).
+- **OPERATE vs ACT** — the fork that decides a multi-account app's architecture: a person using N live
+  sessions in one window (Electron partitions + WebContentsView + hibernation) versus the app acting on the
+  accounts (official API first). Found by tracing the user's own prompt, not by review.
+- **The UI-thread contract** (Chromium's threading model, Electron's performance guide) — including Electron's second trap: a blocked MAIN
+  process freezes every window.
+- **The process model** (Chromium; Gamma's VS Code extension host): what can hang, crash or be hostile
+  runs in a supervised process; IPC is a validated contract. In Electron the process split *is* the layering.
+- **Data on the machine**, **security** where the trust boundary is the user's PC (safeStorage / keyring,
+  honest about same-user malware; the Electron baseline; fuses + ASAR integrity; deep links and sidecar
+  messages as untrusted input; signing + notarization; verified updates), **resilience** (Armstrong +
+  Nygard), **performance budgets** (Gregg; session hibernation), **packaging/updates per shape**, the
+  **desktop experience floor** (Fluent / HIG), and **testing** down to launching the packaged build.
+- **Multi-account apps (§10):** official API first (TikTok Content Posting API: per-account OAuth, no
+  agency token); automation only as a raised viability question; an Account aggregate with
+  **NEEDS_ATTENTION as a human-in-the-loop state**; evasion (anti-detect, captcha bypass, ban evasion,
+  mass accounts, fake engagement) out of scope, with the reason and the permitted path.
+
+### Added — `references/stacks/electron.md` (the default shape's mechanics)
+Main / preload / renderer as composition root / bridge / view; a shared zod-validated IPC contract with
+sender checks; utilityProcess workers; partitions + WebContentsView for account sessions; safeStorage;
+better-sqlite3 rebuilt for Electron's ABI; CSP, navigation and permission handlers; fuses; Electron Forge
+or electron-builder; signed updates; Vitest + Playwright `_electron`.
+
+### Added — `references/stacks/python-desktop.md`
+PySide6 (licence as a one-way door, the Qt threading contract, asyncio via QtAsyncio/qasync, the GIL and
+free-threaded 3.14 with its silent-GIL caveat, Nuitka `--standalone`, tufup, pytest-qt) — and **Python as
+a sidecar behind Electron**: frozen with Nuitka, supervised, a versioned newline-delimited JSON-RPC over
+stdio (stdout is protocol only), validated on both sides, treated as an Adapter.
+
+### Wired to fire (the ref is not done until something reaches it)
+Description vocabulary ("desktop app", "Windows app", "Electron", "PySide6", "multi-account" — kept under
+~1.5k characters so the tail isn't truncated in the skill listing), a Mid-work row in the always-loaded
+core, the reference map, registry trigger rows + a `desktop-app` entry, Branch A scope inference (official
+API question up front), pointers from `nodejs.md` and `python.md` so existing projects reach it too, a
+desktop row in `judgment.md` §5b, the desktop floor in `ui-design.md`, and `security.md` §5. Branch A's
+project-type list also gained the `mcp-server` and `blockchain-dapp` entries it was missing. EVALS 49–55,
+written after the grep.
+
+### Changed — the Node/Python baselines the desktop layer loads were out of date
+A desktop app loads `nodejs.md` / `python.md` alongside `desktop.md`, and a review against the release
+calendar found them pointing at EOL or superseded tooling:
+- **Node.js 20 reached end-of-life on 30 April 2026** — `nodejs.md`, the orders-api example and the
+  registry now target **Node.js 24 LTS** (26 enters LTS late October 2026), `node:24-alpine`.
+- **TypeScript 7** (the native Go compiler, July 2026) as the build check.
+- Jest + ts-jest → **Vitest** (TS/ESM-native — and what `electron.md` already used, so the two files
+  disagreed); ts-node-dev → **tsx**; `.eslint.config.js` (a filename ESLint never reads) → flat
+  `eslint.config.js` with typescript-eslint; db-migrate → **Drizzle / Kysely / Prisma**; the built-in
+  `fetch` + `AbortSignal.timeout()` as the default HTTP client (Boundary 5 in one line), axios optional.
+- Python: **3.13+ (3.14 current)**, **uv** + `uv.lock`, **ruff**; `pydantic BaseSettings` → the
+  **pydantic-settings** package it moved to in pydantic v2 (the old import no longer works).
+- PostgreSQL 16 → 18 in the skeleton prompts. Leftover `jest` calls in `boundaries.md`, `resilience.md`,
+  `levels.md` and `prompts.md` updated to match.
+- `desktop.md` no longer anchors the UI-thread rule on a Win32-era book: the masters are now Chromium's
+  threading model and Electron's performance guide, which state the same rule for the stack in use.
+
+### Changed — `browser-extension.md` rebuilt on the current toolchain, and three wrong rules fixed
+Same review, same Node ecosystem: the extension stack still taught Extension.js + Jest +
+`jest-webextension-mock` + raw callback `chrome.*`. Now **WXT** (Vite-based, generates the per-browser
+manifest, actively maintained — the 2026 default; CRXJS as the minimal alternative), the promise-based
+typed `browser` API, a typed message contract validated on receipt, **Vitest + WXT's fakeBrowser** for unit
+tests (in-memory storage/runtime instead of hand mocks), and **Playwright `launchPersistentContext`** on the
+built extension for end-to-end — including a test that waits past the service worker's ~30 s idle stop.
+
+Rewriting it surfaced guidance that was not just old but **wrong**, and would have produced bad code:
+- "Content script: NO chrome.storage access" — content scripts *can* use storage. The real rule is no
+  network calls from the content script; that one stays.
+- "IndexedDB: use via offscreen document" — the background service worker has IndexedDB directly. The
+  offscreen document is only for DOM APIs the worker lacks.
+- The sample manifest made the offscreen document web-accessible to `<all_urls>` and injected the content
+  script into `<all_urls>` — the file's own least-privilege section forbade both. The example now matches
+  the rules: narrow `matches`, `optional_host_permissions` requested at the moment of use.
+Also added: `storage.session` for short-lived tokens, the side panel, shadow-root UI injection so pages
+can't read or restyle it, and the MV3 alarms floor (30 s). Registry entry and README updated.
+
+### Caught before merge — scope, twice
+First draft: Python-only (the example's language taken as a requirement). Second: every desktop stack
+there is (a catalogue the user didn't want). Scope belongs to the user — now recorded in the file itself.
+
+### Deliberately NOT added
+.NET, Qt C++, Flutter, Tauri, Tkinter/pywebview (out of scope by the user's decision); a separate
+browser-automation stack file (it lives inside §10 — on its own it invites building on automation first);
+a component library or theming system (scope, not floor); anything that helps an account look like
+something it isn't.
+
 ## [1.25.1] — 2026-09 — Consistency pass: renamed probes, dead targets, and a gate Branch B never closed
 A full read of every live file against the core. No new ideas — every fix brings a ref back in line with
 what SKILL.md already says. Two of them are the repo's own documented failure modes, recurring.
