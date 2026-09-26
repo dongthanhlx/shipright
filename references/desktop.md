@@ -7,11 +7,12 @@
 > **Scope — modern Node.js / Python only.** shipright builds desktop apps the way today's flagship apps
 > are built: **Electron + TypeScript** (VS Code, Claude desktop, Slack, Discord, Figma, Notion — all
 > Chromium-based), with **Python** entering as PySide6 or as a sidecar process behind an Electron UI.
-> Deliberately not covered: .NET (WPF/WinUI/Avalonia/MAUI), Qt C++, Flutter, Tauri (Rust core), Tkinter.
+> Nothing outside these three shapes is proposed (the scope decision is recorded in CHANGELOG v1.26.0).
 >
 > Masters, by concern:
-> - **Charles Petzold** (*Programming Windows*) — the message loop. Every UI stack, Chromium included, is
->   one thread pumping events; block it and the app is dead.
+> - **Chromium's threading model** (*Threading and Tasks in Chrome*) and **Electron's performance guide** —
+>   the UI thread only pumps events and posts work elsewhere; block it (or Electron's main process) and
+>   the app is dead.
 > - **The Chromium multi-process architecture** and **Erich Gamma** (VS Code's architecture — the
 >   extension host runs out-of-process so an extension can't freeze the editor) — put untrusted or heavy
 >   work in *another process*.
@@ -91,7 +92,7 @@ In Electron the process split *is* the layering: renderer = view; preload = the 
 = composition root + OS adapters; utility processes = workers. A renderer that reaches Node or the file
 system directly is a Boundary 1 violation *and* a security hole.
 
-### The UI-thread contract (Petzold) — the rule that decides whether the app feels broken
+### The UI-thread contract (Chromium, Electron) — the rule that decides whether the app feels broken
 ```
 One thread owns the UI and pumps its events. It never waits: anything that can take more than a frame
 (~16 ms) — network, disk, a query, parsing, a browser action — runs elsewhere, and the result comes

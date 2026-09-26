@@ -23,7 +23,7 @@ PySide6 (Qt for Python, official) — default. LGPLv3: closed-source commercial 
          linking. Widgets for data-heavy tools; QML for fluid UI.
 PyQt6 — the same Qt under GPLv3 or a paid licence. For a closed-source product that is a LICENCE
          one-way door — decide it at L0, not at release.
-Not covered (desktop.md scope): Tkinter, wxPython, pywebview/Flet — shipright builds on the two shapes above.
+Other Python GUI toolkits are out of scope — shipright builds on the two shapes above (desktop.md).
 ```
 
 ## The sidecar shape — Python behind Electron
@@ -86,7 +86,7 @@ Startup      python -X importtime → lazy-import heavy modules after the first 
 Nuitka --standalone (a folder) for anything you distribute: compiled, faster start, far fewer antivirus
   false positives. PyInstaller --onedir is fine for internal tools.
 Avoid --onefile in either: it unpacks to %TEMP% on every launch — slow, and exactly what AV heuristics flag.
-Installer: Inno Setup or MSIX, per-user. Sign the exe, the built DLLs and the installer (desktop.md §4).
+Installer: Inno Setup (what VS Code's Windows installer uses) or MSIX, per-user. Sign the exe, the built DLLs and the installer (desktop.md §4).
 Updates:  tufup (built on python-tuf) — signed, verified, packaging-agnostic.
 CI:       build on windows-latest and launch the frozen build with --self-check; missing hidden imports
           and data files only appear there.

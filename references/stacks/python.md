@@ -7,6 +7,9 @@
 ```
 public boundary file    → __init__.py (explicit exports with __all__)
 schema validation       → pydantic v2
+runtime                 → Python 3.13+ (3.14 is current)
+project / deps          → uv (pyproject.toml + uv.lock committed)
+lint + format           → ruff
 test runner             → pytest + pytest-asyncio
 build check             → mypy --strict
 http validation         → pydantic BaseModel
@@ -14,7 +17,7 @@ db client               → SQLAlchemy 2.0 async + asyncpg
 migration tool          → alembic
 http client             → httpx (with retry via tenacity)
 structured logging      → structlog
-env validation          → pydantic BaseSettings
+env validation          → pydantic-settings (BaseSettings lives there in pydantic v2)
 scheduler               → APScheduler or celery beat
 ```
 
@@ -34,13 +37,13 @@ or a model that subclasses `django.db.models.Model`, is a Boundary-2/4 violation
 ```
 Read CLAUDE.md and ARCHITECTURE.md.
 Create Python + FastAPI project skeleton:
-- pyproject.toml: python 3.12+, dependencies listed
+- pyproject.toml managed by uv (uv.lock committed): requires-python ">=3.13"
 - mypy.ini: strict = True
 - pytest.ini: asyncio_mode = auto, cov-fail-under = 80
 - Each module: __init__.py (explicit __all__), types.py (Pydantic models), [name]_service.py (stub — raises NotImplementedError)
 - shared/: db.py (SQLAlchemy async engine), logger.py (structlog), errors.py (exception hierarchy), http_client.py (httpx with tenacity retry)
-- config/settings.py: pydantic BaseSettings, fails on startup if required vars missing
-- docker-compose.yml: app (python:3.12-slim) + postgres:16
+- config/settings.py: pydantic-settings BaseSettings, fails on startup if required vars missing
+- docker-compose.yml: app (python:3.14-slim) + postgres:18
 Gate: mypy --strict src/ must pass with zero errors.
 ```
 
@@ -102,7 +105,7 @@ A05 Template / SSRF
 
 Other
   ✓ Passwords: argon2/bcrypt (passlib) — never sha256/plain.
-  ✓ Secrets via pydantic BaseSettings from env — never hardcoded; never logged (structlog processors).
+  ✓ Secrets via pydantic-settings from env — never hardcoded; never logged (structlog processors).
   ✓ Validate every request body with a Pydantic model at the router boundary.
 
 A03 Supply chain

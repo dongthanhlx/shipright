@@ -90,7 +90,7 @@ grep -r "from.*shared/db" src/modules/*/*.service.ts   # must be empty
 grep -rE "from 'stripe'|require\('stripe'\)" src/modules/orders/  # must be empty
 grep -rn "amount.*: number" src/modules/               # review: should be Money, not number
 npx tsc --noEmit                                       # must pass
-npx jest --passWithNoTests                             # must pass
+npx vitest run --passWithNoTests                       # must pass
 npx madge --circular src/                              # must show no cycles
 ```
 
@@ -140,10 +140,10 @@ Mark new shortcuts: `// TODO[trigger]: description`
 
 ## Tech stack
 ```
-Runtime:    Node.js 20 LTS + TypeScript strict
-Database:   PostgreSQL 16 (pg + node-postgres)
-Migrations: db-migrate (SQL files)
-Testing:    Jest + ts-jest (coverage threshold: 80%)
+Runtime:    Node.js 24 LTS + TypeScript 7 (strict)
+Database:   PostgreSQL 18 (Drizzle ORM over pg)
+Migrations: drizzle-kit (versioned SQL, committed)
+Testing:    Vitest (coverage threshold: 80%)
 Validation: zod (env vars + request bodies)
 HTTP:       Express + axios (gateway calls: timeout 4s, axios-retry 2x on 5xx/timeout only)
 Payment:    Stripe (wrapped behind PaymentGateway adapter — never imported outside payments/)

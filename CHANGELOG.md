@@ -18,7 +18,7 @@ Slack ship on (Electron on Chromium), with Python via PySide6 or as a sidecar. .
 - **OPERATE vs ACT** — the fork that decides a multi-account app's architecture: a person using N live
   sessions in one window (Electron partitions + WebContentsView + hibernation) versus the app acting on the
   accounts (official API first). Found by tracing the user's own prompt, not by review.
-- **The UI-thread contract** (Petzold's message loop) — including Electron's second trap: a blocked MAIN
+- **The UI-thread contract** (Chromium's threading model, Electron's performance guide) — including Electron's second trap: a blocked MAIN
   process freezes every window.
 - **The process model** (Chromium; Gamma's VS Code extension host): what can hang, crash or be hostile
   runs in a supervised process; IPC is a validated contract. In Electron the process split *is* the layering.
@@ -52,6 +52,23 @@ API question up front), pointers from `nodejs.md` and `python.md` so existing pr
 desktop row in `judgment.md` §5b, the desktop floor in `ui-design.md`, and `security.md` §5. Branch A's
 project-type list also gained the `mcp-server` and `blockchain-dapp` entries it was missing. EVALS 49–55,
 written after the grep.
+
+### Changed — the Node/Python baselines the desktop layer loads were out of date
+A desktop app loads `nodejs.md` / `python.md` alongside `desktop.md`, and a review against the release
+calendar found them pointing at EOL or superseded tooling:
+- **Node.js 20 reached end-of-life on 30 April 2026** — `nodejs.md`, the orders-api example and the
+  registry now target **Node.js 24 LTS** (26 enters LTS late October 2026), `node:24-alpine`.
+- **TypeScript 7** (the native Go compiler, July 2026) as the build check.
+- Jest + ts-jest → **Vitest** (TS/ESM-native — and what `electron.md` already used, so the two files
+  disagreed); ts-node-dev → **tsx**; `.eslint.config.js` (a filename ESLint never reads) → flat
+  `eslint.config.js` with typescript-eslint; db-migrate → **Drizzle / Kysely / Prisma**; the built-in
+  `fetch` + `AbortSignal.timeout()` as the default HTTP client (Boundary 5 in one line), axios optional.
+- Python: **3.13+ (3.14 current)**, **uv** + `uv.lock`, **ruff**; `pydantic BaseSettings` → the
+  **pydantic-settings** package it moved to in pydantic v2 (the old import no longer works).
+- PostgreSQL 16 → 18 in the skeleton prompts. Leftover `jest` calls in `boundaries.md`, `resilience.md`,
+  `levels.md` and `prompts.md` updated to match.
+- `desktop.md` no longer anchors the UI-thread rule on a Win32-era book: the masters are now Chromium's
+  threading model and Electron's performance guide, which state the same rule for the stack in use.
 
 ### Caught before merge — scope, twice
 First draft: Python-only (the example's language taken as a requirement). Second: every desktop stack

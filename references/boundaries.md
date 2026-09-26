@@ -88,7 +88,7 @@ class OrderService {
 }
 ```
 
-**The test**: Can you run `OrderService.spec.ts` with `jest` and zero database connections?
+**The test**: Can you run `OrderService.test.ts` with Vitest and zero database connections?
 
 If yes: Rule 2a is respected.
 If no: there's direct DB access in a service layer.

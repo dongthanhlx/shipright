@@ -379,7 +379,7 @@ install:
       skills: [test-driven-development]
       when: complex business logic exists
 
-tested-with: Node.js 20+, Python 3.11+
+tested-with: Node.js 24 LTS, Python 3.13+
 load: references/stacks/<language>.md — the CLI's language file. A CLI has no UI/UX floor but still
       owes the system floor when it grows past a script (judgment.md §5)
 
@@ -414,7 +414,7 @@ install:
       skills: [security-and-hardening]      # plus /security-review (bundled) on every such diff
   per-stack tooling: desktop.md §7 (packaging + signed updates) and §9 (mechanics)
 
-tested-with: Electron (current stable), Node 22 LTS, TypeScript 5.x, Python 3.12–3.13, PySide6 6.x, Nuitka 2.x
+tested-with: Electron (current stable), Node.js 24 LTS, TypeScript 7, Python 3.13–3.14, PySide6 6.x, Nuitka 2.x
 load: references/desktop.md — ALWAYS (stack choice, UI-thread contract, process model, secrets, signing,
       updates, resilience, multi-account apps). Then the shape's mechanics:
       Electron → stacks/electron.md + stacks/nodejs.md; Python → stacks/python-desktop.md + stacks/python.md.
