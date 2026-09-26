@@ -143,8 +143,11 @@ Vague targets never get met. Write budgets into ARCHITECTURE.md so they're enfor
 | Bundle (initial JS) | < 200KB gzip | CI bundle check    |
 ```
 
-Frontend / Core Web Vitals: that's a deep specialty — hand off to a web-performance skill
-(`agent-skills:webperf` / web-performance-auditor) rather than guessing here.
+Frontend / Core Web Vitals: a deep specialty — don't guess here. Measure first (Lighthouse / PageSpeed,
+or `browser-testing-with-devtools` for a real-runtime trace), then run the same ladder above. Execution
+detail by stack: React/Next → `vercel-react-best-practices` (waterfalls, bundle size, re-renders);
+deployed on Vercel → `vercel-optimize` (metric-backed, covers CWV and the bill). Both vercel-labs;
+checked on demand when this fires, never pre-installed (registry.md §Install recipes).
 
 ---
 

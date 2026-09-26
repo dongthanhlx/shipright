@@ -685,10 +685,12 @@ Install only what your current page type needs.
 
 **How detection works (do not "fix" it back into a path check):** the repo name never appears on disk,
 and the on-disk layout differs between `npx skills add` (flat, by install name) and `git clone` (nested
-under `<repo>/skills/<name>/`). So SKILL.md's `skill/taste` probe matches the **`name:` field inside
-SKILL.md** — what the skill *is*, independent of how it got installed — and lists which taste skills are
-actually present, because dispatch depends on the specific one. **Adding a new sibling skill here means
-adding its install name to that probe**, or it will read as "not installed" forever.
+under `<repo>/skills/<name>/`). So SKILL.md's `skill/ui` probe matches the **`name:` field inside
+SKILL.md** — what the skill *is*, independent of how it got installed — and lists which UI skills (the taste
+family + vercel `web-design-guidelines` + `browser-testing-with-devtools`) are actually present, because
+dispatch depends on the specific one. **Adding a new sibling skill here means adding its install name to
+that probe** — and to the taste-family regex in `.claude/commands/shipright-version.md` — or it will read
+as "not installed" forever.
 
 **Already available — do not tell the user to install these:** `dataviz` and `artifact-design` ship with
 Claude Code. Invoke them directly for charts and for Artifact pages.

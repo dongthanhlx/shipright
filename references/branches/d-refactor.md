@@ -39,9 +39,9 @@ Both (UI code is a mess AND the UI looks bad)            → run the EXPERIENCE 
 
 ```
 1. AUDIT first — never jump straight to a taste-skill on existing UI (ui-design.md says this explicitly).
-   [skill/taste lists redesign-existing-projects] → run it: it audits the current UI, names the generic/
+   [skill/ui lists redesign-existing-projects] → run it: it audits the current UI, names the generic/
                          AI-slop patterns, and covers hierarchy/contrast/spacing defects too
-   [skill/taste = NO ] → shipright audits manually against ui-design.md: the FLOOR (a11y/WCAG contrast +
+   [not in skill/ui]   → shipright audits manually against ui-design.md: the FLOOR (a11y/WCAG contrast +
                          keyboard + semantics · responsive at 360px + 200% zoom · information architecture)
                          then the state-floor (loading / empty / error / success / permission) then
                          Nielsen's 10 + Norman (affordance, feedback) then Refactoring UI mechanics

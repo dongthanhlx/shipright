@@ -28,8 +28,8 @@ VISUAL / UX bug — the code "works" but the screen is wrong: broken layout, ove
                                        becomes: capture the broken state (screenshot at 360px, contrast
                                        number, keyboard path) as the repro, using
                                        browser-testing-with-devtools if installed (real runtime beats
-                                       reading the CSS). [skill/taste = YES] →
-                                       redesign-existing-projects (its audit covers hierarchy/contrast/
+                                       reading the CSS). [redesign-existing-projects in skill/ui] →
+                                       run it (its audit covers hierarchy/contrast/
                                        spacing; there is no separate visual-diagnostic skill). If it's a
                                        whole-screen redesign, not one defect → Branch D EXPERIENCE track.
 ```

@@ -18,7 +18,11 @@ test, and eventually split into services. They're cheap to follow. Expensive to 
 
 ---
 
-## Rule 1 — Modules talk through index.ts, not internal files
+> Numbering matches SKILL.md (the source of truth). Rule 2 has two concrete halves (2a/2b) because
+> "each layer has one job" is violated in two distinct ways — a service touching the DB, and a
+> repository leaking raw rows.
+
+## Rule 1 — Dependencies point inward only: modules talk through index.ts, not internal files
 
 **The rule**: When module A needs something from module B,
 it imports from `modules/b/index.ts` only — never from `modules/b/b.service.ts` directly.
@@ -45,7 +49,12 @@ If no: there's a deep import somewhere that needs fixing.
 
 ---
 
-## Rule 2 — Services never touch the database directly
+## Rule 2 — Each layer has one job
+
+Handler: parse → call service → format (zero domain logic). Service: business rules only (no HTTP,
+no DB). Repository: queries only, returns typed domain objects. The two violations that matter most:
+
+### 2a — Services never touch the database directly
 
 **The rule**: Service files cannot import `shared/db`.
 The only path to the database is through a repository interface.
@@ -81,12 +90,10 @@ class OrderService {
 
 **The test**: Can you run `OrderService.spec.ts` with `jest` and zero database connections?
 
-If yes: Rule 2 is respected.
+If yes: Rule 2a is respected.
 If no: there's direct DB access in a service layer.
 
----
-
-## Rule 3 — Repositories hide persistence details
+### 2b — Repositories hide persistence details
 
 **The rule**: Repositories return typed domain objects.
 Nothing outside the repository knows what SQL looks like or what columns exist.
@@ -125,24 +132,67 @@ class UserRepository {
 **The test**: Can you change the database table's column names
 (e.g., `created_at` → `createdAt`) without changing any service file?
 
-If yes: Rule 3 is respected.
+If yes: Rule 2b is respected.
 If no: a repository is leaking raw rows.
 
 ---
 
-## Why these 3 rules = no rewrite when scaling
+## Rule 3 — Modules do not share databases
+
+**The rule**: Each table is owned by exactly one module. When module A needs data that module B
+owns, it calls B's public interface — it never queries B's tables, not even read-only.
+
+**Why**: A shared table is a hidden dependency that no import statement shows. B renames a column,
+adds a soft-delete flag, or changes an invariant — and A breaks silently, because A never went
+through B's rules. It also makes extraction impossible: B cannot move to its own database while A
+still joins against its tables.
+
+```typescript
+// ✅ CORRECT — orders asks inventory through its public interface
+class OrderService {
+  constructor(private orders: IOrderRepository, private stock: IStockService) {}
+
+  async placeOrder(cmd: PlaceOrderCommand) {
+    await this.stock.reserve(cmd.productId, cmd.qty)   // inventory enforces its own rules
+    // ...
+  }
+}
+
+// ❌ WRONG — orders' repository reads inventory's table directly
+class OrderRepository {
+  async availableStock(productId: string) {
+    return this.db.query('SELECT available FROM stock WHERE product_id = $1', [productId])
+    // bypasses inventory's reservation logic; breaks when inventory changes its schema
+  }
+}
+```
+
+**The test**: For each table, can you name the ONE module that reads and writes it?
+Grep every other module's repositories for that table name — the result must be empty.
+
+If yes: Rule 3 is respected.
+If no: two modules share a table — route the access through the owner's interface.
+
+(Cheapest enforcement as you grow: one DB schema per module, no cross-schema queries —
+`references/scaling-guide.md` Stage 1, Step 5.)
+
+---
+
+## Why rules 1–3 = no rewrite when scaling
 
 When the system needs to scale and you want to split `users` into its own service:
 
-**Without the 3 rules**:
+**Without rules 1–3**:
 - Other modules import `users.service.ts` directly → must find and update all imports
 - Services use `db` directly → can't split without copying DB logic
 - Repositories return raw rows → services contain SQL column knowledge → everything breaks
+- Other modules query the `users` table → the table can't move without breaking them
 
-**With the 3 rules**:
+**With rules 1–3**:
 - Other modules import from `users/index.ts` → change index.ts to call HTTP instead of local → zero changes elsewhere
 - Services use `IUserService` interface → the HTTP client implements the same interface → zero changes to service logic
 - Repositories are already isolated → can be moved entirely to the new service
+- Only `users` touches its tables → the tables move with it
 
 The split becomes: create new service, implement `IUserService` as HTTP client,
 flip a feature flag. One day of work instead of weeks of untangling.

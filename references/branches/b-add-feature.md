@@ -171,40 +171,45 @@ No external skills needed for Tier S.
 Exception: bug → activate debugging-and-error-recovery if installed.
 ```
 
+> `[X in skill/core]` below means the skill name X appears in the `skill/core` list from SKILL.md's
+> working context (re-run the grep if something was installed mid-session — the snapshot is stale).
+
 **Tier M — Simple (2–5 files, < 2 hrs)**
 ```
 PHASE: before implement
-  [skill/spec-driven = YES] → NOT needed for Tier M (scope already clear)
+  spec-driven-development → NOT needed for Tier M, even if installed (scope already clear)
   → Write acceptance criteria inline (2-3 sentences)
 
 PHASE: implementing
-  [skill/tdd = YES] → activate test-driven-development NOW
-  [skill/tdd = NO]  → write RED test manually → implement → GREEN
+  [test-driven-development in skill/core] → activate it NOW
+  [not in skill/core]                     → write RED test manually → implement → GREEN
 
 PHASE: before commit/merge
-  [skill/review = YES] → activate code-review-and-quality
-  [skill/review = NO]  → run quality gate checklist in Step 5 below
+  [code-review-and-quality in skill/core] → activate it
+  [not in skill/core]                     → run quality gate checklist in Step 5 below
+  Either way, close with a real review (Step 5 "Close the gate") — not a self-assessment.
 ```
 
 **Tier L — Complex (5–10 files, 2–8 hrs)**
 ```
 PHASE: before implement (required — do not skip)
-  [skill/spec-driven = YES] → activate spec-driven-development FIRST
+  [spec-driven-development in skill/core] → activate it FIRST
     Wait for spec approved before writing any code.
-  [skill/spec-driven = NO]  → write spec manually:
+  [not in skill/core]                     → write spec manually:
     File: SPEC-[feature-name].md
     Include: problem, acceptance criteria, risks, out-of-scope
     Gate: SPEC reviewed before coding starts
 
 PHASE: implementing
-  [skill/incremental = YES + skill/tdd = YES] → /build auto
-  [skill/incremental = YES only] → activate incremental-implementation
-  [skill/tdd = YES only] → activate test-driven-development
+  [incremental-implementation + test-driven-development both in skill/core] → /build auto
+  [only incremental-implementation] → activate incremental-implementation
+  [only test-driven-development]     → activate test-driven-development
   [neither] → implement subtask by subtask, RED→GREEN per subtask
 
 PHASE: before merge
-  [skill/review = YES] → activate code-review-and-quality (mandatory for Tier L)
-  [skill/review = NO]  → full quality gate checklist (Step 5) + 2nd human review if team
+  [code-review-and-quality in skill/core] → activate it (mandatory for Tier L)
+  [not in skill/core]                     → full quality gate checklist (Step 5) + 2nd human review if team
+  Either way, close with a real review (Step 5 "Close the gate").
 ```
 
 **Tier XL — Architecture update first**
@@ -278,10 +283,16 @@ npx tsc --noEmit 2>/dev/null || python -m mypy src/  # must pass
 - [ ] AuthZ enforced in the SERVICE, deny-by-default? (A01 — the #1 real breach)
 - [ ] All input validated at the boundary; queries parameterized (no string-built SQL/HTML/shell)? (A05)
 - [ ] No secret in code, logs, or error messages? (A04/A09)
-- [ ] auth/payments/untrusted-input present → activate security-and-hardening skill
+- [ ] auth/payments/untrusted-input present → run `/security-review` on the diff (bundled, free) +
+      activate security-and-hardening if installed
 
 **Violation found:** fix → add specific rule to CLAUDE.md (compound engineering)
 **Load** `references/code-quality.md` for fix guidance on specific violation.
+
+**Close the gate (Tier M+) — a real review, not a self-assessment** (SKILL.md §Quality system):
+- Touched auth / payments / untrusted input → `/security-review` must have run on this diff.
+- Ask the user to run `/code-review`. It is **user-invoke-only** — shipright cannot run it, so never
+  report the gate as closed until the user has. (Both are bundled — never offer to install them.)
 
 ---
 

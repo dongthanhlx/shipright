@@ -357,7 +357,7 @@ shipright-adds-to-CLAUDE:
   api-boundary: [standard boundary rules 1-4 apply to API layer]
   ui-page-types:
     landing-portfolio: design-taste-frontend
-    product-ui: minimalist-skill
+    product-ui: minimalist-ui   # install name — the folder is minimalist-skill, which fails with --skill
     dashboard-admin: vercel-labs (NOT taste-skill)
     multi-step-forms: addyosmani/api-and-interface-design
   debt-signals:
