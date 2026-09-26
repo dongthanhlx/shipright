@@ -119,7 +119,7 @@ pending *"did it actually work?"* into that session, so it gets asked before the
 | REST API / backend | web-api | addyosmani/agent-skills |
 | RAG / knowledge base | rag-pipeline | RAGAS + addyosmani |
 | Telegram/Discord bot | chatbot-telegram-discord | grammy/discord.js + addyosmani |
-| Browser extension | browser-extension | jest-webextension-mock |
+| Browser extension | browser-extension | WXT + Vitest (fakeBrowser) + Playwright |
 | AI agent | ai-agent | DeepEval + addyosmani |
 | Full-stack web | full-stack-web | addyosmani + taste-skill |
 | CLI tool | cli-tool | optional |
@@ -250,7 +250,7 @@ shipright/
       ai-agent.md             # agents & multi-agent: workflow-vs-agent, 5 patterns, state machines, eval
       chatbot-platforms.md    # Telegram/Discord: adapter, state, security
       blockchain.md           # EVM/Solana/TON/SUI: security, audit gate, chain patterns
-      browser-extension.md    # MV3: manifest, components, chrome.* APIs
+      browser-extension.md    # MV3 with WXT: contexts, typed messaging, storage boundaries, least privilege, Vitest + Playwright
       electron.md             # the default desktop shape: main/preload/renderer, typed zod IPC, utilityProcess, partitions + WebContentsView, fuses, Forge
       python-desktop.md       # PySide6 + Python as a supervised stdio JSON-RPC sidecar behind Electron (Nuitka, tufup)
     examples/

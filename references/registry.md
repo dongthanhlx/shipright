@@ -220,36 +220,35 @@ shipright-adds-to-CLAUDE:
 ---
 
 ## browser-extension
-Chrome/Firefox extension using Manifest V3.
+Chrome / Firefox / Safari extension, Manifest V3, TypeScript.
 
 ```
 install:
   required:
     - addyosmani/agent-skills
       skills: [incremental-implementation, test-driven-development]
+  framework:
+    - WXT (Vite-based, generates the per-browser manifest): npx wxt@latest init
   testing:
-    - jest-webextension-mock: npm install --save-dev jest-webextension-mock
+    - Vitest + WXT's fakeBrowser (unit) · Playwright launchPersistentContext (end-to-end, built extension)
 
-tested-with: Chrome MV3, Firefox MV3 (via Extension.js)
-load: references/stacks/browser-extension.md — MV3 architecture, message passing, storage boundaries,
-      and the content-script security model (a content script trusts a hostile DOM — see security.md)
-
-tooling:
-  recommended: Extension.js (Chrome + Firefox from same source)
-  install: npx extension create my-extension
+tested-with: Chrome MV3, Firefox MV3, WXT 0.x (current), Vitest 4, Playwright (current)
+load: references/stacks/browser-extension.md — MV3 contexts, typed messaging, storage boundaries, and the
+      content-script security model (a content script trusts a hostile DOM — see security.md)
 
 shipright-adds-to-CLAUDE:
-  boundary-sw: "Service Worker: NO DOM, NO module variables (state lost on terminate)"
-  boundary-content: "Content Script: NO external fetch → message to service worker"
-  boundary-state: "All state via chrome.storage.local/sync. Never in JS variables."
+  boundary-sw: "Background (service worker): NO DOM, NO module-level state (it is stopped when idle)"
+  boundary-content: "Content script: NO network calls → typed message to the background"
+  boundary-state: "State via browser.storage (session for ephemeral tokens, local for data). Never JS variables."
+  messaging: "One typed message contract; sender + payload validated on every receipt"
   mv3-gotchas:
-    - "ALL listeners registered SYNCHRONOUSLY at top level of background.js"
-    - "No setTimeout/setInterval → use chrome.alarms API"
-    - "Async message response: return true from onMessage listener"
-    - "No inline scripts in HTML (CSP violation)"
+    - "Listeners registered SYNCHRONOUSLY at the top level of the background"
+    - "No long-lived timers → browser.alarms (min 30 s period)"
+    - "Promise-based `browser` API for replies (raw chrome.runtime.onMessage needs `return true`)"
+    - "No remote code; keep the default extension-page CSP"
   debt-signals:
-    - "TODO[publish]: add privacy policy URL to manifest"
-    - "TODO[v2]: request minimal permissions audit"
+    - "TODO[publish]: privacy policy URL + least-privilege permission review before store submission"
+    - "TODO[broad-host-permission]: move to optional_host_permissions requested at the moment of use"
 ```
 
 ---

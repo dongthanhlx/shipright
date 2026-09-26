@@ -70,6 +70,25 @@ calendar found them pointing at EOL or superseded tooling:
 - `desktop.md` no longer anchors the UI-thread rule on a Win32-era book: the masters are now Chromium's
   threading model and Electron's performance guide, which state the same rule for the stack in use.
 
+### Changed — `browser-extension.md` rebuilt on the current toolchain, and three wrong rules fixed
+Same review, same Node ecosystem: the extension stack still taught Extension.js + Jest +
+`jest-webextension-mock` + raw callback `chrome.*`. Now **WXT** (Vite-based, generates the per-browser
+manifest, actively maintained — the 2026 default; CRXJS as the minimal alternative), the promise-based
+typed `browser` API, a typed message contract validated on receipt, **Vitest + WXT's fakeBrowser** for unit
+tests (in-memory storage/runtime instead of hand mocks), and **Playwright `launchPersistentContext`** on the
+built extension for end-to-end — including a test that waits past the service worker's ~30 s idle stop.
+
+Rewriting it surfaced guidance that was not just old but **wrong**, and would have produced bad code:
+- "Content script: NO chrome.storage access" — content scripts *can* use storage. The real rule is no
+  network calls from the content script; that one stays.
+- "IndexedDB: use via offscreen document" — the background service worker has IndexedDB directly. The
+  offscreen document is only for DOM APIs the worker lacks.
+- The sample manifest made the offscreen document web-accessible to `<all_urls>` and injected the content
+  script into `<all_urls>` — the file's own least-privilege section forbade both. The example now matches
+  the rules: narrow `matches`, `optional_host_permissions` requested at the moment of use.
+Also added: `storage.session` for short-lived tokens, the side panel, shadow-root UI injection so pages
+can't read or restyle it, and the MV3 alarms floor (30 s). Registry entry and README updated.
+
 ### Caught before merge — scope, twice
 First draft: Python-only (the example's language taken as a requirement). Second: every desktop stack
 there is (a catalogue the user didn't want). Scope belongs to the user — now recorded in the file itself.
