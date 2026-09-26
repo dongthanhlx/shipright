@@ -144,7 +144,10 @@ Unbreakable rules:
 □ One small change at a time
 □ Run tests AFTER EACH change — never batch
 □ Test goes RED during refactor → REVERT that step immediately, find different approach
-□ Commit after each green step: "refactor([module]): [small description]"
+  (`git restore <only the files this step touched>` — never a blanket reset; if the user had
+  uncommitted changes before you started, ask first — references/git.md Tier 2)
+□ Commit after each green step (per the Git policy): "refactor([module]): [small description]" —
+  each commit is the checkpoint that makes the next revert safe and small
 □ No new features in refactor commits
 □ No interface changes without updating all callers in same commit
 

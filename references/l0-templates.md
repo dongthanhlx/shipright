@@ -98,6 +98,14 @@ When that happens: stop, define the right domain term, rename.
 |---|---|
 | [shortcut] | TODO[[metric]]: [what to do] |
 
+## Git policy
+Default branch: main — protected; never commit or push to it directly
+Commit:   [auto on feature branches at green | ask first]
+Push:     [auto to my own feature branches | ask first]
+PR:       [auto-open as draft | ask first]
+Merge:    always ask
+Strategy: [squash | merge commit | rebase] · Style: Conventional Commits
+
 ## When to ask before doing
 - Changing any module's public interface (index.ts exports)
 - Adding a new npm/pip dependency

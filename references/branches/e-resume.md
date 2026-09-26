@@ -68,6 +68,9 @@ git stash list           # forgotten stash?
 git branch -a            # which branch? WIP branches?
 ```
 
+Uncommitted changes or a stash you didn't make → that is the user's work in progress: report it, never
+discard, stash-drop or reset it (references/git.md Tier 2). Ask what they want done with it.
+
 Read CLAUDE.md + ARCHITECTURE.md fully.
 If neither exists → the code already exists, so start from what the code says: run Claude Code's
 native `/init` (it analyzes the codebase and drafts a CLAUDE.md), THEN refine it with shipright's

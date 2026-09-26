@@ -48,6 +48,11 @@ in 6 months — an afternoon, or a migration?"*
   guard — don't freeze, don't big-bang rewrite. See `references/evolutionary-architecture.md` (fitness
   functions + the recovery path). The seam you built to get it right is what lets you fix being wrong.
 
+**The same two questions govern the agent's own actions.** Every git operation is a door with a
+reversibility (reflog protects commits; nothing protects uncommitted work) and a visibility (local vs
+pushed vs merged into main). `references/git.md` turns that into a consent ladder: what shipright just
+does, what it does per the project's Git policy, and what it must always ask first.
+
 ---
 
 ## 2. The MVP matrix — ship fast WITHOUT breaking architecture

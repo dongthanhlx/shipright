@@ -74,6 +74,8 @@ error taxonomy cover A10; **least privilege + fail-safe defaults** are the spine
 ```
 Secrets      — never in source, logs, error messages, tool args, or client code. Env/secret manager
                only. Rotate on exposure. (Ties to observability.md "never log" list + A04.)
+               A secret that reached git: ROTATE first — purging history is a Tier 4 rewrite and does not
+               un-leak what was pushed or cloned (references/git.md §10). .gitignore + secret scanning prevent it.
 AuthZ        — access control is a SERVICE-layer decision, enforced on every call, deny-by-default.
                A handler authenticates (who are you); the service authorizes (may you do this). (A01)
 Input        — untrusted until validated at the boundary (zod/pydantic/validator). The model/user/

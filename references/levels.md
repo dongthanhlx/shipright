@@ -180,7 +180,8 @@ feat(orders): add cancelOrder with refund trigger
 fix(orders): handle concurrent order race condition
 ```
 
-Never: `feat: add stuff` or `wip` or `various fixes`
+Never: `feat: add stuff` or `wip` or `various fixes`. Whether the agent commits on its own, and when it
+must ask before push / PR / merge, is the project's Git policy — references/git.md.
 
 **What "done" (for one feature) looks like**:
 - Feature test cases: GREEN

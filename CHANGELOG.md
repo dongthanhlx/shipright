@@ -1,5 +1,54 @@
 # Changelog
 
+## [1.27.0] — 2026-09 — Git: fluent with the tool, careful with the doors
+shipright told the agent to commit in four places and never said whether it was allowed to. There was no
+model of which git operations the agent may simply do, which it does under the user's standing rules, and
+which it must always ask about — and the gap showed in practice: while building v1.26 a branch was pushed
+on the strength of an earlier release's approval.
+
+### Added — `references/git.md`, the consent ladder first
+- **Five tiers by reversibility × visibility** (judgment.md's doors applied to the agent's own actions):
+  read-only → just do it · local and reflog-recoverable (commit on a feature branch, unpublished rebase)
+  → per the project's Git policy · destroys UNCOMMITTED work (reset --hard, clean, restore, stash drop,
+  deleting unmerged branches) → always ask, with what would be lost · outward (push, PR, tag, release) →
+  ask unless the policy grants it, and a yes is scoped to that action on that branch · shared history and
+  production (merge to main, force-push, rewriting published history, deploy-triggering tags) → always
+  explicit confirmation. Standing rules: never `--no-verify`, never edit git config, never amend after a
+  failed hook, force only with `--force-with-lease --force-if-includes` on your own branch.
+- **How to ask:** one line with what, where, whether it's reversible, and the evidence (the commit list).
+- **The Git policy** — durable authorization recorded once in CLAUDE.md (commit / push / PR / merge /
+  strategy / style). It can widen the local and outward tiers; nothing widens the destructive or
+  shared-history tiers. No policy → propose commits, ask before push/PR/merge, offer to record one.
+- The craft, from the masters: when to commit (at green, atomic, structure before behaviour — Beck's
+  *Tidy First?*; stage deliberately; the never-commit list), messages (Beams' seven rules + Conventional
+  Commits, Ubiquitous Language scopes), branches (Fowler, trunk-based, GitHub Flow — short-lived, never
+  on the default branch), PRs (Google's *Small CLs*, self-review, CI green, the real review gate), merging
+  (prepared by shipright, decided by the user; strategy read from history), conflicts, SemVer + Keep a
+  Changelog, recovery (reflog, revert vs reset, bisect; a committed secret is rotated first), and the
+  git hygiene that is really security.
+- `git-workflow-and-versioning` (addyosmani), which v1.24 declined as outside the spine, is now mapped as
+  an optional executor of the mechanics — the consent ladder and the policy stay shipright's.
+
+### Wired to fire — and to be read every session
+- **The working context reads `## Git policy` and the count of uncommitted files every session** — so
+  consent comes from the project, not from memory of an earlier conversation. Verified against a real
+  CLAUDE.md; the block is capped at 7 lines for the same reason `Last shipped` was.
+- The L0 constitution (both templates, Branch A's confirm step and gate, the orders-api example) records
+  the policy, asked once alongside the constitution playback.
+- Every "commit" in the branches now reads "per the Git policy"; Branch B Step 6 spells out commit → push →
+  PR → merge with each tier; Branch D's "revert the step" restores only the files that step touched;
+  Branch E never discards work it finds; Branch F reverts instead of reset + force-push and leaves push,
+  merge and deploy to the user; `judgment.md`, `levels.md`, `registry.md` and `security.md` point here.
+- Description gained git vocabulary; to stay under ~1.5k characters, three triggers another trigger
+  already covered were dropped ("is this feature worth it", "mobile layout", "scale this").
+- EVALS rows 56–62 — including row 57, this repo's own consent slip, recorded on purpose.
+
+### Deliberately NOT added
+git-flow as a default (long-lived develop/release branches — the opposite of the short-lived,
+integrate-often model the masters and DORA support; follow it only where a repo already does);
+auto-merge of the agent's own PRs under any policy; commit-count or PR-size quotas as gates (sizes are
+guidance for review quality, not a Goodhart target).
+
 ## [1.26.0] — 2026-09 — Desktop apps, built the way today's flagship apps are
 Prompted by a concrete ask — *"a TikTok Account Manager on a PC, 10–50–100 accounts in one interface"*.
 Traced through shipright the v1.17 way it was DARK end to end: no registry type, no desktop reference, no

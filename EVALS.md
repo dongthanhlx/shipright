@@ -187,6 +187,27 @@ Node/Python and wanted shipright expert in the path today's flagship apps take. 
 decision, not the example's and not the catalogue's.** Row 51 came from tracing the user's own prompt
 through the files, not from review — the v1.17 method still finds what reading doesn't.
 
+### Git scenarios (v1.27) — the agent's own actions had no consent model
+
+| # | Situation | Before | Verdict → fix |
+|---|---|---|---|
+| 56 | Tier S / Branch D: "implement → commit", "commit after each green step" | the branches ordered commits with no word on whether the user had agreed to the agent committing at all | **NO-GATE → fixed v1.27.** Every commit step now reads "per the Git policy"; `git.md` §1 Tier 1 + §2 |
+| 57 | a user says "oke" to pushing branch X; later, a different branch is ready | nothing said a yes is scoped — **this happened while building v1.26: a branch was pushed on the strength of an earlier release's approval.** Reversible, but exactly the failure | **CONSENT-CARRYOVER → fixed v1.27.** Tier 3: a yes covers that action on that branch; the ask carries the evidence |
+| 58 | a refactor step goes RED: "REVERT that step immediately" | a revert is a Tier 2 discard; with the user's uncommitted work in the tree, a blanket reset destroys it | **HAZARD → fixed v1.27.** Branch D + `git.md` Tier 2: restore only the files this step touched; checkpoint commits make it safe |
+| 59 | resuming a project that has uncommitted changes / a stash | Branch E listed `git status` and `stash list` and said nothing about what to do with what it found | **HAZARD → fixed v1.27.** Branch E: report it, never discard it, ask |
+| 60 | production incident: "roll it back" | nothing stopped reset + force-push on main — the fast, evidence-destroying move | **HAZARD → fixed v1.27.** Branch F: `git revert`; push/merge/deploy are the user's explicit call |
+| 61 | every session: what may the agent do with git here? | nothing recorded; consent was re-decided (or assumed) each time | **DARK → fixed v1.27.** `## Git policy` in the L0 constitution, asked once; SKILL.md's working context reads it every session (7-line block, verified against a real CLAUDE.md) |
+| 62 | "commit/push/PR/merge" with no other shipright trigger | the description carried no git vocabulary | **DARK → fixed v1.27.** Description + a Mid-work row → `references/git.md` |
+
+Verified by grep before writing these rows: `git.md` is reached from SKILL.md (description, working
+context, a Mid-work row, the quality-system note, the map), all six branches, `judgment.md`, `levels.md`,
+`registry.md` and `security.md`.
+
+**Row 57 is this repo's own history, recorded on purpose.** Every other row describes a gap found by
+reading. This one is a gap found by *doing*: the agent pushed on stale consent and noticed only after.
+A consent model that the model applying it doesn't follow is decoration — hence a probe in the working
+context rather than one more paragraph of advice.
+
 ### Finding (v1.20) — the trigger can be perfect and still dead-end
 
 v1.17's lesson was *retrieval + timing*. v1.20 adds: **the target must exist**. shipright's UI dispatch

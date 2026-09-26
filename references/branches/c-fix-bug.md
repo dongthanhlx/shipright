@@ -102,7 +102,7 @@ Fix in the correct layer (service bug → fix service, not handler).
 Minimal change — only enough to make the failing test pass.
 No refactoring in the same commit.
 Run full test suite — no regression.
-Commit: "fix([module]): [description]"
+Commit (per the Git policy — git.md): "fix([module]): [description]" — the RED test and the fix together
 
 After fix: could this same pattern occur elsewhere?
   Yes → add test or lint rule to prevent recurrence

@@ -244,6 +244,14 @@ Check by: [a date, or a trigger condition]
 |---|---|
 | [from registry entry] | TODO[signal]: [action] |
 
+## Git policy
+Default branch: main — protected; never commit or push to it directly
+Commit:   [auto on feature branches at green | ask first]
+Push:     [auto to my own feature branches | ask first]
+PR:       [auto-open as draft | ask first]
+Merge:    always ask
+Strategy: [squash | merge commit | rebase] · Style: Conventional Commits
+
 ## When to ask before doing
 - Changing module's public interface (index.ts / __init__.py exports)
 - Adding dependency not in stack above
@@ -278,6 +286,10 @@ Play the distilled constitution back — don't just generate and move on:
  boundaries [the project-specific banned imports] · the one-way doors I'm nailing now: [list].
  The one risk I see is [X]. Anything wrong or missing before we build?"
 Fix on the user's correction. A constitution the user didn't confirm won't be trusted or honored.
+
+Ask the Git policy in the same breath — it is the user's to set, and asking once here is what saves
+asking at every commit: "Should I commit on feature branches as I go, or ask first? And push / open
+PRs — ask each time, or go ahead on my own branches? (Merging into main I'll always ask.)"
 ```
 
 ---
@@ -298,7 +310,7 @@ Fix on the user's correction. A constitution the user didn't confirm won't be tr
 
    a) OUTPUT check — "are we done building?"
       "Can a real user complete [the one journey] right now?"
-      YES → deploy, put in front of real users. Don't gold-plate first — the last 20% costs the most
+      YES → deploy, put in front of real users (push / PR / merge / deploy per the Git policy — git.md). Don't gold-plate first — the last 20% costs the most
             and no user has asked for it. Cut remaining scope to nice-to-have; the quality floor stays.
       NO  → not done. Cut SCOPE to reach the journey, never cut the quality floor. Then ship + learn.
 
@@ -340,6 +352,7 @@ L0 → L1 Skeleton → L2 Interfaces + RED tests → L3 Implement loop
 - [ ] Core domain type defined (Entity vs Value Object — must be right)
 - [ ] Registry entry loaded, required skills noted
 - [ ] Shipright state section written to CLAUDE.md
+- [ ] `## Git policy` recorded from the user's answer (commit / push / PR / merge — references/git.md §2)
 - [ ] MVP: walking skeleton identified as 1 user journey
 - [ ] Production: all modules, error taxonomy, idempotency decisions
 
