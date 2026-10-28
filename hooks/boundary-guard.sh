@@ -18,7 +18,8 @@
 #     paths are normalized, and a python is used only if it actually RUNS (the Microsoft Store
 #     `python3` alias exists on PATH and fails, which used to turn the guard into a silent no-op).
 #
-# Install (settings.json):
+# Install — as a plugin: already registered by hooks/hooks.json; turn on the plugin's
+# `boundary_guard` option (/plugin configure shipright@shipright). Or by hand, in settings.json:
 #   { "hooks": { "PreToolUse": [ { "matcher": "Edit|Write",
 #       "hooks": [ { "type": "command",
 #         "command": "~/.claude/skills/shipright/hooks/boundary-guard.sh" } ] } ] } }
@@ -246,6 +247,12 @@ fi
 
 # ----------------------------------------------------------------------------- main
 [ "${SHIPRIGHT_GUARD:-on}" = "off" ] && exit 0
+# As a plugin (hooks/hooks.json), this hook is registered for everyone who enables shipright —
+# plugin hooks have no opt-in of their own. The guard stays opt-in through the plugin's
+# `boundary_guard` option, off by default. A settings.json install has no plugin root: unaffected.
+if [ -n "${CLAUDE_PLUGIN_ROOT:-}" ]; then
+  case "${CLAUDE_PLUGIN_OPTION_BOUNDARY_GUARD:-}" in true|1|yes) ;; *) exit 0 ;; esac
+fi
 INPUT="$(cat 2>/dev/null)"
 pick_parser
 run_hook

@@ -1,0 +1,32 @@
+{
+  "name": "shipright",
+  "displayName": "shipright",
+  "version": "1.29.0",
+  "description": "Ship your MVP fast, grow it right — the Project Brain OS for AI coding: a project constitution, 5 architecture boundaries and a quality gate, build-now-vs-defer judgment, fault tolerance, session state, and community-skill dispatch.",
+  "author": {
+    "name": "ThD",
+    "url": "https://github.com/dongthanhlx"
+  },
+  "homepage": "https://github.com/dongthanhlx/shipright",
+  "repository": "https://github.com/dongthanhlx/shipright",
+  "license": "MIT",
+  "keywords": [
+    "architecture",
+    "mvp",
+    "boundaries",
+    "ddd",
+    "quality-gate",
+    "resilience",
+    "ui-ux",
+    "git",
+    "workflow"
+  ],
+  "userConfig": {
+    "boundary_guard": {
+      "type": "boolean",
+      "title": "Boundary guard",
+      "description": "Block the two highest-confidence boundary violations (a service importing the DB, a deep import into another module's internals) as Claude writes them. Fails open; does nothing outside module-structured projects. Off by default.",
+      "default": false
+    }
+  }
+}

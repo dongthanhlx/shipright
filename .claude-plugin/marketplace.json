@@ -1,0 +1,13 @@
+{
+  "name": "shipright",
+  "owner": { "name": "ThD", "url": "https://github.com/dongthanhlx" },
+  "description": "shipright — the Project Brain OS for AI coding, as a Claude Code plugin.",
+  "plugins": [
+    {
+      "name": "shipright",
+      "source": "./",
+      "description": "Ship your MVP fast, grow it right: constitution, boundaries, judgment, resilience, session state, skill dispatch.",
+      "category": "development"
+    }
+  ]
+}

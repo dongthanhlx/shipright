@@ -37,6 +37,23 @@ assert "self-test passes" '[ "$guard_rc" -eq 0 ]'
 if [ "${REQUIRE_PARSER:-0}" = 1 ]; then
   assert "no case skipped (a JSON parser was found)" 'echo "$guard_out" | grep -q "skipped: 0"'
 fi
+# The plugin opt-in gate, through the real stdin path (needs a parser to see a block at all).
+if ! echo "$guard_out" | grep -q "parser: none"; then
+  viol='{"tool_name":"Write","cwd":"/r","tool_input":{"file_path":"/r/src/modules/orders/orders.service.ts","content":"import { db } from \"../../shared/db\""}}'
+  g() { printf '%s' "$viol" | env "$@" "$BASH_BIN" "$ROOT/hooks/boundary-guard.sh" >/dev/null 2>&1; echo $?; }
+  rc_settings=$(g -u CLAUDE_PLUGIN_ROOT)
+  rc_plugin_off=$(g -u CLAUDE_PLUGIN_OPTION_BOUNDARY_GUARD CLAUDE_PLUGIN_ROOT=/p)
+  rc_plugin_false=$(g CLAUDE_PLUGIN_ROOT=/p CLAUDE_PLUGIN_OPTION_BOUNDARY_GUARD=false)
+  rc_plugin_on=$(g CLAUDE_PLUGIN_ROOT=/p CLAUDE_PLUGIN_OPTION_BOUNDARY_GUARD=true)
+  assert "settings.json install (no plugin root) → blocks"       '[ "$rc_settings" = 2 ]'
+  assert "plugin, boundary_guard unset → allows (opt-in)"        '[ "$rc_plugin_off" = 0 ]'
+  assert "plugin, boundary_guard=false → allows"                 '[ "$rc_plugin_false" = 0 ]'
+  assert "plugin, boundary_guard=true → blocks"                  '[ "$rc_plugin_on" = 2 ]'
+fi
+# hooks/hooks.json (the plugin's registration) must point at a script that exists.
+hook_cmd=$(sed -n 's/.*"command": *"\(.*\)".*/\1/p' "$ROOT/hooks/hooks.json" | sed 's/\\"//g')
+hook_path=$(printf '%s' "$hook_cmd" | sed "s#\${CLAUDE_PLUGIN_ROOT}#$ROOT#; s#^bash ##")
+assert "hooks/hooks.json runs an existing script ($(basename "$hook_path"))" '[ -f "$hook_path" ]'
 
 # ------------------------------------------------------------------ check-update
 echo "check-update:"

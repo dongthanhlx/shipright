@@ -34,7 +34,12 @@ When blocked, Claude receives the reason on stderr and self-corrects (imports vi
 
 ## Install (opt-in)
 
-Add to `~/.claude/settings.json` (user-level is safe — see "Safe to enable globally" below):
+**Plugin install:** the hook is already registered (`hooks/hooks.json`). Plugin hooks fire for everyone
+who enables the plugin, so the guard checks the plugin's `boundary_guard` option first and does nothing
+until it is on: `/plugin configure shipright@shipright` → **Boundary guard**. Don't also add it to
+settings.json, or every edit is checked twice.
+
+**Skill-folder install:** add to `~/.claude/settings.json` (user-level is safe — see "Guarantees" below):
 
 ```json
 {
@@ -66,6 +71,7 @@ Verify the logic at any time (no Claude Code session needed):
 | Control | Effect |
 |---|---|
 | `SHIPRIGHT_GUARD=off` (env) | Disable the guard entirely for a session |
+| plugin option `boundary_guard` | Plugin installs only: the guard is off until this is `true` (`/plugin configure shipright@shipright`) |
 | `shipright-ignore` (code comment on the line) | Allow one specific import — the senior move: name the exception |
 | module dir convention | Auto-detects `modules/ \| domains/ \| features/ \| services/` as the module root |
 
