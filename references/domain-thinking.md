@@ -89,7 +89,9 @@ FeedItemCreated -> trigger: notify downstream consumers (if any)
 ```
 
 At MVP: domain events can be simple function calls or Promise.allSettled chains.
-Later: domain events become the backbone of async messaging (Kafka, EventBridge).
+Later: domain events become the backbone of async messaging (Kafka, EventBridge). When one
+leaves the process, publish it through a transactional outbox, never straight after the DB write:
+`references/messaging.md` §2.
 
 **Key insight**: If module A needs to react to something in module B,
 that's a domain event — not a direct service call.

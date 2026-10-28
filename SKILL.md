@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 1.30.0
+version: 1.31.0
 description: >
   Ship your MVP fast, grow it right — the Project Brain OS for AI coding. Sets up the project
   constitution (CLAUDE.md, ARCHITECTURE.md), enforces 5 architecture boundaries and a quality gate,
@@ -41,7 +41,7 @@ Tests:         !`if [ -f package.json ] && grep -q '"test":' package.json; then 
 
 ---
 
-# Shipright v1.30 — Project Brain OS
+# Shipright v1.31 — Project Brain OS
 
 An executive layer over two hemispheres. The executive decides how much of each hemisphere to
 apply, by stage × risk × reversibility (construction is ON from day one — the irreversible quadrant;
@@ -308,6 +308,9 @@ Never add L4 work proactively. Only when production gives a measurable signal.
 | "One dependency takes the system down" | Timeout + circuit breaker + bulkhead | `references/resilience.md` |
 | "Retries storm a struggling dependency" | Backoff+jitter + retry budget | `references/resilience.md` |
 | "Duplicate charges / double-processing" | Idempotency key (DB/Redis, structural) | `references/resilience.md` |
+| "Hot reads hammer the DB" · stale data or a stampede after caching | Cache-aside, TTL+jitter, stampede guard | `references/caching.md` |
+| "Events lost or duplicated" · queue backlog / DLQ growing | Outbox + idempotent consumers + age SLO | `references/messaging.md` |
+| "One box / one DB can't keep up" · adding instances | Measure the limit → climb one rung | `references/capacity.md` |
 | "p95 latency / DB CPU over target" | Profile → fix query/N+1 → cache → replica | `references/performance.md` (React/Next front end → also `vercel-react-best-practices`; deployed on Vercel and it's the BILL → `vercel-optimize`) |
 | "Need SLOs / error budget" | Golden signals + SLO + alerting | `references/observability.md` |
 | "API changed silently" | Schema validation + contract tests | `references/third-party-apis.md` |
@@ -335,13 +338,14 @@ them here: when the thought below crosses your mind while building, load the ref
 | "The requirements changed under us mid-build" | `references/requirement-drift.md` (expand → migrate → contract). Removing the old path / moving users off it is the contract phase → `deprecation-and-migration` |
 | "I just decided a ONE-WAY door (public interface, data identity, money, persisted state)" | Record it before it becomes folklore — shipright decides *what* is irreversible, `documentation-and-adrs` records it properly (ARCHITECTURE.md / ADR). An unrecorded one-way door gets re-litigated by the next session. |
 | "We're exposing tools/data to an AI host (MCP server/client)" | `references/stacks/mcp.md` (lethal-trifecta boundary) |
-| "This runs as a desktop app on the user's PC" — a window, an .exe, an installer, or many accounts/browser sessions on one machine | `references/desktop.md` — modern Node/Python only: Electron+TS by default, Python via PySide6 or a sidecar; choose the shape at L0 (a rewrite to change) · OPERATE (N live sessions in one window) vs ACT (the app acts via API) · the UI thread never blocks · risky work in supervised processes · OS secret store · signed build + verified updates. Mechanics: `stacks/electron.md` / `stacks/python-desktop.md`. Many accounts on a third-party platform → official API first; UI automation is a viability question (`product-judgment.md` §1), and evasion (anti-detect, captcha bypass) is out of scope. |
+| "This runs as a desktop app on the user's PC" — a window, an .exe, an installer, or many accounts/browser sessions on one machine | `references/desktop.md` — Electron+TS by default, Python via PySide6 or a sidecar; the shape is chosen at L0 (a rewrite to change). Mechanics: `stacks/electron.md` / `stacks/python-desktop.md`. Many accounts on a third-party platform → official API first; UI automation is a viability question (`product-judgment.md` §1); evasion (anti-detect, captcha bypass) is out of scope. |
 | "I'm about to commit, push, open/merge a PR, tag a release, discard changes, rewrite history, or resolve a conflict" | `references/git.md` — the **consent ladder**: read-only = just do it · local + recoverable = per the project's Git policy · destroys uncommitted work = ALWAYS ask, with what would be lost · outward (push/PR/tag) = ask unless the policy grants it · shared history (merge to main, force-push) = ALWAYS explicit confirmation. A "yes" covers that action on that branch, not the next one. No policy recorded → offer to write `## Git policy` into CLAUDE.md once. |
 | "This module got too big for one person to hold in their head" | `references/team-scale.md` (cognitive load → split) |
 | "I keep threading the same 3 fields / a string stands in for a domain concept" | `references/code-quality.md` (smells → extract) |
 | "I'm about to write / touch a user-facing surface — a page, screen, form, table, dashboard" | `references/ui-design.md` — the EXPERIENCE floor is not optional and not an afterthought: a11y + responsive/mobile + IA + the state-floor (loading / empty / error / success are *designed*). Then dispatch execution (taste-skill / vercel-labs / dataviz). |
 | "This screen only has a happy path / this table is unusable at 360px / these are emoji icons" | `references/ui-design.md` (state-floor · §Mobile & responsive · §Icons — SVG, never emoji) |
-| "I'm about to call / integrate a NEW 3rd-party API (YouTube, Stripe, **or an LLM API**, …)" | `references/third-party-apis.md` §Layer-1 — MANDATORY before the Adapter: call the real API/sandbox → save real responses as `tests/fixtures/` → THEN write the Adapter + unit tests (fixtures) + a contract test. Never code an Adapter from docs alone. **LLM APIs count** — also capture token-usage / cost / streaming / error shapes (`references/stacks/ai-projects.md`). Anything carrying an ONGOING cost or obligation (per-call billing, PII, a support burden) also raises **viability**, which is not an architecture question and has no other trigger: what does this bill at 100 users, not 3 · who answers the mail it generates · may we legally hold this data → `references/product-judgment.md` §1. |
+| "I'm adding a cache or Redis, a queue, an event published after a DB write, or state in process memory" | `references/caching.md` · `references/messaging.md` (the outbox is decided with the first event) · `references/capacity.md` Rung 0 |
+| "I'm about to call / integrate a NEW 3rd-party API (YouTube, Stripe, **or an LLM API**, …)" | `references/third-party-apis.md` §Layer-1 — MANDATORY before the Adapter: call the real API/sandbox → save real responses as `tests/fixtures/` → THEN write the Adapter + unit tests (fixtures) + a contract test. Never code an Adapter from docs alone. **LLM APIs count** — also capture token-usage / cost / streaming / error shapes (`references/stacks/ai-projects.md`). An ONGOING cost or obligation (per-call billing, PII, support burden) also raises **viability**, which nothing else triggers: the bill at 100 users, not 3 · who answers its mail · may we hold this data → `references/product-judgment.md` §1. |
 
 ---
 
@@ -358,11 +362,9 @@ never). The full capability/signal → skill table (addyosmani, taste-skill, AI-
 index in `references/registry.md`** — load it after routing. Default ladder if no trigger fires:
 SEED=debug · VALIDATE=+tdd/incremental/review · HARDEN=+spec/security/observability · SCALE=+specialized.
 
-**Reach for the BUNDLED skills first — they ship with Claude Code and need no install.** Never offer to
-install something these already cover (Check 3 exists for what is genuinely missing). They are normally
-present but **not guaranteed**: the set varies by version, and `disableBundledSkills` / `skillOverrides`
-can remove any of them. Confirm against this session's available-skills list before promising one; if it
-isn't there, say so and fall back rather than inventing it.
+**Reach for the BUNDLED skills first** — no install needed, so never offer to install what they cover.
+Usually present, **not guaranteed** (Check 3): confirm in this session's list before promising one; if
+it isn't there, say so and fall back.
 
 | Bundled | Use it when |
 |---|---|
@@ -395,9 +397,8 @@ boundaries (that's over-engineering). Full-stack product → BOTH floors, integr
 
 ## Reference files — the map, not the trigger
 
-The tables above (routing · L4 signals · Mid-work) are what MAKES these load, and they carry the *when*.
-This list is the map: reach for it when a situation matches none of them. A file appearing here is not a
-reason to load it. All paths under `references/`.
+The tables above (routing · L4 · Mid-work) make these load. This is the map, for a situation none of
+them matches; being listed here is not a reason to load a file. Paths under `references/`.
 
 **Branches** (load ONE per session): `branches/` a-new-project · b-add-feature · c-fix-bug · d-refactor ·
 e-resume · f-incident · **`registry.md`** — trigger index + install recipes + the pack table → `registry/<type>.md` (load one).
@@ -412,6 +413,7 @@ as real code) · `enforcement.md` (the blocking hook) · `l0-templates.md` · `l
 `git.md` (the consent ladder, Git policy, commits, branches, PRs, merges, recovery).
 
 **Operation** — `resilience.md` (Nygard, Boundary 5) · `observability.md` (Correlation ID, SLO) ·
+`caching.md` (Redis) · `messaging.md` (outbox, idempotency) · `capacity.md` (load ladder) ·
 `performance.md` (measure-first ladder) · `scaling-guide.md` (Stage 1→2→3, Strangler Fig) ·
 `debug-intermittent.md` · `security.md` (Saltzer & Schroeder, OWASP → layer map, threat modeling).
 

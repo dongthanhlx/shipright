@@ -4,6 +4,7 @@
 > cognitive load, context maps, and cross-module contract tests for parallel developers. This file
 > covers the *architecture-growth* side (Stage 1→2→3, extraction). They share the module-ownership
 > matrix; load team-scale.md the moment more than one person owns modules.
+> Scaling the LOAD (instances, replicas, caches, queues, sharding) is `references/capacity.md`.
 
 ## Ubiquitous Language at scale
 
@@ -135,6 +136,8 @@ eventBus.on('quota.consumed', ({ source, units }) => { ... })
 
 Why: decouples modules without the operational overhead of actual message queues.
 When to add real queue (BullMQ/RabbitMQ): when event processing must survive restarts.
+Then read `references/messaging.md` first: the outbox for any event that follows a DB write, and
+idempotent consumers, decided with the first real event.
 
 **Step 5: Separate DB schemas per module (not separate DBs)**
 

@@ -1,5 +1,74 @@
 # Changelog
 
+## [1.31.0] — 2026-10 — Data and async, from the people who ran them: caching, messaging, capacity
+A coverage audit measured what shipright knew against two scaling write-ups (a file-storage service
+grown in six steps; AWS's "first 10 million users" ladder). Logging, tracing and resilience were deep.
+Three load-bearing areas were not:
+- **caching** was one line ("in-process → Redis → CDN");
+- **messaging** was scattered, and the transactional outbox was missing entirely;
+- **scaling the load** had no home: `scaling-guide.md` scales the team and the modules.
+
+Each now has a reference built on the people who operated these systems at scale, with the failure
+modes first.
+
+### Added — `references/caching.md`
+Grounded in Kleppmann (*DDIA*), Facebook's *Scaling Memcache* (NSDI 2013), Amazon's Builders' Library
+(*Caching challenges and strategies*), XFetch (VLDB 2015), Kleppmann on distributed locking, Stripe's
+rate limiters and the Redis docs.
+- **A gate before the first `SET`:** a staleness budget per data class; permissions and money are
+  never trusted from cache.
+- **Cache-aside with delete-after-commit**, plus the remaining race and its fixes: TTL, versioned
+  values, leases.
+- **TTL:** jitter, soft vs hard TTL, serve-stale-on-error, negative caching.
+- **The four failure modes and their fixes:** stampede (single-flight, one recomputer, XFetch's
+  `now − δ·β·ln(rand) ≥ expiry`), hot keys, cold cache, slow cache.
+- **Redis in production:** key versioning, value size, `maxmemory` and eviction policy, separate
+  instances for durable-ish data, the O(N) commands to avoid.
+- **The L1 → L2 → CDN layers** and the HTTP rules that prevent leaks.
+- **Sessions, rate limiting** (atomic, keyed by principal, fail-open vs fail-closed) and **locks**
+  (efficiency only; correctness needs fencing tokens or DB constraints).
+- Tests, the per-phase dial, and CLAUDE.md conventions.
+
+### Added — `references/messaging.md`
+Grounded in Hohpe & Woolf, Helland, Richardson, Kleppmann/Kreps, Treat, and Builders' Library pieces
+by Yanacek and Brooker.
+- **Work queue vs log,** and the broker kept behind an adapter.
+- **The honest delivery semantics:** exactly-once is at-least-once plus idempotency.
+- **The dual-write bug and the Transactional Outbox,** marked a one-way door to decide with the first
+  event: SQL, a `SKIP LOCKED` relay or CDC, the message id set at insert, outbox-lag monitoring.
+- **Idempotent consumers,** cheapest technique first.
+- **Retries and the DLQ:** transient vs permanent errors, visibility timeout above p99, the DLQ as a
+  human work queue, poison messages in ordered streams.
+- **Ordering per key,** and **backlogs:** age of the oldest message as the SLO, headroom, TTL on stale
+  work, isolation.
+- **Contracts and evolution,** crypto-shredding for PII in retained logs, observability and the six
+  tests every consumer needs, and a pointer to sagas.
+
+### Added — `references/capacity.md`
+Grounded in AWS's re:Invent ladder, *DDIA* on replication and partitioning, the Google SRE book,
+*The Tail at Scale*, Little's Law and Gunther's USL, and Yanacek on health checks.
+- **Sizing:** Little's Law, USL, and fan-out tail math (63% of requests at p99 with 100 backends).
+- **Nine rungs, each with its signal and its ongoing cost:**
+  - stateless from SEED, a quiet one-way door;
+  - scale up;
+  - DB failover;
+  - LB + N instances: shallow liveness, readiness that never checks shared dependencies, graceful
+    shutdown, least-outstanding balancing, connection math and a pooler;
+  - presigned direct uploads, where a presigned PUT does not cap size;
+  - cache, then replicas with read-your-writes / monotonic / consistent-prefix handling;
+  - queues;
+  - autoscaling, which can DDoS your own database;
+  - federation (Boundary 3's payoff), then sharding.
+
+### Changed — wiring
+- **SKILL.md:** three L4 rows (hot reads, lost/duplicate events and backlogs, one box can't keep up),
+  one Mid-work row, and the map. The always-loaded core stayed inside its 33,000-byte budget. To make
+  room, the desktop and third-party-API rows now trigger their files instead of summarising them,
+  and two paragraphs that repeated Check 3 were cut. No trigger was removed.
+- **Cross-links** from the places the old one-liners stopped: performance.md's ladder steps 4–5,
+  scaling-guide.md (team vs load; "when to add a real queue"), domain-thinking.md (events leaving the
+  process), and error-handling.md (at-least-once consumers).
+
 ## [1.30.0] — 2026-10 — When the world moves: MCP's stateless spec, and guardrails that hold
 A read through recent engineering write-ups (Canva, Figma, the MCP 2026-07-28 spec notes, JetBrains on
 tool search, a post on reviewing AI-written code) checked against shipright's references. One was a
