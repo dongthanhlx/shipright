@@ -1,5 +1,30 @@
 # Changelog
 
+## [1.29.1] — 2026-10 — The macOS run that finally ran
+v1.29.0's macOS job did get a runner on the pushes to main, and it failed: 4 of 21 cases, all of them
+"check-update stays silent". The bash 3.2 container passed the same cases. It has coreutils `timeout`,
+so it never reached the watcher fallback that stock macOS (no `timeout`) always takes.
+
+### Fixed — check-update printed bash's job notice on macOS
+In the fallback, the watcher is killed once the command finishes. bash 3.2 then reports the killed
+background job ("Terminated") on the shell's own stderr. No per-command redirect reaches that stream,
+and it turned every "silent" result into noise. The hook now runs `exec 2>/dev/null` (it speaks only
+through its one stdout line), stops the watcher's `sleep`, and reaps the watcher with `wait`, so nothing
+outlives the hook.
+
+### Added — "macOS mode" in the tests, on every OS
+`tests/hooks.test.sh` also runs a copy of check-update with `timeout` treated as absent: up to date,
+newer release (exactly one line) and missing remote. So the blocking bash 3.2 container job now covers
+the path that only macOS takes, instead of the best-effort macOS job that rarely gets a runner. Checked
+from both sides: a simulated stray stderr line in the fallback fails exactly those three cases, while
+the coreutils-path cases pass, which is the pattern macOS CI showed.
+
+### Changed — CI diagnostics and actions
+- A failing test also prints a `::error::` annotation. Annotations are public; job logs need admin
+  rights, and this diagnosis had to wait for a pasted log.
+- `actions/checkout` and `actions/setup-node` v4 → v7. Node 20 is deprecated on runners, and the
+  majors in between change nothing this repo uses (release notes checked).
+
 ## [1.29.0] — 2026-10 — A plugin, a license, and docs that agree with the product
 shipright reached users as a folder they cloned, plus hooks they wired by hand from README snippets.
 The version command never reached them. Now the repo root is also a Claude Code plugin. Every claim

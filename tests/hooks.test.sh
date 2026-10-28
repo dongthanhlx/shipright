@@ -24,7 +24,9 @@ export GIT_CONFIG_NOSYSTEM=1
 
 pass=0; fail=0
 assert() {  # description ; condition (string, eval'd)
-  if eval "$2"; then pass=$((pass+1)); echo "  ok   $1"; else fail=$((fail+1)); echo "  FAIL $1"; fi
+  if eval "$2"; then pass=$((pass+1)); echo "  ok   $1"; else fail=$((fail+1)); echo "  FAIL $1"
+    # On GitHub Actions, also as an annotation: those are public, job logs need admin rights.
+    [ "${GITHUB_ACTIONS:-}" = true ] && echo "::error title=hooks.test (bash ${BASH_VERSION%%(*})::$1"; fi
 }
 
 echo "under test: $("$BASH_BIN" -c 'echo bash $BASH_VERSION')"
@@ -33,6 +35,9 @@ echo "under test: $("$BASH_BIN" -c 'echo bash $BASH_VERSION')"
 echo "boundary-guard:"
 guard_out=$("$BASH_BIN" "$ROOT/hooks/boundary-guard.sh" --self-test 2>&1); guard_rc=$?
 echo "$guard_out" | grep -E 'FAIL|passed:|parser:' | sed 's/^/    /'
+if [ "${GITHUB_ACTIONS:-}" = true ]; then
+  echo "$guard_out" | grep 'FAIL' | while IFS= read -r l; do echo "::error title=boundary-guard self-test::$l"; done
+fi
 assert "self-test passes" '[ "$guard_rc" -eq 0 ]'
 if [ "${REQUIRE_PARSER:-0}" = 1 ]; then
   assert "no case skipped (a JSON parser was found)" 'echo "$guard_out" | grep -q "skipped: 0"'
@@ -58,6 +63,9 @@ assert "hooks/hooks.json runs an existing script ($(basename "$hook_path"))" '[ 
 # ------------------------------------------------------------------ check-update
 echo "check-update:"
 cu() { (cd "$WORK/skill" && SHIPRIGHT_UPDATE_TIMEOUT=5 "$BASH_BIN" hooks/check-update.sh 2>&1); }
+# "macOS mode": the same script with coreutils `timeout` treated as absent, so the watcher fallback
+# runs on every OS (stock macOS has no `timeout`; v1.29.0's fallback leaked "Terminated" there).
+cu_fb() { (cd "$WORK/skill" && SHIPRIGHT_UPDATE_TIMEOUT=5 "$BASH_BIN" hooks/check-update-no-timeout.sh 2>&1); }
 (
   cd "$WORK" || exit 1
   git init -q --bare -b main origin.git
@@ -65,11 +73,14 @@ cu() { (cd "$WORK/skill" && SHIPRIGHT_UPDATE_TIMEOUT=5 "$BASH_BIN" hooks/check-u
   git remote add origin ../origin.git
   mkdir hooks && cp "$ROOT/hooks/check-update.sh" hooks/
   printf 'name: shipright\nversion: 1.27.0\n' > SKILL.md
+  sed 's/if command -v timeout >\/dev\/null 2>&1; then/if false; then/' hooks/check-update.sh > hooks/check-update-no-timeout.sh
   git add -A && git commit -qm a
   git tag -a v1.24.1 -m x && git tag -a v1.27.0 -m x
   git push -q -u origin main --tags
 ) >/dev/null 2>&1
 out=$(cu); assert "up to date, annotated tags present → silent" '[ -z "$out" ]'
+out=$(cu_fb); assert "up to date, no coreutils timeout (macOS) → silent" '[ -z "$out" ]'
+assert "the macOS-mode copy really disables timeout" '! grep -q "if command -v timeout" "$WORK/skill/hooks/check-update-no-timeout.sh"'
 
 (cd "$WORK" && git clone -q origin.git other && cd other && git commit -q --allow-empty -m b && git push -q origin main) >/dev/null 2>&1
 out=$(cu); assert "untagged commit upstream → 'new commits'" 'echo "$out" | grep -q "new commits upstream"'
@@ -81,12 +92,14 @@ out=$(cu); assert "after pull → silent" '[ -z "$out" ]'
   && git commit -qam rel && git tag -a v1.28.0 -m x && git tag -a v1.9.9 -m x \
   && git push -q origin main --tags) >/dev/null 2>&1
 out=$(cu); assert "newer release → names v1.28.0 (numeric sort beats v1.9.9)" 'echo "$out" | grep -q "v1.28.0 is available"'
+out=$(cu_fb); assert "newer release, no coreutils timeout → exactly one line" '[ "$out" = "$(cu)" ]'
 
 (cd "$WORK/skill" && git pull -q && git commit -q --allow-empty -m local) >/dev/null 2>&1
 out=$(cu); assert "local ahead of remote → silent" '[ -z "$out" ]'
 
 (cd "$WORK/skill" && git remote set-url origin "$WORK/does-not-exist.git")
 out=$(cu); rc=$?; assert "missing remote → silent, exit 0" '[ -z "$out" ] && [ "$rc" -eq 0 ]'
+out=$(cu_fb); rc=$?; assert "missing remote, no coreutils timeout → silent, exit 0" '[ -z "$out" ] && [ "$rc" -eq 0 ]'
 
 (cd "$WORK" && mkdir plain && cp -R skill/hooks plain/ && cp skill/SKILL.md plain/)
 out=$(cd "$WORK/plain" && "$BASH_BIN" hooks/check-update.sh 2>&1); rc=$?
