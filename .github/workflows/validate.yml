@@ -26,6 +26,18 @@ jobs:
       - uses: actions/checkout@v4
       - run: shellcheck --version && shellcheck -S warning hooks/*.sh install.sh tests/*.sh
 
+  plugin:
+    name: Plugin manifest (claude plugin validate)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # The official validator; needs no login. Pinned so a new CLI release can't redden CI unannounced —
+      # bump it deliberately. Warnings (CLAUDE.md at the root, no listing icon) are expected and pass.
+      - run: npx -y @anthropic-ai/claude-code@2.1.312 plugin validate .
+
   scripts:
     name: Scripts (${{ matrix.os }}, ${{ matrix.bash }})
     strategy:
@@ -34,11 +46,16 @@ jobs:
         include:
           - os: ubuntu-latest
             bash: bash
-          - os: macos-latest      # stock /bin/bash is 3.2 — the oldest bash shipright's hooks support
-            bash: /bin/bash
           - os: windows-latest    # Git Bash; backslash paths + the Store python alias live here
             bash: bash
+          # Best effort: GitHub's macOS arm64 pool often has no runner to give (v1.27.2's job was never
+          # picked up). bash 3.2 itself is covered by the container job below; this one adds the BSD
+          # userland (sed/awk/grep/mktemp, no coreutils `timeout`) when a runner is available.
+          - os: macos-latest
+            bash: /bin/bash
+            best_effort: true
     runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.best_effort == true }}
     defaults:
       run:
         shell: bash
@@ -49,3 +66,20 @@ jobs:
           BASH_BIN: ${{ matrix.bash }}
           REQUIRE_PARSER: '1'
         run: ${{ matrix.bash }} tests/hooks.test.sh
+
+  bash32:
+    name: Scripts (bash 3.2, container)
+    # The oldest bash the hooks support (stock macOS), without waiting on a macOS runner. Checkout on
+    # the host, run inside bash:3.2 (Alpine/busybox userland: this checks bash semantics; the macOS
+    # job checks BSD tools). `docker run` rather than `container:` so no JS action runs on musl.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Behaviour tests under bash 3.2
+        run: |
+          docker run --rm -v "$PWD:/w" -w /w -e REQUIRE_PARSER=1 -e BASH_BIN=/usr/local/bin/bash \
+            bash:3.2 bash -c '
+              apk add --no-cache git jq >/dev/null &&
+              git config --global --add safe.directory "*" &&
+              bash --version | head -1 &&
+              bash tests/hooks.test.sh'

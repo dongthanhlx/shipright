@@ -244,6 +244,18 @@ shipright asks". SKILL.md is ~8.2k tokens against the spec's ~5k recommendation.
 means cutting firing paths, and those should not be cut until the scenarios in this file run as an
 automated suite rather than a reading exercise.
 
+### Distribution scenarios (v1.29) — what a user actually receives
+
+| # | Situation | Before | Verdict → fix |
+|---|---|---|---|
+| 75 | a user wants the version / skill-status check | `/shipright-version` lived in this repo's `.claude/commands/`, which Claude Code loads only for sessions *inside this repo*: no install ever shipped it | **BROKEN-TARGET → fixed v1.29.** `commands/version.md`, served as `/shipright:version` by the plugin. Verified the default `commands/` dir is what loads: a manifest `commands` entry (map or path) didn't appear in `claude plugin details` |
+| 76 | enabling the boundary guard or the update check | hand-edited `settings.json`, from a README snippet that was itself wrong until v1.27.1 | **FRICTION → fixed v1.29.** Plugin install: the hook is registered by `hooks/hooks.json`, and the guard is turned on with an option (`/plugin configure`). Updates come through `/plugin`, so the update-check hook isn't needed |
+| 77 | plugin hooks fire for everyone who enables the plugin | shipping the guard that way would have silently turned an opt-in guard into a default | **HAZARD → designed out v1.29.** `boundary_guard` option, off by default. The guard exits 0 under a plugin root unless the option is true. Tested through the stdin path: unset → allow, false → allow, true → block, settings install → block |
+
+Verified with the official CLI, not by reading: `claude plugin validate .` passes (two expected
+warnings); `claude plugin marketplace add` + `install` from a local path in an isolated config dir load
+1 skill + 1 hook, with a projected ~380 tokens always-on and ~7.8k on invoke.
+
 ### Finding (v1.20) — the trigger can be perfect and still dead-end
 
 v1.17's lesson was *retrieval + timing*. v1.20 adds: **the target must exist**. shipright's UI dispatch

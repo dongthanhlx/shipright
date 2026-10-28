@@ -694,7 +694,7 @@ under `<repo>/skills/<name>/`). So SKILL.md's `skill/ui` probe matches the **`na
 SKILL.md** — what the skill *is*, independent of how it got installed — and lists which UI skills (the taste
 family + vercel `web-design-guidelines` + `browser-testing-with-devtools`) are actually present, because
 dispatch depends on the specific one. **Adding a new sibling skill here means adding its install name to
-that probe** — and to the taste-family regex in `.claude/commands/shipright-version.md` — or it will read
+that probe** — and to the taste-family regex in `commands/version.md` (`/shipright:version`) — or it will read
 as "not installed" forever.
 
 **Already available — do not tell the user to install these:** `dataviz` and `artifact-design` ship with

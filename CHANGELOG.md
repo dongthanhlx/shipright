@@ -1,5 +1,49 @@
 # Changelog
 
+## [1.29.0] — 2026-10 — A plugin, a license, and docs that agree with the product
+shipright reached users as a folder they cloned, plus hooks they wired by hand from README snippets.
+The version command never reached them. Now the repo root is also a Claude Code plugin. Every claim
+below was checked with the official CLI, not just read.
+
+### Added — the repo is a Claude Code plugin
+- `.claude-plugin/plugin.json` + `.claude-plugin/marketplace.json`. Install with
+  `/plugin marketplace add dongthanhlx/shipright` then `/plugin install shipright@shipright`.
+  The root `SKILL.md` loads as the plugin's single skill (`/shipright:shipright`). The skill-folder
+  install (`git clone`, `install.sh`) is unchanged and still `/shipright`.
+- `hooks/hooks.json` registers the boundary guard. **Plugin hooks fire for everyone who enables the
+  plugin**, so it is gated by a `boundary_guard` option, off by default
+  (`/plugin configure shipright@shipright`). A settings.json install is unaffected. All four cases are
+  tested through the real stdin path.
+- **The version command finally ships.** It lived in `.claude/commands/`, which loads only for sessions
+  inside this repo, so no install ever had it. Moved to `commands/version.md` → `/shipright:version`;
+  it finds SKILL.md through the plugin root. The default folder was chosen by experiment: a `commands`
+  entry in the manifest (map or path) did not appear in `claude plugin details`; the folder did.
+- Verified: `claude plugin validate .` passes with two expected warnings (CLAUDE.md at the root is this
+  repo's Git policy, not plugin context; no listing icon). A local marketplace install in an isolated
+  config dir loads 1 skill + 1 hook: ~380 tokens always-on, ~7.8k on invoke.
+
+### Added — `LICENSE`
+MIT, © 2026 ThD. The README had said MIT; there was no license file.
+
+### Changed — CI
+- **Plugin manifest** job: the official validator (`npx @anthropic-ai/claude-code@2.1.312 plugin
+  validate .`), pinned, needs no login (verified with an empty config dir).
+- **bash 3.2 in a container** (`docker run bash:3.2` on ubuntu). Every v1.27.2 run waited for a macOS
+  runner that never came, so bash 3.2 had never been tested. The macOS job stays for the BSD userland,
+  marked best-effort.
+- `check-content.sh`: plugin.json's `version` must match SKILL.md (it pins plugin users, so a missed bump
+  strands them); the three JSON manifests must parse; the marketplace must point at `./`. The probe-parity
+  and placeholder checks follow the command to `commands/`.
+
+### Changed — docs that contradicted the product
+- **README**: plugin-first install, with the plugin and skill-folder forms of every command, and a warning
+  not to install both (two skills with one description compete for every trigger). The 40-line Roadmap,
+  a second copy of this file, is now one screen plus links. 32KB → 18KB. Stale "(NEW v0.8)" tags removed.
+- **CONTRIBUTING** listed SLOs/error budgets and team topology as out of scope, while `observability.md`
+  and `team-scale.md` teach both. It now says where the real line is. The release steps include
+  plugin.json, and the PR gate lists the plugin validator.
+- `enforcement.md`: how to turn the guard on as a plugin, and not to register it twice.
+
 ## [1.28.0] — 2026-10 — Pay for what fires: the registry split, honest sizes, a description inside the spec
 The firing audits (v1.17, v1.20, v1.24) asked whether the right file loads. This one asked what loading
 costs, measured with bytes instead of estimates. The answer: the routing table was off by 3–5×, the

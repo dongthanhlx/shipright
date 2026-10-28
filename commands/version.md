@@ -1,5 +1,4 @@
 ---
-name: shipright-version
 description: Check shipright version and ecosystem skill status
 user-invocable: true
 disable-model-invocation: true
@@ -10,8 +9,10 @@ Run this and report the results cleanly:
 
 ```bash
 echo "=== Shipright ==="
-grep "^version:" "${CLAUDE_SKILL_DIR}/../SKILL.md" 2>/dev/null \
+# As a plugin, the plugin-root variable is substituted with the install dir; otherwise it is empty.
+grep "^version:" "${CLAUDE_PLUGIN_ROOT}/SKILL.md" 2>/dev/null \
   || grep "^version:" ~/.claude/skills/shipright/SKILL.md 2>/dev/null \
+  || grep "^version:" .claude/skills/shipright/SKILL.md 2>/dev/null \
   || echo "version: unknown (cannot locate SKILL.md)"
 
 echo ""

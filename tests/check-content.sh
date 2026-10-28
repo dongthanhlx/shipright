@@ -56,29 +56,47 @@ grep -q "^# Shipright v${mm} " SKILL.md       || { bad "SKILL.md H1 does not say
 grep -q "^# shipright v${v}\$" README.md       || { bad "README.md H1 is not 'shipright v${v}'"; ver_ok=0; }
 top=$(grep -m1 -oE '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' CHANGELOG.md | tr -d '#[] ')
 [ "$top" = "$v" ]                               || { bad "CHANGELOG top entry is [$top], SKILL.md says $v"; ver_ok=0; }
-[ "$ver_ok" = 1 ] && ok "version $v agrees across SKILL.md, its H1, README and CHANGELOG"
+# plugin.json's version PINS plugin users until it changes — a missed bump strands them.
+pv=$(sed -n 's/^ *"version": *"\([^"]*\)".*/\1/p' .claude-plugin/plugin.json | head -1)
+[ "$pv" = "$v" ]                                || { bad ".claude-plugin/plugin.json version is '$pv', SKILL.md says $v"; ver_ok=0; }
+[ "$ver_ok" = 1 ] && ok "version $v agrees across SKILL.md, its H1, README, CHANGELOG and plugin.json"
+
+# ---------------------------------------------------------------- plugin manifests
+json_ok() {  # jq, else a python that actually runs
+  if command -v jq >/dev/null 2>&1; then jq empty "$1" >/dev/null 2>&1; return; fi
+  for py in python3 python; do
+    if "$py" -c 'import json' >/dev/null 2>&1; then "$py" -c 'import json,sys; json.load(open(sys.argv[1]))' "$1" >/dev/null 2>&1; return; fi
+  done
+  return 0  # no parser here; CI has one
+}
+json_all=1
+for f in .claude-plugin/plugin.json .claude-plugin/marketplace.json hooks/hooks.json; do
+  json_ok "$f" || { bad "$f is not valid JSON"; json_all=0; }
+done
+grep -q '"source": *"\./"' .claude-plugin/marketplace.json || { bad "marketplace.json must list the repo root (\"./\") as the plugin source"; json_all=0; }
+[ "$json_all" = 1 ] && ok "plugin.json, marketplace.json, hooks/hooks.json parse; marketplace points at ./"
 
 # ---------------------------------------------------------------- templated files
 # Claude Code substitutes argument placeholders in skill/command content BEFORE any shell runs
 # (v1.24.1: an awk positional print crashed the skill). Spelled out here so this file doesn't
 # contain the token it forbids: a dollar sign + digit, or the ARGUMENTS token.
 ph_re='\$[0-9]|\$ARGUMENTS'
-ph_hits=$(grep -nE "$ph_re" SKILL.md .claude/commands/*.md 2>/dev/null)
+ph_hits=$(grep -nE "$ph_re" SKILL.md commands/*.md 2>/dev/null)
 if [ -n "$ph_hits" ]; then bad "argument placeholder in templated content:"; echo "$ph_hits" | sed 's/^/    /'
-else ok "no argument placeholders in SKILL.md / commands"; fi
+else ok "no argument placeholders in SKILL.md / commands/"; fi
 
 # ---------------------------------------------------------------- probe parity
-# The skill lists in SKILL.md's working context and in /shipright-version must name the same skills.
-cmd=.claude/commands/shipright-version.md
+# The skill lists in SKILL.md's working context and in the version command must name the same skills.
+cmd=commands/version.md
 core_skill=$(grep '^skill/core:' SKILL.md | grep -oE '\(spec-driven[^)]*\)' | tr -d '()' | tr '|' '\n' | sort)
 core_cmd=$(sed -n '/^for s in /,/; do/p' "$cmd" | tr ' ;\\' '\n\n\n' | grep -E '^[a-z]+(-[a-z]+)+$' | sort)
-if [ -n "$core_skill" ] && [ "$core_skill" = "$core_cmd" ]; then ok "core skill list matches /shipright-version"
+if [ -n "$core_skill" ] && [ "$core_skill" = "$core_cmd" ]; then ok "core skill list matches commands/version.md"
 else bad "core skill list differs: SKILL.md [$(echo $core_skill)] vs $cmd [$(echo $core_cmd)]"; fi
 
 taste_of() { grep -oE 'design-taste-frontend\(-v1\)\?\|.*\|full-output-enforcement' "$1" | head -1; }
 taste_skill=$(grep '^skill/ui:' SKILL.md | grep -oE 'design-taste-frontend\(-v1\)\?\|.*\|full-output-enforcement')
 taste_cmd=$(taste_of "$cmd")
-if [ -n "$taste_skill" ] && [ "$taste_skill" = "$taste_cmd" ]; then ok "taste-skill family matches /shipright-version"
+if [ -n "$taste_skill" ] && [ "$taste_skill" = "$taste_cmd" ]; then ok "taste-skill family matches commands/version.md"
 else bad "taste-skill family differs between SKILL.md skill/ui and $cmd"; fi
 
 # ---------------------------------------------------------------- honest load sizes

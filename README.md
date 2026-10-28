@@ -1,4 +1,4 @@
-# shipright v1.28.0
+# shipright v1.29.0
 
 > **Ship your MVP fast. Grow it right.**
 
@@ -7,8 +7,10 @@ The Project Brain OS for AI coding workflow. Sets up the minimal irreversible ar
 Works in your language. Write Vietnamese, English, or any language — shipright responds accordingly.
 
 ```
-/shipright
+/shipright              # installed as a skill folder
+/shipright:shipright    # installed as a plugin
 ```
+Or just describe the task: shipright loads itself when a task matches. Install: [below](#install).
 
 ---
 
@@ -156,17 +158,23 @@ auto mode never prompts. Say no and it falls back to its built-in guidance and m
 
 ## Install
 
-**Personal — git (enables update notifications):**
+**As a Claude Code plugin (recommended)** — updates through `/plugin`, the version command and the
+boundary guard come with it:
+```
+/plugin marketplace add dongthanhlx/shipright
+/plugin install shipright@shipright
+```
+(One step on Claude Code 2.1.275+: `/plugin install shipright --marketplace dongthanhlx/shipright`.)
+As a plugin, the skill is `/shipright:shipright` and the status check is `/shipright:version`. It also
+loads by itself when a task matches; you rarely need to type either.
+
+**As a skill folder — git** (the same skill, invoked as `/shipright`; updates by `git pull`):
 ```bash
 git clone https://github.com/dongthanhlx/shipright ~/.claude/skills/shipright
+git -C ~/.claude/skills/shipright pull     # update
 ```
 
-**Update:**
-```bash
-git -C ~/.claude/skills/shipright pull
-```
-
-**Copy instead of clone** (no git history, no update check) — from any checkout:
+**As a skill folder — copy** (no git history, no update check), from any checkout:
 ```bash
 ./install.sh            # personal: ~/.claude/skills/shipright
 ./install.sh --project  # this repo only: ./.claude/skills/shipright (commit it for the team)
@@ -174,8 +182,12 @@ git -C ~/.claude/skills/shipright pull
 It copies only the runtime files (`SKILL.md`, `references/`, `hooks/`), and refuses to overwrite a
 directory that isn't a shipright install. Running it inside a clone that already *is* the install is a no-op.
 
-**Session start update check (optional)** — one line when a newer release or upstream commits exist,
-otherwise silent; one network call capped at 5s (`SHIPRIGHT_UPDATE_TIMEOUT`); git installs only:
+**Pick one.** A plugin install and a skill-folder install side by side are two skills with the same
+description: both compete for every trigger.
+
+**Session start update check (optional, git installs only)** — plugin installs update through `/plugin`
+instead. One line when a newer release or upstream commits exist, otherwise silent; one network call
+capped at 5s (`SHIPRIGHT_UPDATE_TIMEOUT`):
 ```json
 // ~/.claude/settings.json
 {
@@ -190,7 +202,9 @@ otherwise silent; one network call capped at 5s (`SHIPRIGHT_UPDATE_TIMEOUT`); gi
 }
 ```
 
-**Boundary enforcement (optional) — block violations as they're written:**
+**Boundary enforcement (optional) — block violations as they're written.** As a plugin, the hook is
+already registered and does nothing until you turn it on: `/plugin configure shipright@shipright` →
+**Boundary guard**. As a skill folder, add it to settings:
 ```json
 // ~/.claude/settings.json
 {
@@ -218,8 +232,12 @@ Microsoft Store `python3` alias is on PATH.
 ```
 shipright/
   SKILL.md                    # Project Brain OS core (always loaded): executive + 5 boundaries + spine + dispatch
-  hooks/check-update.sh       # SessionStart update checker
+  .claude-plugin/             # plugin.json + marketplace.json — the repo root is also a Claude Code plugin
+  commands/version.md         # /shipright:version — version + ecosystem skill status
+  hooks/hooks.json            # plugin hook registration (boundary guard, opt-in via the plugin's option)
   hooks/boundary-guard.sh     # PreToolUse hook — BLOCKS boundary violations as written (--self-test)
+  hooks/check-update.sh       # SessionStart update checker (git installs)
+  install.sh                  # copy-install into ~/.claude/skills or ./.claude/skills
   tests/                      # what CI runs: content checks + behaviour tests for hooks and install.sh (run-all.sh)
   references/
     registry.md               # Capability/signal → skill (trigger dispatch) + install recipes + pack table
@@ -233,9 +251,9 @@ shipright/
       f-incident.md           # Triage → mitigate → investigate
     git.md                    # the CONSENT LADDER: what the agent just does / does per the Git policy / must ask;
                               #   commits, messages, branches, PRs, merges, conflicts, releases, recovery
-    judgment.md               # EXECUTIVE: one-way/two-way doors, MVP matrix, when to break each rule (NEW v0.8)
-    resilience.md             # Nygard 8 stability patterns, Boundary 5, fault-injection tests (NEW v0.8)
-    performance.md            # Measure-first optimization ladder, N+1, mechanical sympathy, budgets (NEW v0.8)
+    judgment.md               # EXECUTIVE: one-way/two-way doors, MVP matrix, when to break each rule
+    resilience.md             # Nygard 8 stability patterns, Boundary 5, fault-injection tests
+    performance.md            # Measure-first optimization ladder, N+1, mechanical sympathy, budgets
     code-quality.md           # Evans + Uncle Bob + Fowler: full quality system
     code-health.md            # SOLID tactical + Ousterhout (deep modules, define errors out of existence)
     testing.md                # testing STRATEGY: pyramid, test-through-public-interface, mock-only-at-seams, Test Desiderata
@@ -280,59 +298,30 @@ shipright/
 
 ---
 
-## Roadmap
+## What's in it, and what's next
 
-- [x] 6-branch routing
-- [x] MVP mode vs production mode
-- [x] 4 boundary rules (non-negotiable)
-- [x] Three masters quality system (Evans + Uncle Bob + Fowler)
-- [x] Complexity-based skill activation (Tier S/M/L/XL)
-- [x] Observability: Correlation ID, tracing, API tracing, retrofit
-- [x] Scaling guide: Stage 1→2→3 + Strangler Fig
-- [x] AI/RAG/chatbot/browser-extension stack support
-- [x] **v0.7: Registry (project type → curated skill pack)**
-- [x] **v0.7: Persistent state (CLAUDE.md state section)**
-- [x] **v0.7: Session-start state check (30-second resume)**
-- [x] **v0.7: Ecosystem dispatch (who owns what)**
-- [x] **v0.8: Executive/judgment layer (one-way/two-way doors, MVP matrix, when to break each rule)**
-- [x] **v0.8: Operation hemisphere — Nygard resilience (Boundary 5, 8 stability patterns, fault-injection tests)**
-- [x] **v0.8: Ousterhout counterweight (deep modules, define errors out of existence)**
-- [x] **v0.8: Lifecycle spine (unifies L0–L4 / Stage 1–3 / MVP–Scale)**
-- [x] **v0.8: Trigger-based skill dispatch + SLO/error budget/DORA**
-- [x] **v0.9.1: Go stack file (packages + internal/ compile-time boundaries, context timeouts, pgx/sqlc, error taxonomy)**
-- [x] **v0.8.2: registry capability/signal → skill trigger index**
-- [x] **v1.1.0: MCP stack (server=adapter/ACL, tool=interface contract, lethal-trifecta security, Boundary-5 resilience)**
-- [x] **v1.2.0: agents & multi-agent stack (workflow-vs-agent judgment, Anthropic/Ng patterns, LangGraph state machines, trajectory eval + tracing)**
-- [x] **v1.3.0: security spine (Saltzer&Schroeder + OWASP 2025→layer map + Shostack threat modeling) + per-stack security depth (Node/Python/Go/extension/RAG)**
-- [x] **v1.4.0: chatbot AI threat model (prompt-injection done right, abuse/cost control, moderation, isolation) + smart-contract defense patterns (CEI/reentrancy, access control, EIP-712 replay, upgradeable) + invariant/fuzz testing**
-- [x] **v1.5.0: intake reimagined — adaptive intent discovery (Mom Test / JTBD / Shape Up / interview-me) replaces the mechanical questionnaire; understand-before-advising, playback step, shipright carries technical judgment; still MVP-first**
-- [x] **v1.6.0: conversational intake across ALL branches — shared "How shipright asks" principle in SKILL.md (read/infer before asking; diagnose-then-confirm, not menu-quiz); B/C/D reworked, F kept as deliberate speed exception**
-- [x] **v1.7.0: constitution as a lean, distilled, confirmed contract (aligned to Anthropic's CLAUDE.md guidance: <200 lines, @import for deep conventions, auto-memory split, distill-from-discovery, generate→confirm, Nygard-format ADRs, /init for existing code)**
-- [x] **v1.8.0: team scale — the module boundary as a team API (Conway/Parnas/Evans/Team Topologies/DORA): cognitive load, inverse Conway at L0, context maps, consumer-driven contract tests; signal-driven (solo skips) + sharpened MVP framing (Validation vs Foundation, Fowler payoff line, Ousterhout local-complexity guard)**
-- [x] **v1.9.0: testing strategy spine (Beck Test Desiderata / Fowler pyramid & mocks / Cohn / Dodds trophy / DHH damage) — anti-dogma; boundaries ARE the test strategy (test through the public interface, mock only at seams); de-dogmatized the TDD framing**
-- [x] **v1.10.0: build-loop disentangled (GOOS/Cockburn) — fixed the adjacent outside-in/inside-out contradiction into three separate axes: DRIVE outside-in · SLICE vertical · IMPLEMENT domain-first for convenience (not "always"); reconciled with testing.md**
-- [x] **v1.11.0: the discipline of STOPPING — completes the executive layer (judgment.md) with Definition-of-Done + good-enough (Hunt & Thomas / Shape Up scope-hammering / Pareto): cut SCOPE not QUALITY, appetite as a fixed budget, ship-then-feedback; a second executive question ("good enough, or gold-plating?")**
-- [x] **v1.12.0: evolutionary architecture — tempers the one-way-door thesis (Ford/Parsons/Bezos/Poppendieck): bias toward reversibility, last responsible moment, and NAMES shipright's existing fitness functions (boundary-guard, arch tests, budgets, SLOs) + the recovery path for when a settled decision was wrong**
-- [x] **v1.13.0: PHP stack file (PHP 8.3+): PHPStan-as-compiler, Deptrac boundary fitness function, Doctrine/Eloquent, exception taxonomy, and the PHP-specific security footguns (unserialize object injection, mass assignment, `==` type juggling)**
-- [x] **v1.14.0: consistent framework guidance for backend stacks (Node/Python/Go/PHP) — recommend a default + when to pick another + "keep the framework at the edge so it stays a two-way door (swappable)"; python.md no longer hard-assumes FastAPI**
-- [x] **v1.15.0: staleness/consistency propagation — removed stale version strings (prompts.md "v0.7.2", go.md "v0.9 hook"), fixed leftover Boundary-5/6 collisions (blockchain + prompts + registry), updated prompts build-order to the v1.10 outside-in/vertical model, noted the expanded master roster in code-quality.md**
-- [x] **v1.16.0: slim the always-loaded core (SKILL.md 461→347 lines) BY PRINCIPLE not by number — cut duplication (ecosystem-dispatch↔registry, quality-system↔refs) + re-read explanation; kept every load-bearing instruction; reframed shipright's own "<200 lines" advice (size is a consequence, not a Goodhart target)**
-- [x] **v1.17.0: RUNTIME evals — dogfooded shipright against 13 real scenarios to verify knowledge FIRES at the right moment (the artifact↔runtime gap greps can't see). Found the "we were wrong / requirements changed / MCP" family was DARK (catalogued but no in-session trigger, because they surface mid-construction — neither a routing moment nor an L4 operation signal). Fixed with a "Mid-work signals" trigger table in the always-loaded core; captured the suite as a reusable fitness function in `EVALS.md`**
-- [x] **v1.18.0: UI/UX judgment layer — the one domain with zero master grounding now has a full hemisphere. `references/ui-design.md` rebuilt from a pure taste-skill dispatch table into judgment (Norman/Nielsen/Krug/Refactoring UI/Tufte/Tidwell/Wroblewski + WCAG-as-correctness + state-floor), an MVP-first floor-vs-scope split, mobile/responsive (incl. data-tables-on-mobile), durable style archetypes + living reference sources, landing anatomy (Krug/Cialdini) and an admin/dashboard pattern language. Wired to FIRE from Branch A + B + session-start (dogfooded). Judgment decides; taste-skill/dataviz/vercel execute**
-- [x] **v1.19.0: UI/UX judgment layer + system-vs-experience balance — `ui-design.md` rebuilt into a masters-grounded hemisphere (Norman/Nielsen/Krug/Refactoring UI/Tufte/Tidwell/Wroblewski/Walter + brand archetypes + Paul Rand): principles, MVP-first floor-vs-scope, deep mobile/responsive, SVG icons (no emoji), logo, style archetypes + audience emotional tone + emotional design (anti-AI-slop), and design-brief intake. The executive layer (judgment.md §5b) now balances the SYSTEM floor vs the EXPERIENCE floor — by project shape AND per task (Branch B forks on task KIND before complexity). Wired to fire from Branch A/B + session-start**
-- [x] **v1.20.0: system-wide firing audit — (a) the UI/UX layer now actually fires: the description carried zero UI vocabulary so the whole v1.18/v1.19 hemisphere only loaded if the user said "build", Branch D had no redesign track (its "no measurable pain" guard was bouncing legitimate UI work), Branch C didn't recognize visual/UX bugs, and there was no mid-work UI signal. (b) Then the harder question — do the dispatch targets exist? **6 of 8 taste-skill install commands were broken** (folder names where the CLI wants install names) and two named skills were never in the repo at all; every skill probe encoded one install layout and returned NO forever under the other; `/shipright-version` probed a root SKILL.md that multi-skill repos don't have. Plus `boundaries.md` was DARK, stack files fired only from Branch A, and 6 registry entries had no `load:` line. EVALS.md gains a **BROKEN-TARGET** verdict — a trigger that fires into a name that doesn't exist is indistinguishable from no trigger**
-- [x] **v1.21.0: capability additions, curated by trigger — the audit's second half surfaced capable skills shipright had never mapped at all (a quieter failure than a broken name, same outcome: a real need with no executor). Added `browser-testing-with-devtools` (shipright mandated "verify at 360px with a real thumb" but had no way to actually see a page run — now wired into the mobile rule, Branch D's before/after capture, and Branch C's visual repro, with an explicit ban on calling a UI responsive/accessible from reading code), `vercel-react-best-practices` (React/Next execution detail under performance.md's stack-agnostic ladder), `documentation-and-adrs` (a one-way door nobody recorded gets re-litigated next session), `deprecation-and-migration` (the contract phase of expand→migrate→contract), `ci-cd-and-automation` (a fitness function only guards you if it runs). Explicitly NOT added, and recorded so it isn't re-proposed: code-simplification and planning-and-task-breakdown (duplicate shipright), composition-patterns (empty description — unverifiable)**
-- [x] **v1.22.0: acquisition — a missing skill is a 10-second problem, not a permanent one. shipright printed an install command and resigned to its fallback, on the untested assumption that a mid-session install wouldn't help. It does: Claude Code watches the skill directories, so a skill added under `~/.claude/skills/` takes effect immediately without a restart. Check 3 goes from *note it* to *offer → install on consent → use it this session* (verified: the CLI detects an agent environment and runs non-interactively; `--list` prints the exact install names). Consent is mandatory and must come from shipright, since its own `allowed-tools` pre-approves Bash and the harness prompts for nothing. Also fixed a bug that existed under the old policy: the `skill/*` probes are rendered **once** per session, so a user who installed the skill mid-session — as shipright told them to — kept being told it wasn't installed**
-- [x] **v1.23.0: slim the core again, by principle — three releases of firing fixes put 56 net lines back into the always-loaded core, pushing it toward the ~460 v1.16 deliberately cut. Took back 35 lines / ~740 tokens with **no trigger removed**: 8 skill probes collapse to 2 that *list what's present* (six fewer subprocesses per session, and more information than a boolean), install commands stop living in three places, and the reference index — the largest always-loaded block, which by shipright's own doctrine causes nothing to fire — becomes a role-grouped map with all 42 filenames kept. Deliberately untouched: the Mid-work and L4 tables, the executive question, "How shipright asks", the boundaries, and every fallback-judgment column — that prose is where shipright reasons rather than checklists. Verified nothing load-bearing left: the first draft dropped 9 stack files off the map and the check caught it before commit**
-- [x] **v1.24.0: backend/system/architecture/security firing audit — the refs held (resilience, observability, performance, error-handling, domain-thinking, team-scale, evolutionary-architecture, third-party-apis, scaling-guide all keep trigger rows; the v1.20 stack-file fix survived v1.23's slim). Two things didn't. (a) **shipright dispatched to zero bundled Claude Code skills** while telling users to install third-party ones for the same jobs — worse since v1.22 made it *offer* installs. `/security-review` is the missing execution arm of `security.md` (the old "manual OWASP" fallback was selling shipright short); `/code-review` is the merge gate and is **user-invoke-only**, so shipright must ask rather than claim the gate closed; plus `/run`, `/debug`, `/claude-api`. (b) **Security fired at intake and nowhere else** — a bug fix in a payment path or a refactor of auth triggered nothing, which is exactly where a vulnerability moves while every test stays green. Now fires in any branch, plus Branch C and D specifically. Added `doubt-driven-development` (adversarial review of irreversible/security-sensitive decisions — shipright's one-way door in someone else's words) and wired `api-and-interface-design` to Branch B's contract fork**
-- [x] **v1.25.0: the outcome loop — a PM audit (Cagan's four risks, Perri's build trap, Torres's riskiest assumption, Rumelt's diagnosis) found shipright answering only half its own executive question: *"is this a one-way door, and **is the need real today**?"* The need was taken on faith at intake and never revisited. Of the four risks it hard-covered **feasibility** and part of **usability**; **value** and **viability** were absent — and the reason is agent-specific: a coding agent verifies feasibility *simply by building*, so feasibility feels like the whole of "it works", while value has to be asked explicitly or it never gets asked. The SHIP GATE ("can a user complete the journey?") was an **output** check dressed as a done-check, and Branch E — the one moment the loop could close — checked git, level and tests but never whether the last thing shipped had worked. Added: `## Outcome` in CLAUDE.md (the change, the signal you'd actually SEE, the riskiest assumption marked UNTESTED, a check-by), a SHIP GATE split into output-now / outcome-next-session, `Last shipped` in project state carrying the pending check, and **Branch E Step 1b** which asks it before `Next` and routes all three answers. Plus the WHETHER half of the executive layer: `references/product-judgment.md` (Cagan's four risks with shipright's coverage marked honestly per row — including the **viability** questions a solo builder always skips; the riskiest assumption as a *product* one-way door with a cheapest-test ladder whose one rule is that it must be able to come back NO; Rumelt's kernel mapped onto what shipright already produces — the boundaries ARE a guiding policy, what's missing is one line of diagnosis), and **Branch B Step 2b**, a value fork placed before tiering where exactly one quadrant refuses to proceed: unproven value + expensive build. Deliberately NOT added: RICE/WSJF/CoD/Kano, full opportunity solution trees, PR/FAQ, pre-mortems as a ritual, or a new master roster — what was missing was a loop and a gate, not more frameworks**
-- [x] **v1.26.0: desktop apps, built the way today's flagship apps are — Electron + TypeScript (VS Code, Claude desktop, Slack) by default, Python via PySide6 or as a sidecar behind Electron; nothing older, no other languages. New `references/desktop.md` grounded in the Chromium threading + process model + Gamma's VS Code architecture, Raymond Chen, Gossman/Fowler (MVVM), the Electron security guide + Electronegativity, Armstrong + Nygard, Gregg, Fluent/HIG and TUF: the shape chosen at L0; OPERATE (N live sessions in one window — partitions + WebContentsView + hibernation) vs ACT (the app acts via an official API); the UI thread — renderer AND main — never blocks; risky work in supervised processes; OS secret store (honest about limits); signed builds, fuses, verified updates; CI launches the packaged build. Multi-account: official API first, automation as a raised viability question, NEEDS_ATTENTION as a human-in-the-loop state, evasion out of scope with the reason. Plus `stacks/electron.md` and `stacks/python-desktop.md`**
-- [x] **v1.27.0: git — fluent with the tool, careful with the doors. New `references/git.md` built on Chacon (Pro Git), Beams + Conventional Commits, Beck (Tidy First), Fowler + trunk-based development, Google's Small CLs, DORA, SemVer + Keep a Changelog, Julia Evans: a five-tier consent ladder by reversibility × visibility (read-only → just do it; local + recoverable → per the Git policy; destroys uncommitted work → always ask with what would be lost; push/PR/tag → ask unless the policy grants it, a yes scoped to that action; merge to main / force-push / rewriting published history → always explicit confirmation). The `## Git policy` is recorded once in CLAUDE.md at L0 and read by the working context every session. Every branch's commit step now follows it. Motivated partly by this repo's own slip: a push on stale consent while building v1.26**
-- [ ] references/registry.md community contributions (ongoing)
-- [x] **v0.9: PreToolUse boundary-enforcement hook (blocks service→db + deep cross-module imports; opt-in, fails open, self-test)**
+The full history, release by release, with the reasoning: **[CHANGELOG.md](CHANGELOG.md)**. What each
+release verified at runtime, and what it found broken: **[EVALS.md](EVALS.md)**.
+
+In one screen:
+- **Executive layer:** one-way / two-way doors, the discipline of stopping, and the WHETHER half:
+  Cagan's four risks, the riskiest assumption, the outcome loop that asks "did it work?" next session.
+- **Construction:** 5 boundaries, a quality gate, testing strategy, domain modelling, error handling,
+  security, the git consent ladder.
+- **Operation, on signal:** resilience (Nygard), observability and SLOs, performance, scaling.
+- **Experience:** the UI/UX floor (a11y, responsive, state-floor) and design-brief judgment.
+- **Stacks:** Node, Python, Go, PHP, browser extensions, AI/RAG/agents/MCP/chatbots, blockchain, and
+  desktop apps (Electron, PySide6).
+- **Enforcement and CI:** an opt-in boundary-guard hook; every script tested on Linux, Windows and
+  bash 3.2; version, size and spec limits checked on every PR.
+
+Next:
+- [ ] Runtime evals as an automated suite (`claude plugin eval`), so the always-loaded core can be
+      slimmed toward the spec's ~5k tokens without darkening a trigger
+- [ ] Project-type packs from the community (`references/registry/<type>.md`, see CONTRIBUTING)
 
 ---
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE).
