@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 1.29.0
+version: 1.29.1
 description: >
   Ship your MVP fast, grow it right — the Project Brain OS for AI coding. Sets up the project
   constitution (CLAUDE.md, ARCHITECTURE.md), enforces 5 architecture boundaries and a quality gate,

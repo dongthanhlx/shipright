@@ -16,6 +16,11 @@
 
 TIMEOUT_S="${SHIPRIGHT_UPDATE_TIMEOUT:-5}"
 
+# The hook speaks only through its one stdout line. bash 3.2 (stock macOS) reports a killed background
+# job on the shell's own stderr ("Terminated"), which no per-command redirect can catch: v1.29.0's
+# macOS CI caught it as noise on every "should be silent" case. Nothing this script does needs stderr.
+exec 2>/dev/null
+
 SKILL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." 2>/dev/null && pwd)"
 [ -f "${SKILL_DIR}/SKILL.md" ] || SKILL_DIR="${HOME}/.claude/skills/shipright"
 git -C "$SKILL_DIR" rev-parse --git-dir >/dev/null 2>&1 || exit 0
@@ -32,7 +37,9 @@ with_timeout() {
   local watcher=$!
   wait "$pid" 2>/dev/null
   local rc=$?
+  pkill -P "$watcher" >/dev/null 2>&1   # the sleep inside the watcher, so nothing outlives the hook
   kill "$watcher" >/dev/null 2>&1
+  wait "$watcher" 2>/dev/null           # reap it here, quietly, rather than leave the shell to report it
   return $rc
 }
 

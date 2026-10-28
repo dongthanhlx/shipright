@@ -16,22 +16,22 @@ jobs:
     name: Content checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: bash tests/check-content.sh
 
   shellcheck:
     name: shellcheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: shellcheck --version && shellcheck -S warning hooks/*.sh install.sh tests/*.sh
 
   plugin:
     name: Plugin manifest (claude plugin validate)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: '22'
       # The official validator; needs no login. Pinned so a new CLI release can't redden CI unannounced —
@@ -60,7 +60,7 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Behaviour tests (boundary-guard, check-update, install.sh)
         env:
           BASH_BIN: ${{ matrix.bash }}
@@ -74,7 +74,7 @@ jobs:
     # job checks BSD tools). `docker run` rather than `container:` so no JS action runs on musl.
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Behaviour tests under bash 3.2
         run: |
           docker run --rm -v "$PWD:/w" -w /w -e REQUIRE_PARSER=1 -e BASH_BIN=/usr/local/bin/bash \
