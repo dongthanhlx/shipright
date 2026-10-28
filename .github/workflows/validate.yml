@@ -1,55 +1,51 @@
 name: Validate skill
 
+# Every PR and every push to main, whatever it touches: hooks/*.sh and install.sh are code, and a
+# paths filter on *.md let changes to them merge untested. The jobs only call scripts in tests/, so
+# `bash tests/run-all.sh` locally is the same gate.
 on:
   pull_request:
-    paths: ['**/*.md', 'SKILL.md']
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
-  validate:
+  content:
+    name: Content checks
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - run: bash tests/check-content.sh
 
-      - name: Check SKILL.md has required fields
-        run: |
-          grep -q "^name: shipright" SKILL.md || (echo "Missing name field" && exit 1)
-          grep -q "^version:" SKILL.md || (echo "Missing version field" && exit 1)
-          grep -q "^description:" SKILL.md || (echo "Missing description field" && exit 1)
-          echo "✓ SKILL.md frontmatter valid"
+  shellcheck:
+    name: shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: shellcheck --version && shellcheck -S warning hooks/*.sh install.sh tests/*.sh
 
-      - name: Check all branch files exist
-        run: |
-          for branch in a-new-project b-add-feature c-fix-bug d-refactor e-resume f-incident; do
-            test -f "references/branches/${branch}.md" || (echo "Missing: ${branch}.md" && exit 1)
-          done
-          echo "✓ All branch files present"
-
-      - name: Check examples exist
-        run: |
-          test -f "references/examples/orders-api-CLAUDE.md" || (echo "Missing example" && exit 1)
-          test -f "references/examples/orders-api-ARCHITECTURE.md" || (echo "Missing example" && exit 1)
-          echo "✓ Example files present"
-
-      - name: Check no broken internal reference links (hard fail)
-        run: |
-          # CHANGELOG is a historical record — allowed to mention intentionally-removed files.
-          grep -rhoE 'references/[a-zA-Z0-9/_-]+\.md' --include='*.md' --exclude=CHANGELOG.md . | sort -u > /tmp/refs.txt
-          rc=0
-          while read ref; do
-            if [ ! -f "$ref" ]; then echo "BROKEN LINK: $ref"; rc=1; fi
-          done < /tmp/refs.txt
-          if [ $rc -ne 0 ]; then exit 1; fi
-          echo "✓ No broken reference links"
-
-      - name: Check no orphaned reference files (hard fail)
-        run: |
-          # A reference file must be linked from a live file (CHANGELOG mention does not count).
-          rc=0
-          for f in $(find references -name '*.md'); do
-            base=$(basename "$f")
-            if ! grep -rqF "$base" --include='*.md' --exclude="$base" --exclude=CHANGELOG.md .; then
-              echo "ORPHAN (referenced nowhere live): $f"; rc=1
-            fi
-          done
-          if [ $rc -ne 0 ]; then exit 1; fi
-          echo "✓ No orphaned reference files"
+  scripts:
+    name: Scripts (${{ matrix.os }}, ${{ matrix.bash }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            bash: bash
+          - os: macos-latest      # stock /bin/bash is 3.2 — the oldest bash shipright's hooks support
+            bash: /bin/bash
+          - os: windows-latest    # Git Bash; backslash paths + the Store python alias live here
+            bash: bash
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - name: Behaviour tests (boundary-guard, check-update, install.sh)
+        env:
+          BASH_BIN: ${{ matrix.bash }}
+          REQUIRE_PARSER: '1'
+        run: ${{ matrix.bash }} tests/hooks.test.sh

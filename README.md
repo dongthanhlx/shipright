@@ -1,4 +1,4 @@
-# shipright v1.27.1
+# shipright v1.27.2
 
 > **Ship your MVP fast. Grow it right.**
 
@@ -218,6 +218,7 @@ shipright/
   SKILL.md                    # Project Brain OS core (always loaded): executive + 5 boundaries + spine + dispatch
   hooks/check-update.sh       # SessionStart update checker
   hooks/boundary-guard.sh     # PreToolUse hook — BLOCKS boundary violations as written (--self-test)
+  tests/                      # what CI runs: content checks + behaviour tests for hooks and install.sh (run-all.sh)
   references/
     registry.md               # Capability/signal → skill (trigger dispatch) + project-type packs
     branches/
