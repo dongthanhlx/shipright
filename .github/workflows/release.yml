@@ -1,0 +1,53 @@
+name: Tag release
+
+# A release is a merge to main that changes SKILL.md's `version:`. Tag it, so hooks/check-update.sh
+# (which reads tags) can see it: v1.25.0–v1.27.0 shipped untagged, and the checker then told every
+# user to "update" to v1.24.1.
+#
+# Convention (matches every tag before it): an annotated tag on the release branch's tip — the merge
+# commit's second parent — with the CHANGELOG heading as its message. Skips if the tag exists, and
+# refuses if CHANGELOG has no entry for the version.
+on:
+  push:
+    branches: [main]
+    paths: ['SKILL.md']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tag-release
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Tag the version if it has no tag yet
+        run: |
+          set -euo pipefail
+          v=$(sed -n 's/^version: *//p' SKILL.md | head -1 | tr -d '\r ')
+          echo "SKILL.md version: $v"
+          if git rev-parse -q --verify "refs/tags/v$v" >/dev/null; then
+            echo "v$v already tagged — nothing to do"; exit 0
+          fi
+          heading=$(grep -m1 -E "^## \[${v//./\\.}\]" CHANGELOG.md || true)
+          if [ -z "$heading" ]; then
+            echo "::error::CHANGELOG.md has no '## [$v]' entry — not tagging"; exit 1
+          fi
+          subject=$(printf '%s' "$heading" | sed -E 's/^## \[[0-9.]+\] — [0-9-]+ — //')
+          target=HEAD
+          git rev-parse -q --verify 'HEAD^2' >/dev/null && target='HEAD^2'
+          tv=$(git show "$target:SKILL.md" | sed -n 's/^version: *//p' | head -1 | tr -d '\r ')
+          if [ "$tv" != "$v" ]; then
+            echo "::error::$target carries version $tv, not $v — not tagging"; exit 1
+          fi
+          git -c user.name='github-actions[bot]' \
+              -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+              tag -a "v$v" "$target" -m "v$v — $subject"
+          git push origin "v$v"
+          echo "tagged v$v → $(git rev-parse --short "$target"): $subject"

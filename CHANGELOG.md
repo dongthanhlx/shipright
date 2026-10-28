@@ -1,5 +1,47 @@
 # Changelog
 
+## [1.27.2] — 2026-10 — CI that runs what ships, on the three machines it ships to
+v1.27.1's bugs had one thing in common: CI could not have caught any of them. It ran only on PRs that
+touched `*.md`, so a change to `hooks/*.sh` or `install.sh` merged untested. It never ran the hook
+self-test, although this repo's own Git policy made that the commit gate. It ran on one OS, and that
+was not the OS any of the three platform bugs lived on.
+
+### Changed — `validate.yml`: every PR and every push to main, three jobs
+- **Content** → `tests/check-content.sh`. The old greps (frontmatter, branch/example files, broken links,
+  orphans), plus five new checks:
+  - **one version** across the SKILL.md frontmatter, the SKILL.md H1, the README H1 and the top CHANGELOG entry;
+  - **no argument placeholders** in SKILL.md or `.claude/commands/` (the v1.24.1 crash, now a check, not a comment);
+  - **probe parity:** the core list and the taste-skill family in SKILL.md and `/shipright-version` name the
+    same skills (`ui-design.md` asked for this by hand);
+  - **size budgets as a ratchet:** SKILL.md ≤ 35,500 bytes and its description ≤ 1,550 characters. These are
+    today's sizes plus a margin, to be lowered when the core is slimmed. The core was cut back in v1.16
+    and v1.23, and nothing stopped it growing in between.
+- **shellcheck** `-S warning` on every script. Clean.
+- **Scripts** → `tests/hooks.test.sh` on ubuntu, **macOS under `/bin/bash` 3.2**, and Windows (Git Bash),
+  with `REQUIRE_PARSER=1`, so a guard that silently found no JSON parser fails CI instead of skipping.
+  Covers: the boundary-guard self-test; check-update against a real bare remote with annotated tags (up to
+  date, upstream commit, newer release with v1.9.9 to prove the sort is numeric, ahead, missing remote,
+  non-git install); install.sh (fresh install, runtime-only copy, reinstall, run inside the install,
+  foreign target, `--project`, a bad flag). On macOS this also exercises check-update's no-`timeout` fallback.
+
+The suite was checked from both sides. It passes on the current scripts, and run against the v1.27.0
+scripts it fails 6 cases (the downgrade check, the self-deleting install, and others). The content checks
+were mutation-tested: version drift, taste-regex drift, core-list drift, a dollar-digit, a missing
+example, an over-budget core, a broken link and an orphan each fail it.
+
+### Added — `release.yml`: a merged version bump gets its tag
+On a push to main that changes SKILL.md, it creates `vX.Y.Z` if missing. Same convention as every
+earlier tag: annotated, on the release branch's tip (the merge's second parent), with the CHANGELOG
+heading as the message. It refuses if CHANGELOG has no entry, or if the tip carries a different version.
+Tags are what `check-update.sh` reads; v1.25.0–v1.27.0 shipped without them. Tested on a fixture repo
+with a real `--no-ff` merge: tags the tip, is a no-op the second time, errors on a bump with no
+CHANGELOG entry.
+
+### Added — `tests/run-all.sh`, and the gate written down
+One local command for everything CI runs. CONTRIBUTING gains "Before you open a PR" (what each check
+guards) and "Releasing" (bump, CHANGELOG, EVALS, merge → tag). This repo's CLAUDE.md commit gate now
+names `tests/run-all.sh`.
+
 ## [1.27.1] — 2026-10 — The parts that run as code, run on a real machine
 A full review ran every script and probe against inputs shaped like a user's machine instead of the
 fixtures. Five things that "passed" were broken, two of them silently for a long time.
