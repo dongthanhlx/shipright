@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 1.27.0
+version: 1.27.1
 description: >
   Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
   sets up constitution, enforces boundaries, judges what to build now vs defer,
@@ -40,11 +40,11 @@ Git branch:    !`git branch --show-current 2>/dev/null || echo "no git"`
 Last commit:   !`git log --oneline -1 2>/dev/null || echo "no commits"`
 CLAUDE.md:     !`test -f CLAUDE.md && echo "EXISTS — read first" || echo "MISSING"`
 ARCHITECTURE:  !`test -f ARCHITECTURE.md && echo "EXISTS — read first" || echo "MISSING"`
-# -A5, not -A3: the state block gained `Last shipped` (the pending outcome check). At -A3 it falls
-# off the end and the outcome loop never fires. Widen this if the block ever grows again.
-Project state: !`grep -A5 "## Shipright state" CLAUDE.md 2>/dev/null | tail -5 || echo "no state tracked"`
+# Whole sections via a sed range (heading → next heading), never a line count: a fixed -A<n> silently
+# dropped any field past line n. The trailing `grep .` is what makes the fallback fire on no match.
+Project state: !`sed -n '/^## Shipright state/,/^## /p' CLAUDE.md 2>/dev/null | grep -v '^## ' | grep . || echo "no state tracked"`
 # Consent for git lives in the project, not in the model's mood: read the recorded policy every session.
-Git policy:    !`grep -A7 "## Git policy" CLAUDE.md 2>/dev/null | tail -7 | grep . || echo "none recorded — propose commits; ask before push/PR/merge (references/git.md §2)"`
+Git policy:    !`sed -n '/^## Git policy/,/^## /p' CLAUDE.md 2>/dev/null | grep -v '^## ' | grep . || echo "none recorded — propose commits; ask before push/PR/merge (references/git.md §2)"`
 Uncommitted:   !`git status --porcelain 2>/dev/null | wc -l | tr -d ' '` file(s) — never discard without asking (git.md Tier 2)
 # Granular skill detection — match the SKILL.md `name:` field, NOT a guessed path: `npx skills add`
 # (flat, by install name) and `git clone` (repo/skills/<name>/) produce different layouts, and a
@@ -466,7 +466,7 @@ as real code) · `enforcement.md` (the blocking hook) · `l0-templates.md` · `l
 `python-desktop.md` (PySide6, and Python as a sidecar behind Electron — the rules live in `desktop.md`).
 
 **Passive** — `prompts.md` (copy-paste prompts; pulled by hand, deliberately has no trigger) ·
-`examples/` orders-api-CLAUDE.md · orders-api-ARCHITECTURE.md.`
+`examples/` orders-api-CLAUDE.md · orders-api-ARCHITECTURE.md.
 
 ---
 

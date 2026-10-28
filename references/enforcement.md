@@ -79,12 +79,22 @@ This mirrors judgment.md — breaking a rule is fine *when you name why*; breaki
 
 ## Guarantees
 
-- **Fails open.** Any internal error — missing `jq` and `python3`, malformed input, an unknown
+- **Fails open.** Any internal error — no working `jq` or Python, malformed input, an unknown
   tool shape — results in *allow*, never a block. The guard can never brick your editing.
+  The flip side: failing open is *silent*. Run `--self-test` once on each machine — its header names
+  the parser it found, and with none it reports the end-to-end cases as **skipped**, i.e. the guard
+  is installed but inert. (On Windows the `python3` on PATH is often the Microsoft Store alias, which
+  exists and fails; the guard now only uses a Python that actually runs, `python3` then `python`.)
+- **Portable.** bash 3.2 (stock macOS) to 5.x; Linux, macOS, Windows (Git Bash). Windows paths
+  (`D:\repo\src\modules\…`) are normalized, and paths are made relative to the session's `cwd`
+  before the module is read, so a `services/` folder *above* the repo is never mistaken for one.
+- **Resolves before it judges.** A relative import is resolved against the file's own directory
+  first: `../orders.service` from `orders/http/` is the same module and allowed; `../../payments/
+  payment.service` from the same place is blocked. Comment lines are ignored.
 - **No-op outside module-structured projects.** A file not under a `modules/`-like directory is
   ignored, so enabling it globally is safe — it only acts on shipright-shaped repos.
 - **Source files only.** Non-source files (`.md`, configs) and the Bash tool are ignored.
-- **Fast + offline.** Pure shell + one JSON parse (`jq`, else `python3`). No network, no state.
+- **Fast + offline.** Pure shell + one JSON parse (`jq`, else a working Python). No network, no state.
 
 ---
 

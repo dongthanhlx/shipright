@@ -8,10 +8,10 @@
 ## Step 1 — Read state first
 
 ```bash
-grep -A7 "## Shipright state" CLAUDE.md 2>/dev/null
+sed -n '/^## Shipright state/,/^## /p' CLAUDE.md 2>/dev/null
 ```
-(`-A7` on purpose: here you want the WHOLE block, incl. `Skills active` / `Registry`. The session-start
-probe in SKILL.md uses `-A5 | tail -5` because it only needs up to `Last shipped` — different jobs, not drift.)
+(The whole section, heading to next heading — the same range the session-start probe in SKILL.md reads,
+so a field added to the block is never silently cut off by a line count.)
 
 **If state exists:**
 ```

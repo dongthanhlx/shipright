@@ -244,5 +244,6 @@ shipped to the session that resumes (Branch E reads it first). Leave the signal 
 check is actually answered — clearing it unasked is how a project quietly re-enters the build trap.
 
 Shipright reads this via working context injection:
-`!grep -A5 "## Shipright state" CLAUDE.md | tail -5` — so `Last shipped` lands in the session-start
-context. Keep `Last shipped` within the first 5 lines of the block, or the outcome loop stops firing.
+the whole section, heading to the next `## ` heading — so `Last shipped` lands in the session-start
+context wherever it sits in the block. Keep the block as a block: a blank line inside it is fine, a
+`## ` heading inside it ends it.
