@@ -61,7 +61,7 @@ bash tests/run-all.sh
 |---|---|
 | `tests/check-content.sh` | frontmatter; required branch/example files; no broken `references/…` links; no orphaned reference files; **one version** across SKILL.md (frontmatter + H1), README H1 and the top CHANGELOG entry; no argument placeholders (dollar sign + digit, or the ARGUMENTS token) in SKILL.md or `.claude/commands/` — Claude Code substitutes them before any shell runs; the skill lists in SKILL.md and `/shipright-version` name the same skills; **size budgets** for SKILL.md and its description |
 | `tests/hooks.test.sh` | `boundary-guard.sh` self-test (unit + end-to-end through the real stdin-JSON path), `check-update.sh` against a real bare remote with annotated tags, `install.sh` against a clone at the install path and a foreign directory |
-| shellcheck (`-S warning`) | every `*.sh` |
+| shellcheck (`-S warning`) | every `*.sh` — CI uses the ubuntu image's **0.9.0**, and versions disagree (0.11 misses SC2120, which 0.9 fails on). Match it locally: `pip install shellcheck-py==0.9.0.6` |
 
 CI runs the script tests on Linux, macOS with **`/bin/bash` 3.2**, and Windows (Git Bash), because
 those are three different bugs: v1.27.1 fixed one of each. To reproduce the macOS run locally:

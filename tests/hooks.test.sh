@@ -40,7 +40,7 @@ fi
 
 # ------------------------------------------------------------------ check-update
 echo "check-update:"
-cu() { (cd "$WORK/skill" && SHIPRIGHT_UPDATE_TIMEOUT="${1:-5}" "$BASH_BIN" hooks/check-update.sh 2>&1); }
+cu() { (cd "$WORK/skill" && SHIPRIGHT_UPDATE_TIMEOUT=5 "$BASH_BIN" hooks/check-update.sh 2>&1); }
 (
   cd "$WORK" || exit 1
   git init -q --bare -b main origin.git
