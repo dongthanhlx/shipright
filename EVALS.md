@@ -257,6 +257,17 @@ Verified with the official CLI, not by reading: `claude plugin validate .` passe
 warnings); `claude plugin marketplace add` + `install` from a local path in an isolated config dir load
 1 skill + 1 hook, with a projected ~380 tokens always-on and ~7.8k on invoke.
 
+### Freshness (v1.30) — right when written, wrong now
+
+| # | Situation | Before | Verdict → fix |
+|---|---|---|---|
+| 79 | "build a remote MCP server" in 2026-10 | `stacks/mcp.md` fired correctly and taught the `initialize` handshake, Sampling and Logging. The 2026-07-28 spec removed the first and deprecated the other two | **STALE-SOURCE → fixed v1.30.** Firing was perfect; the content had expired. Each stack file names the revision it tracks (mcp.md now does), so a stale one shows its age |
+| 80 | the agent is about to force-push or `reset --hard` | the consent ladder was prompt-only, and nothing in the harness backed it | **PROMPT-ONLY → floor added v1.30.** Permission `ask` rules are enforced by Claude Code, including in auto mode |
+
+A seventh failure mode, after DARK, WEAK, BROKEN-TARGET, NOT-ACQUIRED, BUNDLED-IGNORED and
+PLATFORM-PATH: **STALE-SOURCE**. A trigger fires into accurate, well-written knowledge about a
+protocol that has since changed. No grep sees it. Only checking the source again does.
+
 ### Finding (v1.20) — the trigger can be perfect and still dead-end
 
 v1.17's lesson was *retrieval + timing*. v1.20 adds: **the target must exist**. shipright's UI dispatch

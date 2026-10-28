@@ -138,7 +138,34 @@ interface contract, not a free-form dump.
   (prompt injection — OWASP LLM01). The architecture prevents unauthorized actions, not the model.
 □ Least privilege / excessive agency (LLM06): each tool narrow-scoped; no arbitrary-exec in a loop.
 □ Human approval before irreversible actions. Watch the lethal trifecta (see references/stacks/mcp.md).
+□ A rule that must hold EVERY time is a code step, not a prompt line. Figma's security agents may open
+  PRs, but a fixed post-step in the workflow turns every one into a Draft. Telling the model "always
+  draft" proved not reliable enough. Same for "never touch PRs you didn't create" and "never fetch an
+  employee's sensitive fields": enforce them in the tool layer. Spend autonomy on actions that are
+  bounded, reversible and evidenced (read, compare to precedent, propose); keep arbitrary writes gated.
 ```
+
+## Memory — four kinds, kept apart
+
+An agent that "remembers" usually needs four different stores. Mixing them is a real failure mode: an
+early version of Figma's agent put everything into the policy it loads each run, and one-off cases
+rewrote its behaviour for everyone.
+
+```
+Case memory (precedent)  — past incidents/tickets, retrieved by similarity (RAG), recent and
+                           human-annotated first. "Have we seen this before, and what did we decide?"
+Steering memory (policy) — short Markdown loaded into every run: how to behave, plus time-boxed
+                           operating context ("X is migrating Y this week"). Edited deliberately.
+Procedural memory        — how-to the agent learned and should reuse, e.g. a data schema discovered
+                           by exploratory queries. Figma: the first Zoom-log question took several
+                           discovery queries; once the schema was stored, the same question took one.
+State                    — the task's own progress under a stable key (persisted, see Boundaries).
+```
+One-off resolutions go to case memory as precedent; only a rule meant for every future run goes to
+steering. If the agent queries a store it has to explore (SQL schemas, APIs), add procedural memory
+from the start, since every session without it pays for the same discovery again. shipright makes the
+same split for itself: CLAUDE.md is steering, auto memory holds incidental learnings (SKILL.md
+§Compound engineering).
 
 ---
 

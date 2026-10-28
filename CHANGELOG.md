@@ -1,5 +1,58 @@
 # Changelog
 
+## [1.30.0] — 2026-10 — When the world moves: MCP's stateless spec, and guardrails that hold
+A read through recent engineering write-ups (Canva, Figma, the MCP 2026-07-28 spec notes, JetBrains on
+tool search, a post on reviewing AI-written code) checked against shipright's references. One was a
+correction, three were real gaps, and two needed nothing new. Each claim taken in was checked against
+its primary source; the community summaries were used only as pointers.
+
+### Fixed — `stacks/mcp.md` taught a lifecycle the spec removed
+Checked against the official 2026-07-28 changelog. The protocol is now stateless: the `initialize`
+handshake and `Mcp-Session-Id` are gone, every request carries its version and capabilities in
+`_meta`, and servers must implement `server/discover`. Sampling, Roots and Logging are deprecated, and
+Multi Round-Trip Requests replace server-initiated requests. Tasks moved out of the core into an
+extension, and the HTTP+SSE transport is deprecated. Added what this means for a server you build:
+- cross-call state is a server-minted handle in durable storage, so remote servers scale behind a
+  load balancer with no affinity;
+- the `Mcp-Method` / `Mcp-Name` headers must match the body (HeaderMismatchError), because a gateway
+  routing on headers is otherwise a policy bypass;
+- deterministic `tools/list` order and `ttlMs` / `cacheScope` for caching;
+- a lost stream means a re-issued request, so side-effecting tools stay idempotent;
+- OAuth `iss` validation, credentials bound to their issuer, and DCR deprecated in favour of Client
+  ID Metadata Documents;
+- trace context in `_meta`.
+Also one line on tool search: near-identical descriptions mislead the model, so measure tokens
+against round-trips. Nothing else in the repo referenced the removed parts.
+
+### Added — the consent ladder gets a floor the model can't skip (`git.md` §2)
+Figma moved "always open agent PRs as drafts" out of the prompt into a workflow step, because the
+prompt alone was not reliable. shipright's ladder was prompt-only too. `git.md` now offers, with the Git
+policy, a set of Claude Code `permissions.ask` rules: push, `reset --hard`, `clean`, `checkout --`,
+`restore`, stash drop/clear, `branch -D`, history rewrites and `gh pr merge`. The harness enforces
+them, and an ask rule still prompts in auto mode. The limits come with it, from the permissions docs:
+rules match command text (`git -C . push` slips past), `bypassPermissions` skips them, and precedence
+is deny → ask → allow.
+
+### Added — `stacks/ai-agent.md`: memory kept apart, rules in code
+- Four memory kinds: case (precedent), steering (policy, loaded each run), procedural (learned
+  how-to, such as a discovered schema) and state. One-off cases must not go into steering, which is
+  how Figma's first version drifted. Procedural memory turned their repeat schema questions from
+  several queries into one.
+- A rule that must hold every time is a code step, not a prompt line.
+
+### Added — `resilience.md`: the queue consumer under a sick dependency
+Greedy polling burns every message's retries and fills the DLQ. Fixed limits, on/off breakers and
+per-message backoff each miss part of the problem. What works is a consumer that throttles its own
+intake against a failure-rate set point. Canva's numbers: about 1.8M failed attempts, 22 DLQ messages.
+The throughput cost is stated too.
+
+### Changed — `git.md` §6: why small PRs matter more when an agent writes them
+Writing costs the agent nothing; reviewing costs a person attention. Review is also how a team keeps
+knowing its own code.
+
+### Not added, on purpose
+JIT/compilation warm-up: shipright has no JVM stack, and `performance.md` is stack-agnostic by design.
+
 ## [1.29.1] — 2026-10 — The macOS run that finally ran
 v1.29.0's macOS job did get a runner on the pushes to main, and it failed: 4 of 21 cases, all of them
 "check-update stays silent". The bash 3.2 container passed the same cases. It has coreutils `timeout`,

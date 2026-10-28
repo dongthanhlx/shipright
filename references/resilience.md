@@ -126,6 +126,25 @@ Shed load: return 429 + Retry-After under overload — fail 5% fast, serve 95% w
 Admission control: protect the critical path (checkout) by shedding the optional (analytics).
 ```
 
+**The other side: a queue consumer whose dependency is struggling.** A normal worker is greedy: when
+it has a free slot, it polls another message. If the downstream degrades, the worker keeps pulling at
+full speed. Every message burns its retries against a dependency that can't answer, then lands in the
+DLQ. The usual tools don't fit this case well:
+- A fixed rate limit is wrong whenever capacity changes.
+- An open/closed breaker swings between full speed and nothing, and its re-close is a new spike.
+- Per-message backoff spaces out one message but not the fleet's total pressure.
+
+What works is letting the consumer **throttle its own intake**. After each message, record ok or failed.
+Keep a failure-rate **set point**, the error rate you accept as normal, say 5%. Below it, change
+nothing. Above it, cut the permits the worker may poll at once, a step at a time. When failures fall
+back under the set point, step them back up. Work waits in the queue, which is the cheap place for it
+to wait, and no message is retried to death. Canva's shared queue library does this per instance,
+with no coordinator. Over a 32-hour downstream quota overload they saw ~1.8M failed attempts and
+only 22 messages in the DLQ. The cost is honest: throughput drops while the dependency is sick, and
+that hurts more if workers normally run at full capacity. This is what SKILL.md's L4 signal "retries
+storm a struggling dependency" looks like when the caller is a queue consumer; the signal to watch is
+DLQ growth during a dependency incident.
+
 ### 7. Idempotency — make retries safe (structural, not in-memory)
 Any operation with a side effect must be safe to call twice (retries, at-least-once queues,
 user double-clicks all cause duplicates). The dedup store is the DB or Redis — **never an
