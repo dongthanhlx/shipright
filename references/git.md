@@ -107,8 +107,8 @@ Merge:    always ask (Tier 4 — the user merges or explicitly approves)
 Strategy: squash | merge commit | rebase       (match the repo's history)
 Style:    Conventional Commits — type(scope): imperative summary
 ```
-Keep the block to **7 lines under the heading** — SKILL.md's working context reads exactly that
-(`grep -A7 "## Git policy"`), so a longer block silently drops its last rule from every session.
+SKILL.md's working context reads the **whole section** (heading to next `## ` heading) every session,
+so a rule added here is seen — but keep it short: every line is read at every session start.
 
 **No policy recorded → the conservative default:** propose commits and ask; ask before every push, PR
 and merge. Offer to write the policy down the first time — then stop asking what it already answers.

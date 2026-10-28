@@ -196,7 +196,7 @@ through the files, not from review — the v1.17 method still finds what reading
 | 58 | a refactor step goes RED: "REVERT that step immediately" | a revert is a Tier 2 discard; with the user's uncommitted work in the tree, a blanket reset destroys it | **HAZARD → fixed v1.27.** Branch D + `git.md` Tier 2: restore only the files this step touched; checkpoint commits make it safe |
 | 59 | resuming a project that has uncommitted changes / a stash | Branch E listed `git status` and `stash list` and said nothing about what to do with what it found | **HAZARD → fixed v1.27.** Branch E: report it, never discard it, ask |
 | 60 | production incident: "roll it back" | nothing stopped reset + force-push on main — the fast, evidence-destroying move | **HAZARD → fixed v1.27.** Branch F: `git revert`; push/merge/deploy are the user's explicit call |
-| 61 | every session: what may the agent do with git here? | nothing recorded; consent was re-decided (or assumed) each time | **DARK → fixed v1.27.** `## Git policy` in the L0 constitution, asked once; SKILL.md's working context reads it every session (7-line block, verified against a real CLAUDE.md) |
+| 61 | every session: what may the agent do with git here? | nothing recorded; consent was re-decided (or assumed) each time | **DARK → fixed v1.27.** `## Git policy` in the L0 constitution, asked once; SKILL.md's working context reads it every session (the whole section since v1.27.1 — a 7-line cap until then) |
 | 62 | "commit/push/PR/merge" with no other shipright trigger | the description carried no git vocabulary | **DARK → fixed v1.27.** Description + a Mid-work row → `references/git.md` |
 
 Verified by grep before writing these rows: `git.md` is reached from SKILL.md (description, working
@@ -207,6 +207,24 @@ context, a Mid-work row, the quality-system note, the map), all six branches, `j
 reading. This one is a gap found by *doing*: the agent pushed on stale consent and noticed only after.
 A consent model that the model applying it doesn't follow is decoration — hence a probe in the working
 context rather than one more paragraph of advice.
+
+### Runtime bugs in the parts that run as code (v1.27.1)
+
+Every scenario above traces prose. These are the shell scripts and probes — executed, not read — and
+each was found by running it against an input shaped like a real user's machine, not like the fixture.
+
+| # | Symptom | Cause | Lesson |
+|---|---|---|---|
+| 63 | the update check told v1.27.0 users to "update" to v1.24.1 — and nagged on every session | tags stopped at v1.24.1; peeled `^{}` refs were never filtered, so "latest" was `1.24.1^{}`; versions compared as strings | a checker that can recommend a downgrade is worse than none. Compare numerically, filter peeled refs, tag every release |
+| 64 | the README's SessionStart snippet registered nothing | missing the nested `hooks` array the schema requires — which also hid #63 | a documented config is code: run it |
+| 65 | boundary-guard allowed everything on Windows | the Store `python3` alias exists on PATH and fails → empty parse → fail open; and `D:\…\modules\…` never matched `/modules/` | **fails open is silent** — the self-test now runs the real stdin path and names its parser |
+| 66 | boundary-guard blocked `../orders.service` from `orders/http/` | any `../` + internal suffix counted as "a sibling module" | resolve the path before judging it; a false positive gets the guard switched off |
+| 67 | `./install.sh` inside a clone at the install path deleted the clone | `rm -rf "$TARGET"` where target = source | never delete what you are about to copy from; stage, then swap |
+| 68 | `Project state` never printed "no state tracked" | a pipeline's status is its LAST command's (`tail`), so `\|\| echo` never fired | end probes in `grep .` so "no match" is a failure the fallback can see |
+| 69 | a field past line 5 of the state block (7 of the policy) vanished from every session | fixed `-A<n>` line counts | read sections by range (heading → next heading), not by count |
+
+The pattern is #37's, again: the boundary-guard self-test passed 11/11 for twenty releases because it
+called `inspect()` directly — a fixture shaped like the function, not like Claude Code's call into it.
 
 ### Finding (v1.20) — the trigger can be perfect and still dead-end
 

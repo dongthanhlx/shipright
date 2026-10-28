@@ -1,4 +1,4 @@
-# shipright v1.27.0
+# shipright v1.27.1
 
 > **Ship your MVP fast. Grow it right.**
 
@@ -164,14 +164,25 @@ git clone https://github.com/dongthanhlx/shipright ~/.claude/skills/shipright
 git -C ~/.claude/skills/shipright pull
 ```
 
-**Session start update check (optional):**
+**Copy instead of clone** (no git history, no update check) — from any checkout:
+```bash
+./install.sh            # personal: ~/.claude/skills/shipright
+./install.sh --project  # this repo only: ./.claude/skills/shipright (commit it for the team)
+```
+It copies only the runtime files (`SKILL.md`, `references/`, `hooks/`), and refuses to overwrite a
+directory that isn't a shipright install. Running it inside a clone that already *is* the install is a no-op.
+
+**Session start update check (optional)** — one line when a newer release or upstream commits exist,
+otherwise silent; one network call capped at 5s (`SHIPRIGHT_UPDATE_TIMEOUT`); git installs only:
 ```json
 // ~/.claude/settings.json
 {
   "hooks": {
     "SessionStart": [{
-      "type": "command",
-      "command": "~/.claude/skills/shipright/hooks/check-update.sh"
+      "hooks": [{
+        "type": "command",
+        "command": "~/.claude/skills/shipright/hooks/check-update.sh"
+      }]
     }]
   }
 }
@@ -193,7 +204,10 @@ git -C ~/.claude/skills/shipright pull
 }
 ```
 Opt-in, fails open, safe to enable globally (no-ops outside module-structured projects).
-Details + bypass: `references/enforcement.md`. Verify: `hooks/boundary-guard.sh --self-test`.
+Details + bypass: `references/enforcement.md`. Verify on each machine: `hooks/boundary-guard.sh --self-test`
+— it names the JSON parser it found (`jq`, else a Python that actually runs). With none, the end-to-end
+cases show as *skipped*: the guard is installed but inert, which on Windows usually means only the
+Microsoft Store `python3` alias is on PATH.
 
 ---
 

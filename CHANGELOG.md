@@ -1,5 +1,66 @@
 # Changelog
 
+## [1.27.1] — 2026-10 — The parts that run as code, run on a real machine
+A full review ran every script and probe against inputs shaped like a user's machine instead of the
+fixtures. Five things that "passed" were broken, two of them silently for a long time.
+
+### Fixed — the update check recommended a downgrade
+`hooks/check-update.sh` compared the SKILL.md version to the highest `v*` tag as a string. Tags stopped
+at v1.24.1, so every v1.25–v1.27 git install was told to "update" to v1.24.1 (`git checkout v1.24.1`).
+Even with tags current it could never stay quiet: `ls-remote` also lists peeled `v1.24.1^{}` refs, and
+`1.24.1^{}` sorted last, so "latest" never equalled any real version. Its "new commits" branch fired on
+any hash difference, including a checkout that was ahead. And the "timeout 3s" in its comment did not
+exist: two unbounded network calls at every session start. Rewritten: one `ls-remote` with a hard limit
+(5s, `SHIPRIGHT_UPDATE_TIMEOUT`; coreutils `timeout`, else a watcher that also kills child processes
+and writes to a file, so an orphaned `git-remote-https` can't hold the session open), peeled refs
+filtered, numeric X.Y.Z comparison, "behind" meaning *the remote commit is not in your history*, and a
+plain one-line message telling you to `pull` (no detached-HEAD checkout). Locates its own install dir
+instead of assuming `~/.claude/skills/shipright`. Verified against a local bare remote across six cases:
+up to date, upstream commit, newer release (plus v1.9.9, to prove the sort is numeric), ahead of remote,
+unreachable remote.
+
+### Fixed — the README's SessionStart snippet registered nothing
+It was missing the nested `"hooks": [...]` array the settings schema requires, so nobody following it
+ever ran the update check. That is also why the bug above went unreported.
+
+### Fixed — boundary-guard was inert on Windows, and blocked legitimate imports everywhere
+- **Windows, no-op:** the Microsoft Store `python3` alias is on PATH and fails when run, so the JSON parse
+  returned empty and the guard failed open on every edit. Behind that, `D:\repo\src\modules\…` never
+  matched `/modules/`. Now a Python is used only if it actually runs (`python3`, then `python`), paths
+  are normalized to `/` and made relative to the session `cwd` (case-insensitive, since drive letters vary).
+- **macOS:** `${curmod^}` is bash-4 syntax and fails on stock bash 3.2. Replaced.
+- **False positives (each a reason to switch the guard off):** `../orders.service` from `orders/http/`
+  was blocked as "a sibling module"; `../../modules/orders/…` from inside `orders` was blocked; a module
+  with its own nested `services/` folder was misread; comment lines mentioning an import were blocked.
+  Relative imports are now resolved against the file's directory before modules are compared, the module
+  is the segment after the FIRST modules-like dir of the project-relative path, and comments are skipped.
+- **The self-test could not have caught any of this.** It called `inspect()` directly, so the stdin-JSON
+  path that Claude Code actually uses was never exercised. Now 20 unit + 8 end-to-end cases through that
+  path, including Windows paths and malformed JSON. With no working parser, the end-to-end cases are
+  reported as **skipped**, and the header names the parser, so an inert guard is visible.
+
+### Fixed — `install.sh` could delete the checkout it was installing from
+Run inside a clone at `~/.claude/skills/shipright`, `rm -rf "$TARGET"` removed the source before the
+copy. It also copied `.git`, `.github`, the CHANGELOG and the evals into the skill, accepted unknown
+flags silently, and was mentioned nowhere. Now: copies only `SKILL.md`, `references/`, `hooks/`; detects
+"this checkout IS the install" and stops; refuses to replace a directory that isn't a shipright install;
+stages the copy and swaps it in; `--help`; documented in the README.
+
+### Added — `.gitattributes` pins `*.sh` to LF
+A Windows checkout with `core.autocrlf=true` (the Git for Windows default) would otherwise hand CRLF
+scripts to a WSL or Linux bash, which rejects them. Git Bash tolerates CRLF, which is why it never showed.
+
+### Fixed — working-context probes
+- `Project state` never printed its fallback: a pipeline's status is its last command's (`tail`), so
+  `|| echo "no state tracked"` could not fire. Ends in `grep .` now.
+- The state and Git-policy blocks were read by line count (`-A5 | tail -5`, `-A7`), which silently cut
+  `Skills active` from every session and capped the policy at 7 lines. Both now read the whole section
+  (heading → next `## ` heading). `l0-templates.md`, `git.md` and Branch E no longer carry the line-count
+  constraints they had to document.
+- A stray backtick at the end of SKILL.md's reference map.
+
+EVALS.md rows 63–69 record each one with its cause.
+
 ## [1.27.0] — 2026-09 — Git: fluent with the tool, careful with the doors
 shipright told the agent to commit in four places and never said whether it was allowed to. There was no
 model of which git operations the agent may simply do, which it does under the user's standing rules, and
