@@ -40,7 +40,7 @@ Generate:
 2. ARCHITECTURE.md — ASCII flow diagram, 2-3 modules max,
    core domain type with comments, 1 ADR for hardest decision
 
-After generating: load references/registry.md entry for this project type.
+After generating: load the registry pack for this project type (references/registry/<type>.md).
 Note which skills to install + which CLAUDE.md additions to copy.
 
 Do NOT include: full error taxonomy, all ADRs, performance specs.

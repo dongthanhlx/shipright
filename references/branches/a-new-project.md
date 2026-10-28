@@ -120,7 +120,7 @@ What's in scope — INFER from what you learned, and state it as an assumption t
     what it costs at 100 users (not 3), who answers the mail it generates, whether that data may
     legally be held. It rarely kills the idea; it changes the shape, and it is cheapest to change
     before the Adapter exists. references/product-judgment.md §1.
-  • AI/LLM implied? → load the matching registry entry (rag-pipeline / chatbot / ai-agent).
+  • AI/LLM implied? → load the matching registry pack (references/registry/rag-pipeline.md / chatbot-telegram-discord.md / ai-agent.md).
   • Runs on the user's own PC (a Windows app, an .exe, "manage N accounts from one machine")? → registry
     `desktop-app` + references/desktop.md (the shape is chosen there — Electron + TypeScript by default,
     Python via PySide6 or a sidecar; OPERATE vs ACT). If it drives a third-party platform, ask FIRST
@@ -159,14 +159,14 @@ Ready to generate CLAUDE.md and ARCHITECTURE.md?
 
 ---
 
-## Step 3 — Load registry entry
+## Step 3 — Load the registry pack
 
 ```
-Identify project type from references/registry.md:
+Identify project type (the pack table in references/registry.md):
   web-api | rag-pipeline | chatbot-telegram-discord | browser-extension |
   ai-agent | mcp-server | full-stack-web | desktop-app | cli-tool | blockchain-dapp
 
-Load that entry only. Note:
+Load that pack only — references/registry/<type>.md. Note:
   - Required skills to install
   - Shipright-adds-to-CLAUDE rules specific to this type
   - Tested-with versions for compatibility awareness
@@ -242,7 +242,7 @@ Check by: [a date, or a trigger condition]
 ## Tech debt log (MVP shortcuts — pay when trigger fires)
 | Shortcut | Trigger |
 |---|---|
-| [from registry entry] | TODO[signal]: [action] |
+| [from the registry pack] | TODO[signal]: [action] |
 
 ## Git policy
 Default branch: main — protected; never commit or push to it directly

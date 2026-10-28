@@ -2,13 +2,14 @@
 
 ## Adding to the registry
 
-The most impactful contribution is adding a new project type to `references/registry.md`:
+The most impactful contribution is a new project-type pack: `references/registry/<type>.md`, plus a
+row in the pack table of `references/registry.md`:
 - Define: project type name, required skills, tested-with versions
 - Add: shipright-adds-to-CLAUDE rules (boundaries, debt signals, CLAUDE.md additions)
 - Include: Ubiquitous Language examples for this domain
 - Include: test-first setup for this stack/framework
 
-See existing entries (web-api, rag-pipeline, blockchain-dapp) as templates.
+See existing packs (`references/registry/web-api.md`, `rag-pipeline.md`, `blockchain-dapp.md`) as templates.
 
 ## Adding a new stack
 
@@ -50,6 +51,28 @@ PRs welcome for:
 - Additional entries in `references/ui-design.md` page type map
 
 Keep PRs focused — one concern per PR.
+
+## Editing SKILL.md safely
+
+SKILL.md is **templated, then shelled, then loaded every session** — three different ways to break it.
+These notes used to live inside its working-context block, where every session paid for them.
+
+- **Argument placeholders.** Claude Code substitutes a dollar sign followed by a digit (0-based:
+  `$` + `0` is the first argument) and the all-caps ARGUMENTS token before any shell runs. An awk
+  positional print became `print <a word the user typed>` and crashed the skill (v1.24.1). Use `sed`,
+  `cut` or a named variable; never a positional parameter. `tests/check-content.sh` enforces this.
+- **`grep -R`, not `-r`.** `npx skills add` symlinks skills into `~/.claude/skills`; lowercase `-r`
+  does not follow symlinked directories, so every correctly installed skill reads as missing.
+- **Probe the `name:` field, never a path.** `npx skills add` (flat, by install name) and `git clone`
+  (`repo/skills/<name>/`) produce different layouts; a path-shaped probe returns NO forever under the
+  other one. Probes LIST what is present (dispatch needs the name); taste-skill folder names ≠ install
+  names (`references/ui-design.md`).
+- **Read sections by range, not line count.** `sed -n '/^## X/,/^## /p'` — a fixed `-A<n>` silently drops
+  every field past line n. End a probe in `grep .` so "no match" is a failure the `|| echo` fallback sees.
+- **Every `` !`…` `` must exit 0.** A failing injected command aborts the whole skill invocation, not just
+  its line. Give each one an `|| echo …` fallback, or make it a test that ends in `echo`.
+- **Budgets.** The body is a recurring cost in every session that loads shipright. The spec recommends
+  < 5,000 tokens; `tests/check-content.sh` holds the line as a ratchet — lower it when you cut.
 
 ## Before you open a PR — the same gate CI runs
 

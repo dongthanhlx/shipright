@@ -1,4 +1,4 @@
-# shipright v1.27.2
+# shipright v1.28.0
 
 > **Ship your MVP fast. Grow it right.**
 
@@ -112,9 +112,10 @@ pending *"did it actually work?"* into that session, so it gets asked before the
 
 ## Registry — curated skill packs per project type
 
-`references/registry.md` maps project type → required skills + CLAUDE.md additions:
+`references/registry.md` maps project type → a pack in `references/registry/` (required skills + CLAUDE.md
+additions). Only the matching pack is loaded:
 
-| Project type | Registry entry | Key installs |
+| Project type | Pack | Key installs |
 |---|---|---|
 | REST API / backend | web-api | addyosmani/agent-skills |
 | RAG / knowledge base | rag-pipeline | RAGAS + addyosmani |
@@ -147,8 +148,9 @@ Registry tells you exactly which skills to install for your project type.
 **shipright offers to install a skill the moment you need it — and uses it in the same session.**
 Claude Code watches the skill directories, so a skill added mid-session works immediately without a
 restart. When a trigger fires and the skill is missing, shipright asks once (~10s to install), then uses
-it right away. It never installs without your yes: its `allowed-tools` pre-approves Bash, so the harness
-shows no permission prompt of its own. Say no and it falls back to its built-in guidance and moves on.
+it right away. It never installs without your yes — and that yes has to come from shipright asking,
+because nothing else may: `allowed-tools` pre-approves Bash for the turn shipright is invoked in, and
+auto mode never prompts. Say no and it falls back to its built-in guidance and moves on.
 
 ---
 
@@ -220,7 +222,8 @@ shipright/
   hooks/boundary-guard.sh     # PreToolUse hook — BLOCKS boundary violations as written (--self-test)
   tests/                      # what CI runs: content checks + behaviour tests for hooks and install.sh (run-all.sh)
   references/
-    registry.md               # Capability/signal → skill (trigger dispatch) + project-type packs
+    registry.md               # Capability/signal → skill (trigger dispatch) + install recipes + pack table
+    registry/                 # one project-type pack per file (web-api, rag-pipeline, desktop-app, …) — load ONE
     branches/
       a-new-project.md        # MVP/Production + registry integration + state tracking
       b-add-feature.md        # Health check + complexity tiers + quality gate

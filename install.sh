@@ -57,5 +57,5 @@ trap - EXIT
 echo "✓ Installed to ${TARGET}"
 [ "$SCOPE" = project ] && echo "  Commit .claude/skills/ to share it with your team."
 echo ""
-echo "Type /shipright in Claude Code. (If it isn't listed yet, start a new session — a skills"
-echo "directory that did not exist when the session started is not watched.)"
+echo "Type /shipright in Claude Code. (Not listed yet? Run /reload-skills — a skills directory that"
+echo "did not exist when the session started is not watched until you do.)"

@@ -1,10 +1,10 @@
 # AI Projects — Entry Point
 
-> Load `references/registry.md` for your specific type:
-> - rag-pipeline → registry entry: rag-pipeline
-> - chatbot → registry entry: chatbot-telegram-discord
-> - ai-agent / multi-agent → references/stacks/ai-agent.md (+ registry entry: ai-agent)
-> - LLM integration only → use web-api entry + rules below
+> Load the registry pack for your specific type:
+> - rag-pipeline → `references/registry/rag-pipeline.md`
+> - chatbot → `references/registry/chatbot-telegram-discord.md`
+> - ai-agent / multi-agent → references/stacks/ai-agent.md (+ `references/registry/ai-agent.md`)
+> - LLM integration only → use `references/registry/web-api.md` + rules below
 
 ## The LLM boundary (all AI projects) — Boundary 4 applied to AI
 

@@ -1,5 +1,53 @@
 # Changelog
 
+## [1.28.0] — 2026-10 — Pay for what fires: the registry split, honest sizes, a description inside the spec
+The firing audits (v1.17, v1.20, v1.24) asked whether the right file loads. This one asked what loading
+costs, measured with bytes instead of estimates. The answer: the routing table was off by 3–5×, the
+registry was always read whole to use a tenth of it, and the description broke the Agent Skills spec.
+
+### Changed — the registry is an index plus one file per project type
+`references/registry.md` keeps the trigger index, the install recipes and a pack table (~2.6k tokens).
+The ten project-type packs moved to `references/registry/<type>.md` (~260–690 tokens each). A
+known-type session loads one pack instead of all ten: about 4k fewer tokens. Before, the file asked the
+model to "load only the relevant entry", which a file read cannot do. No content changed, verified line
+by line; only the headings and the how-to were rewritten. Callers updated: SKILL.md, Branch A, prompts,
+`stacks/ai-projects.md`, `stacks/blockchain.md`, README, CONTRIBUTING.
+
+### Fixed — the routing table's token sizes
+It claimed ~900 tokens for Branch A (~4.8k measured) and B (~4.2k), and ~600 for C (~1.4k). The model
+budgets context from these numbers. They now come from the files, and `tests/check-content.sh` fails any
+claim more than ±25% from bytes/4.
+
+### Changed — description within the Agent Skills spec; triggers in `when_to_use`
+The spec allows 1,024 characters; the description had 1,511. It now says what shipright does and when,
+in 864. The quoted trigger phrases moved to `when_to_use`, which Claude Code appends to the description
+in its listing, within the 1,536-character cap (combined: 1,494). A diff confirms no trigger phrase was
+dropped. Both limits are now CI checks.
+
+### Changed — the always-loaded core, −2.1KB, no trigger removed
+- 13 lines of maintainer notes left the working-context block for CONTRIBUTING's new "Editing SKILL.md
+  safely": argument placeholders, `grep -R`, name-not-path probes, sections by range, every `` !`…` ``
+  must exit 0.
+- Check 3 says the same rules in half the space.
+- Budget ratchet lowered: 35,500 → 33,000 bytes.
+
+### Fixed — claims the docs contradict
+- **`allowed-tools`** pre-approves tools only for the turn the skill is invoked in. SKILL.md and README
+  said the harness never prompts. The consent rule is unchanged; its stated reason is now correct.
+- **A skills directory created mid-session** needs `/reload-skills`, not a new session. Check 3 and
+  `install.sh` say so.
+- **`Tests:` probe** guessed `pytest` for any project with a `tests/` folder (JS included) and knew nothing
+  of Go or PHP. It now detects `npm test`, `go test ./...`, `composer test`, and pytest only with Python
+  markers. It exits 0 in every case, which matters because a failing injected command aborts the
+  invocation.
+
+### Correction to v1.27.1
+Its notes called Branch E's mention of a `Registry` state field drift. It isn't: `l0-templates.md`'s
+state block has the field. Only SKILL.md's summary omitted it, and reading the whole section reads it.
+
+Not done, on purpose: deeper cuts to the core (~8.2k tokens vs the spec's ~5k). Those would remove
+firing paths; see EVALS.md rows 70–74.
+
 ## [1.27.2] — 2026-10 — CI that runs what ships, on the three machines it ships to
 v1.27.1's bugs had one thing in common: CI could not have caught any of them. It ran only on PRs that
 touched `*.md`, so a change to `hooks/*.sh` or `install.sh` merged untested. It never ran the hook
