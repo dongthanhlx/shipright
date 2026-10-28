@@ -1,6 +1,6 @@
 ---
 name: shipright
-version: 1.29.1
+version: 1.30.0
 description: >
   Ship your MVP fast, grow it right — the Project Brain OS for AI coding. Sets up the project
   constitution (CLAUDE.md, ARCHITECTURE.md), enforces 5 architecture boundaries and a quality gate,
@@ -41,7 +41,7 @@ Tests:         !`if [ -f package.json ] && grep -q '"test":' package.json; then 
 
 ---
 
-# Shipright v1.29 — Project Brain OS
+# Shipright v1.30 — Project Brain OS
 
 An executive layer over two hemispheres. The executive decides how much of each hemisphere to
 apply, by stage × risk × reversibility (construction is ON from day one — the irreversible quadrant;

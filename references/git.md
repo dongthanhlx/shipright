@@ -114,6 +114,38 @@ so a rule added here is seen — but keep it short: every line is read at every 
 and merge. Offer to write the policy down the first time — then stop asking what it already answers.
 A policy can widen Tier 1 and Tier 3. Nothing widens Tier 2 or Tier 4.
 
+### Make the dangerous tiers deterministic — permission rules, not just this file
+
+Everything above is an instruction to the model, and an instruction is a probability. Teams that run
+agents in production learn this the hard way: telling the model "always open PRs as drafts" proved
+not reliable enough, so the rule moved into a workflow step that runs every time (Figma's security
+agents). Claude Code's own permission rules work the same way: they are enforced by the harness, and
+an `ask` rule still prompts in **auto mode**, which is exactly where nothing else would ask. When the
+Git policy is first recorded, offer this alongside it (user `~/.claude/settings.json`, or the
+project's `.claude/settings.json` to give the whole team the same floor):
+
+```json
+{
+  "permissions": {
+    "ask": [
+      "Bash(git push *)",
+      "Bash(git reset --hard *)", "Bash(git clean *)",
+      "Bash(git checkout -- *)", "Bash(git restore *)",
+      "Bash(git stash drop *)", "Bash(git stash clear *)", "Bash(git branch -D *)",
+      "Bash(git filter-branch *)", "Bash(git filter-repo *)",
+      "Bash(gh pr merge *)"
+    ]
+  }
+}
+```
+`git push *` is there because Tier 3 defaults to ask. Drop that one line if the recorded policy grants
+pushes to your own branches; keep the rest, since Tier 2 and Tier 4 can't be widened. Say the limits
+plainly when offering it:
+- Rules match the command as written: `git -C . push` or `sh -c '…'` slips past. They are a floor
+  under the ladder, not a security boundary.
+- `bypassPermissions` mode skips prompts altogether.
+- Rules are evaluated deny → ask → allow, so an ask rule here wins over a broader allow elsewhere.
+
 ---
 
 ## 3. When to commit (Beck, Fowler, CI)
@@ -178,7 +210,9 @@ Refs: #142
 
 ```
 □ Small: one concern; roughly under 200–400 changed lines. A bigger change is split into PRs that
-  build on each other.
+  build on each other. This matters more for agent-written code: writing it costs the agent nothing,
+  reviewing it costs a person their attention. A PR too big to review well should not exist. Review
+  is also how the team keeps knowing its own code, and it stops working once people only approve.
 □ Self-review the full diff before anyone else sees it — as if reviewing a stranger's code.
 □ Description = what · why · how it was tested · risks / rollout · screenshots for UI. Use the repo's
   PR template when there is one.
