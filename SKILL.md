@@ -1,64 +1,47 @@
 ---
 name: shipright
-version: 1.27.2
+version: 1.28.0
 description: >
-  Ship your MVP fast. Grow it right. The Project Brain OS for AI coding workflow —
-  sets up constitution, enforces boundaries, judges what to build now vs defer,
-  hardens for fault tolerance, and orchestrates community skills at the right moment.
-  Use when: starting ANY project, adding features (2+ files), fixing unclear bugs,
-  refactoring, resuming after break, production incidents, integrating APIs,
-  adding observability/tracing/resilience, scaling, building AI/RAG/chatbot projects,
-  AND deciding WHETHER to build something / what to build next / whether what shipped worked,
-  AND designing or redesigning ANY user-facing surface (page, landing, dashboard, admin,
-  form, flow, mobile/responsive layout) — shipright carries the UI/UX floor and design brief,
-  AND desktop/PC apps (Electron, Python), AND git (commit, push, PR, merge — when to ask first).
-  Triggers: "build", "start project", "add feature", "bug", "refactor",
-  "production down", "back on this", "integrate API", "add tracing", "make it resilient",
-  "build chatbot",
+  Ship your MVP fast, grow it right — the Project Brain OS for AI coding. Sets up the project
+  constitution (CLAUDE.md, ARCHITECTURE.md), enforces 5 architecture boundaries and a quality gate,
+  judges what to build now vs defer and whether to build it at all, hardens for fault tolerance,
+  tracks state across sessions, and dispatches community skills at the right moment. Use when
+  starting any project, adding a feature (2+ files), fixing an unclear bug, refactoring, resuming
+  after a break, a production incident, integrating an API or LLM, adding observability, resilience
+  or scaling, building AI/RAG/agent/chatbot/MCP projects, deciding what to build next or whether what
+  shipped worked, designing or redesigning any user-facing surface (page, landing, dashboard, admin,
+  form, mobile/responsive), desktop apps (Electron, PySide6), and git (commit, push, PR, merge).
+when_to_use: >
+  Triggers: "build", "start project", "add feature", "bug", "refactor", "production down",
+  "back on this", "integrate API", "add tracing", "make it resilient", "build chatbot",
   "should I build", "is this worth building", "what should I build next", "did it work",
-  "nobody uses it", "prioritize",
-  "design a page/screen/UI", "landing page", "dashboard", "admin panel", "frontend",
-  "redesign", "make it look better", "improve the UI/UX", "responsive",
+  "nobody uses it", "prioritize", "design a page/screen/UI", "landing page", "dashboard",
+  "admin panel", "frontend", "redesign", "make it look better", "improve the UI/UX", "responsive",
   "accessibility", "desktop app", "Windows app", "Electron", "PySide6", "multi-account".
-  Skip for: single-line fixes, knowledge questions, mid-implementation steps.
-  Manual invoke: /shipright — always reliable.
+  Skip for: single-line fixes, knowledge questions, mid-implementation steps. Manual: /shipright.
 allowed-tools: Read, Write, Bash, Glob, Grep
 ---
 
 ## Working context — injected every session
 
 ```
-# Two traps in these commands, both silent:
-#  1) A dollar-sign followed by a digit is an ARGUMENT placeholder, substituted before the shell runs —
-#     an awk positional print became `print <a word the user typed>` and crashed the skill. Use sed/cut
-#     or a named variable instead; never a positional param. (Same for the all-caps ARGUMENTS token.)
-#  2) grep -R, not -r: `npx skills add` SYMLINKS skills into ~/.claude/skills by default, and lowercase
-#     -r does not follow symlinked directories — every correctly installed skill reads as missing.
 Shipright:     !`grep "^version:" "${CLAUDE_SKILL_DIR}/SKILL.md" 2>/dev/null | sed 's/^version: *//'`
 Directory:     !`pwd`
 Git branch:    !`git branch --show-current 2>/dev/null || echo "no git"`
 Last commit:   !`git log --oneline -1 2>/dev/null || echo "no commits"`
 CLAUDE.md:     !`test -f CLAUDE.md && echo "EXISTS — read first" || echo "MISSING"`
 ARCHITECTURE:  !`test -f ARCHITECTURE.md && echo "EXISTS — read first" || echo "MISSING"`
-# Whole sections via a sed range (heading → next heading), never a line count: a fixed -A<n> silently
-# dropped any field past line n. The trailing `grep .` is what makes the fallback fire on no match.
 Project state: !`sed -n '/^## Shipright state/,/^## /p' CLAUDE.md 2>/dev/null | grep -v '^## ' | grep . || echo "no state tracked"`
-# Consent for git lives in the project, not in the model's mood: read the recorded policy every session.
 Git policy:    !`sed -n '/^## Git policy/,/^## /p' CLAUDE.md 2>/dev/null | grep -v '^## ' | grep . || echo "none recorded — propose commits; ask before push/PR/merge (references/git.md §2)"`
 Uncommitted:   !`git status --porcelain 2>/dev/null | wc -l | tr -d ' '` file(s) — never discard without asking (git.md Tier 2)
-# Granular skill detection — match the SKILL.md `name:` field, NOT a guessed path: `npx skills add`
-# (flat, by install name) and `git clone` (repo/skills/<name>/) produce different layouts, and a
-# path-shaped probe silently returns NO forever under the other one. Personal + project scope.
-# Each probe LISTS what is present (not YES/NO) — dispatch needs the specific name, and one grep
-# beats six. taste-skill is an ecosystem whose folder names ≠ install names; see ui-design.md.
 skill/core:  !`grep -RhsE '^name: *"?(spec-driven-development|incremental-implementation|test-driven-development|code-review-and-quality|debugging-and-error-recovery|security-and-hardening)"? *$' ~/.claude/skills .claude/skills --include=SKILL.md | sed 's/^name: *//; s/"//g' | sort -u | paste -sd',' | grep . || echo NONE`
 skill/ui:    !`grep -RhsE '^name: *"?(design-taste-frontend(-v1)?|minimalist-ui|high-end-visual-design|redesign-existing-projects|industrial-brutalist-ui|gpt-taste|image-to-code|stitch-design-taste|imagegen-frontend-(web|mobile)|brandkit|full-output-enforcement|web-design-guidelines|browser-testing-with-devtools)"? *$' ~/.claude/skills .claude/skills --include=SKILL.md | sed 's/^name: *//; s/"//g' | sort -u | paste -sd',' | grep . || echo NONE`
-Tests:         !`if [ -f package.json ] && grep -q '"test":' package.json; then echo "npm test"; elif [ -f pytest.ini ] || [ -f pyproject.toml ] || [ -d tests ]; then echo "pytest"; else echo "none detected"; fi`
+Tests:         !`if [ -f package.json ] && grep -q '"test":' package.json; then echo "npm test"; elif [ -f go.mod ]; then echo "go test ./..."; elif [ -f composer.json ]; then echo "composer test (or vendor/bin/phpunit)"; elif [ -f pytest.ini ] || [ -f pyproject.toml ] || [ -f setup.cfg ] || ls tests/*.py >/dev/null 2>&1; then echo "pytest"; else echo "none detected"; fi`
 ```
 
 ---
 
-# Shipright v1.27 — Project Brain OS
+# Shipright v1.28 — Project Brain OS
 
 An executive layer over two hemispheres. The executive decides how much of each hemisphere to
 apply, by stage × risk × reversibility (construction is ON from day one — the irreversible quadrant;
@@ -189,44 +172,26 @@ fallback either. **Offer to install it (see Check 3), because a skill installed 
 
 **Check 3: Missing skill → offer once, install on consent, use it this session**
 
-**First: is it already there?** Nothing gets installed until you have ruled that out. "Already there" is
-three things, and only the second is on disk:
+**First rule out that it is already there** — three places, only one of them on disk: (1) THIS session's
+available-skills list, the authority, already in your context — bundled skills (/security-review,
+/code-review, /run, /debug, /claude-api, dataviz, /simplify …) usually appear there, but the set varies
+by version and `disableBundledSkills` / `skillOverrides` can remove any: look for them, never assume
+them; (2) on disk — `skill/core` / `skill/ui` above; (3) a connected MCP server or plugin. Offering to
+install over any of these spends the user's consent and disk on capability they already had.
+
+Claude Code watches the skill directories, so a skill installed mid-session works in THIS session —
+no restart (if `~/.claude/skills/` itself did not exist when the session started: `/reload-skills`).
 ```
-1. Skills listed in THIS SESSION's available-skills list — the authority, and it is already in your
-   context. Read it. Bundled skills (/security-review, /code-review, /run, /debug, /claude-api,
-   dataviz, artifact-design, /simplify …) normally appear there, but the set varies by Claude Code
-   version and `disableBundledSkills` / `skillOverrides` can remove any of them. Treat the names in
-   §Ecosystem dispatch as what to LOOK FOR, never as a guarantee that it is present.
-2. Already installed on disk — `skill/core` and `skill/ui` above list these (stale after any
-   mid-session install; re-check per §Install recipes).
-3. Served by a connected MCP server or plugin — those appear in the session list too.
-```
-Offering to install over something in that list is a straight downgrade: it spends the user's consent
-and disk on capability they already had. Only when nothing there covers the job does the flow below apply.
-
-Claude Code **watches the skill directories**: a skill added under `~/.claude/skills/` during a session
-takes effect immediately, no restart. So the useful move at the moment a trigger fires is not "here's a
-command, run it sometime" — it's "want it? 10 seconds, and I'll use it right now."
-
-```
-1. OFFER — one line, at the moment the trigger fires (not a wall of options at session start):
-   "This needs [skill] for [the specific job]. Install it now (~10s, global) and I'll use it —
-    or I proceed with shipright's built-in fallback. Your call."
-   Say what it does and what changes if you skip it. Offer ONCE per skill per session; if the user
-   says no, drop it and don't re-ask.
-
-2. NEVER install without that yes. shipright's own `allowed-tools` pre-approves Bash, so the harness
-   will NOT show a permission prompt — the consent has to come from shipright asking. This is
-   third-party code from GitHub landing in the user's home directory, and a skill can grant itself
-   broad tool access. Silence is not consent.
-
-3. ON YES — `--list` for the exact install name (folder names fail), install, then RE-VERIFY: never
-   assume it worked. Commands + the -g/project-scope nuance: `references/registry.md` §Install recipes.
-
-   ⚠ The skill lists in the working context above are a snapshot taken ONCE, when shipright was invoked —
-   Claude Code does not re-run them on later turns. After any install, and whenever the user says they
-   installed something, re-run the grep from §Install recipes instead of trusting the stale snapshot.
-
+1. OFFER once, when the trigger fires — not a wall of options at session start:
+   "This needs [skill] for [the job]. Install it now (~10s, global) and I'll use it — or I continue
+    with shipright's built-in fallback. Your call."  A no is final for this session.
+2. NEVER install without that yes. Nothing else will ask: `allowed-tools` pre-approves Bash for the
+   turn shipright is invoked in, and auto mode or broad Bash permissions never prompt at all. This is
+   third-party code landing in the user's home directory, and a skill can grant itself broad tool
+   access. Silence is not consent.
+3. ON YES — `--list` for the exact install name (folder names fail), install, RE-VERIFY
+   (`references/registry.md` §Install recipes). The skill lists above are a snapshot taken when
+   shipright was invoked: re-run the grep after any install, or when the user says they installed one.
 4. FAILS or REFUSED → say so plainly, use the fallback, continue. Never block on a missing skill.
 ```
 
@@ -249,12 +214,12 @@ Load ONE file. Do not load others until needed.
 
 | Answer | Load | Tokens |
 |---|---|---|
-| A | `references/branches/a-new-project.md` | ~900 |
-| B | `references/branches/b-add-feature.md` | ~900 |
-| C | `references/branches/c-fix-bug.md` | ~600 |
-| D | `references/branches/d-refactor.md` | ~900 |
-| E | `references/branches/e-resume.md` | ~500 |
-| F | `references/branches/f-incident.md` | ~500 |
+| A | `references/branches/a-new-project.md` | ~4.8k |
+| B | `references/branches/b-add-feature.md` | ~4.2k |
+| C | `references/branches/c-fix-bug.md` | ~1.4k |
+| D | `references/branches/d-refactor.md` | ~2.7k |
+| E | `references/branches/e-resume.md` | ~1.3k |
+| F | `references/branches/f-incident.md` | ~1.0k |
 
 ---
 
@@ -280,11 +245,9 @@ and talks like a veteran, not a questionnaire. (Full intent-discovery flow: Bran
 
 ## Registry — project type → curated skills
 
-After routing, if project type is identifiable, load:
-`references/registry.md` — find the project type entry (~300 tokens per entry)
-
-Registry tells: what to install, what shipright adds to CLAUDE.md, tested-with versions.
-Load only the relevant entry, not the full file.
+After routing, if project type is identifiable, load `references/registry.md` (the trigger index +
+install recipes, ~2.6k tokens) and the ONE matching pack, `references/registry/<type>.md` (~250–700).
+A pack tells: what to install, what shipright adds to CLAUDE.md, tested-with versions. Never all packs.
 
 ---
 
@@ -437,7 +400,7 @@ This list is the map: reach for it when a situation matches none of them. A file
 reason to load it. All paths under `references/`.
 
 **Branches** (load ONE per session): `branches/` a-new-project · b-add-feature · c-fix-bug · d-refactor ·
-e-resume · f-incident · **`registry.md`** — trigger index + project-type packs + install recipes (one entry).
+e-resume · f-incident · **`registry.md`** — trigger index + install recipes + the pack table → `registry/<type>.md` (load one).
 
 **Executive & construction** — `judgment.md` (one-way/two-way doors, MVP matrix, when to break each rule,
 system-vs-experience floors) · `product-judgment.md` (is the need real: 4 risks, riskiest assumption +

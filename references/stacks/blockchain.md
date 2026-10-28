@@ -370,13 +370,13 @@ The backend API, indexer, frontend — these follow standard shipright workflow:
 
 ```
 Backend API (reads blockchain data, serves frontend):
-  → web-api registry entry
+  → web-api registry pack (references/registry/web-api.md)
   → Standard boundaries apply
   → RPC calls to blockchain = third-party API (Boundary Rule 4 applies)
   → Use references/third-party-apis.md: Adapter pattern for RPC responses
 
 Frontend DApp:
-  → full-stack-web registry entry
+  → full-stack-web registry pack (references/registry/full-stack-web.md)
   → taste-skill for UI (if applicable)
   → Wallet connection = third-party API (WalletConnect, MetaMask SDK)
   → NEVER trust frontend validation for financial operations

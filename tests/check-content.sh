@@ -8,8 +8,10 @@
 set -uo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.." || exit 1
 
-SKILL_MD_MAX_BYTES=35500      # the always-loaded core (v1.16 and v1.23 both had to cut it back)
-DESCRIPTION_MAX_CHARS=1550    # the frontmatter description, whitespace-collapsed
+SKILL_MD_MAX_BYTES=33000      # the always-loaded core (cut back in v1.16, v1.23, v1.28)
+# Not budgets — hard limits set elsewhere:
+DESCRIPTION_MAX_CHARS=1024    # Agent Skills spec: description must be 1–1024 characters
+LISTING_MAX_CHARS=1536        # Claude Code truncates description + when_to_use beyond this in the listing
 
 failed=0
 ok()   { echo "✓ $1"; }
@@ -79,14 +81,38 @@ taste_cmd=$(taste_of "$cmd")
 if [ -n "$taste_skill" ] && [ "$taste_skill" = "$taste_cmd" ]; then ok "taste-skill family matches /shipright-version"
 else bad "taste-skill family differs between SKILL.md skill/ui and $cmd"; fi
 
+# ---------------------------------------------------------------- honest load sizes
+# The routing table tells the model what each branch costs. It said ~900 for files of ~4.8k tokens
+# until v1.28. Estimate = bytes/4 (CR stripped); a claim must be within ±25% of it.
+sizes_ok=1
+while IFS='|' read -r _ _ path claim _; do
+  path=$(printf '%s' "$path" | tr -d ' `'); claim=$(printf '%s' "$claim" | tr -d ' ~')
+  [ -f "$path" ] || continue
+  case "$claim" in *k) claimed=$(awk -v c="${claim%k}" 'BEGIN{printf "%d", c*1000}') ;; *) claimed="$claim" ;; esac
+  actual=$(( $(tr -d '\r' < "$path" | wc -c) / 4 ))
+  if [ "$claimed" -lt $(( actual * 3 / 4 )) ] || [ "$claimed" -gt $(( actual * 5 / 4 )) ]; then
+    bad "routing table says ~${claim} tokens for ${path}; it is ~${actual}"; sizes_ok=0
+  fi
+done < <(grep -E '^\| [A-F] \| `references/branches/' SKILL.md)
+[ "$sizes_ok" = 1 ] && ok "routing-table token sizes are within ±25% of the files"
+
 # ---------------------------------------------------------------- budgets (ratchet)
 # Counted without CR: a Windows checkout (core.autocrlf) adds one byte per line, CI's doesn't.
 bytes=$(tr -d '\r' < SKILL.md | wc -c | tr -d ' ')
 if [ "$bytes" -le "$SKILL_MD_MAX_BYTES" ]; then ok "SKILL.md ${bytes} bytes ≤ budget ${SKILL_MD_MAX_BYTES}"
 else bad "SKILL.md is ${bytes} bytes, over the ${SKILL_MD_MAX_BYTES} budget — slim it, don't raise the budget"; fi
 
-desc_len=$(awk '/^description:/{f=1;next} f&&/^[a-z-]+:/{exit} f' SKILL.md | tr -s ' \n\r\t' ' ' | sed 's/^ //; s/ $//' | wc -c | tr -d ' ')
-if [ "$desc_len" -le "$DESCRIPTION_MAX_CHARS" ]; then ok "description ${desc_len} chars ≤ budget ${DESCRIPTION_MAX_CHARS}"
-else bad "description is ${desc_len} chars, over the ${DESCRIPTION_MAX_CHARS} budget"; fi
+# A folded frontmatter field, whitespace-collapsed (ends at the next top-level key).
+fm_field() {
+  awk -v k="^$1:" '$0 ~ k {f=1; next} f && /^[a-z_-]+:/ {exit} f && /^---/ {exit} f' SKILL.md     | tr -s ' 
+	' ' ' | sed 's/^ //; s/ $//'
+}
+desc_len=$(fm_field description | wc -c | tr -d ' ')
+wtu_len=$(fm_field when_to_use | wc -c | tr -d ' ')
+listing=$(( desc_len + wtu_len ))
+if [ "$desc_len" -le "$DESCRIPTION_MAX_CHARS" ]; then ok "description ${desc_len} chars ≤ ${DESCRIPTION_MAX_CHARS} (Agent Skills spec)"
+else bad "description is ${desc_len} chars — the Agent Skills spec allows ${DESCRIPTION_MAX_CHARS}; move trigger phrases to when_to_use"; fi
+if [ "$listing" -le "$LISTING_MAX_CHARS" ]; then ok "description + when_to_use ${listing} chars ≤ ${LISTING_MAX_CHARS} (Claude Code listing)"
+else bad "description + when_to_use is ${listing} chars — Claude Code truncates the listing at ${LISTING_MAX_CHARS}"; fi
 
 exit "$failed"

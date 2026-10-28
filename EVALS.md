@@ -226,6 +226,24 @@ each was found by running it against an input shaped like a real user's machine,
 The pattern is #37's, again: the boundary-guard self-test passed 11/11 for twenty releases because it
 called `inspect()` directly — a fixture shaped like the function, not like Claude Code's call into it.
 
+### Cost scenarios (v1.28) — what firing costs, measured instead of estimated
+
+Every verdict above asks whether the right file loads. These ask what it costs when it does: the
+always-loaded core and the routed files are paid for in every session that reaches them.
+
+| # | Situation | Before | Verdict → fix |
+|---|---|---|---|
+| 70 | Branch A on a known project type ("build a Telegram bot") | registry.md loaded whole, ~6.8k tokens, to use one ~500-token pack. "Load only the relevant entry" was not something Read can do | **OVERLOAD → fixed v1.28.** The trigger index + install recipes stay in `registry.md` (~2.6k tokens); each pack is its own file under `references/registry/` |
+| 71 | the model budgets context from the routing table | it said ~900 tokens for files of ~4.8k (A) and ~4.2k (B), and ~600 for ~1.4k (C) | **STALE-COST → fixed v1.28**, and `check-content.sh` fails a claim off by more than ±25% |
+| 72 | every invocation | 13 lines of maintainer notes sat inside the working-context block | **OVERLOAD → fixed v1.28** (moved to CONTRIBUTING "Editing SKILL.md safely") |
+| 73 | installed through `npx skills` for an agent that enforces the Agent Skills spec | description 1,511 characters, spec maximum 1,024 | **SPEC → fixed v1.28.** 864-char description; trigger phrases moved to `when_to_use`, which Claude Code appends (combined 1,494 ≤ its 1,536 listing cap). No trigger phrase dropped, verified by diff |
+| 74 | Check 3: "nothing else will ask" | claimed `allowed-tools` means the harness never prompts; it pre-approves only for the invoking turn | **WRONG-CLAIM → fixed v1.28.** The consent rule stands, with the right reason |
+
+Not changed, on purpose: the Mid-work and L4 tables, the executive question, the boundaries, "How
+shipright asks". SKILL.md is ~8.2k tokens against the spec's ~5k recommendation. Closing that gap
+means cutting firing paths, and those should not be cut until the scenarios in this file run as an
+automated suite rather than a reading exercise.
+
 ### Finding (v1.20) — the trigger can be perfect and still dead-end
 
 v1.17's lesson was *retrieval + timing*. v1.20 adds: **the target must exist**. shipright's UI dispatch
