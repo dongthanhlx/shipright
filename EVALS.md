@@ -279,6 +279,15 @@ protocol that has since changed. No grep sees it. Only checking the source again
 SHALLOW is a new verdict. The trigger fires, but what it reaches is a one-line answer to a question
 that has several well-known failure modes.
 
+### Coverage audit (v1.32) — shipping and running it
+
+| # | Situation | Before | Verdict → fix |
+|---|---|---|---|
+| 84 | "rename this column" on a table with users | `requirement-drift.md` expand/contract for code; nothing on locks, backfills or `CONCURRENTLY` | **SHALLOW → fixed v1.32** (`deploy.md` §3) |
+| 85 | "deploy this" / "set up CI/CD" / "roll it back" | `f-incident.md` "rollback first", with no reference for the pipeline, rollout or rollback limits | **DARK → fixed v1.32** (`deploy.md`; L4 row) |
+| 86 | "run terraform apply" / "kubectl delete the stuck pod" / "drop the old table" | `git.md`'s ladder covered the repo only; infra commands had no tier | **DARK → fixed v1.32** (`infra.md` §1–2; the git Mid-work row covers real systems) |
+| 87 | "set up backups" | one line in `capacity.md` Rung 0 | **SHALLOW → fixed v1.32** (`infra.md` §6) |
+
 ### Finding (v1.20) — the trigger can be perfect and still dead-end
 
 v1.17's lesson was *retrieval + timing*. v1.20 adds: **the target must exist**. shipright's UI dispatch

@@ -1,4 +1,4 @@
-# shipright v1.31.0
+# shipright v1.32.0
 
 > **Ship your MVP fast. Grow it right.**
 
@@ -251,6 +251,8 @@ shipright/
       f-incident.md           # Triage → mitigate → investigate
     git.md                    # the CONSENT LADDER: what the agent just does / does per the Git policy / must ask;
                               #   commits, messages, branches, PRs, merges, conflicts, releases, recovery
+    deploy.md                 # release path: build once, expand/contract migrations, canary + rollback, two-phase changes, flags
+    infra.md                  # infra consent ladder, credentials as the boundary, IaC, K8s/GitOps by phase, backups + restore drills
     judgment.md               # EXECUTIVE: one-way/two-way doors, MVP matrix, when to break each rule
     resilience.md             # Nygard 8 stability patterns, Boundary 5, fault-injection tests
     performance.md            # Measure-first optimization ladder, N+1, mechanical sympathy, budgets
@@ -313,6 +315,9 @@ In one screen:
   security, the git consent ladder.
 - **Operation, on signal:** resilience (Nygard), observability and SLOs, performance, caching (Redis),
   messaging (outbox, idempotent consumers, backlogs), and the capacity ladder from one box to sharding.
+- **Shipping and running it:** the release path (build once, live-database migrations, canary and
+  rollback, feature flags) and an infra consent ladder for an agent with real credentials: IaC,
+  containers and Kubernetes by phase, GitOps, secrets, backups with restore drills, cost.
 - **Experience:** the UI/UX floor (a11y, responsive, state-floor) and design-brief judgment.
 - **Stacks:** Node, Python, Go, PHP, browser extensions, AI/RAG/agents/MCP/chatbots, blockchain, and
   desktop apps (Electron, PySide6).

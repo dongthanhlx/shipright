@@ -1,7 +1,7 @@
 {
   "name": "shipright",
   "displayName": "shipright",
-  "version": "1.31.0",
+  "version": "1.32.0",
   "description": "Ship your MVP fast, grow it right — the Project Brain OS for AI coding: a project constitution, 5 architecture boundaries and a quality gate, build-now-vs-defer judgment, fault tolerance, session state, and community-skill dispatch.",
   "author": {
     "name": "ThD",

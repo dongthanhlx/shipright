@@ -32,6 +32,11 @@ Rule: stopping damage from spreading is more important than finding root cause.
 Do NOT spend 30 minutes investigating while users keep getting hurt.
 ```
 
+> Rollback mechanics, and what a rollback does NOT undo (rows written, messages sent, charges made):
+> `references/deploy.md` §4. Every command against production during the incident is still
+> `references/infra.md` Tier 3–4: verify the target, count before bulk, take a backup point before
+> touching data. Pressure is when the wrong-environment mistake happens.
+
 > Most incidents are failure PROPAGATION through an integration point, not a logic bug.
 > If a slow/dead dependency is stalling the system → `references/resilience.md` for the
 > containment patterns to apply now (timeout, circuit breaker, bulkhead) and Boundary 5.

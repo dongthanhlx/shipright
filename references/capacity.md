@@ -51,7 +51,7 @@ touches every feature, which makes it a quiet **one-way door** (`judgment.md`). 
 on one box for a long time, but it should be able to run on two.
 
 Also from day one: a **managed database with automated backups and point-in-time restore**. A backup is
-only real once a restore has actually been tested.
+only real once a restore has actually been tested (`infra.md` §6).
 
 ---
 
