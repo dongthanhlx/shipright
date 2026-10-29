@@ -1,5 +1,61 @@
 # Changelog
 
+## [1.32.0] — 2026-10 — Ship it and run it: the release path, and an agent with real credentials
+v1.31 covered data and async. What remained was getting change into production safely, and what an
+agent may do once it holds credentials for real systems. Before this release shipright had git's
+consent ladder and an incident branch, but no reference for deploys, live migrations, IaC, backups or
+the platform choice. Two new references fill that gap.
+
+### Added — `references/deploy.md`
+Grounded in Humble & Farley (*Continuous Delivery*), *Accelerate* and DORA, the Twelve-Factor App, the
+Google SRE book and workbook, Liguori and Pokkunuri (Amazon Builders' Library), Hodgson on feature
+toggles, Sato and Ambler & Sadalage on expand/contract, and `strong_migrations`.
+- **A release floor** to meet before the first real user.
+- **Environments and config:** parity, three kinds of config, no environment-name branches in code.
+- **The pipeline:** build once, promote the same SHA, the pipeline holds the production credentials.
+- **Live-database migrations:** a six-step expand/contract, the table of operations that lock or
+  rewrite and their safe forms (`lock_timeout`, `CONCURRENTLY`, `NOT VALID` → `VALIDATE`), and
+  forward-only migrations as a pipeline step.
+- **Rollout:** rolling, blue/green, canary, dark launch; bake time with the business metric; roll back
+  first; what a rollback does not undo.
+- **Two-phase changes** so a rollback never strands data.
+- **Feature flags:** four kinds with lifetimes, defaults for outages, removal dates, Knight Capital.
+
+### Added — `references/infra.md`
+Grounded in the SRE book (change management, *Data Integrity*), Kief Morris (*Infrastructure as Code*),
+AWS Well-Architected (Reliability), OpenGitOps, the Terraform and Kubernetes docs, and the S3 (2017),
+GitLab (2017) and 2025 agent-deleted-database incidents.
+- **The infra consent ladder,** git.md's tiers extended: observe · local · shared non-prod ·
+  production reversible · production irreversible. Standing rules: verify the target, count before
+  bulk, diagnose don't delete, never disable a safety to make a command pass.
+- **The credential is the boundary:** no production write credentials in the agent's environment,
+  short-lived credentials, an account per environment, plus `permissions.ask` rules for Terraform,
+  OpenTofu, Pulumi, CDK, kubectl, helm and docker.
+- **IaC:** remote locked state split by blast radius, `plan -out` → apply the plan, "forces
+  replacement" on data, `prevent_destroy`, drift detection, policy scans.
+- **Where to run it by phase** (PaaS → managed containers → Kubernetes), image hygiene, the Kubernetes
+  minimum, and GitOps as the cleanest consent model for an agent.
+- **Secrets:** rotation with overlap, and a leak is rotated before it is purged.
+- **Backups and DR:** RPO/RTO per data class, PITR plus logical dumps, why a replica or a same-account
+  snapshot is not a backup, 3-2-1 across accounts, automated restore drills, the four DR strategies.
+- **Cost as an operational property.**
+
+### Changed — wiring
+- **SKILL.md:**
+  - the description and triggers name shipping (deploy, rollback, migration, terraform, kubernetes,
+    backup);
+  - a new L4 row ("deploys break prod");
+  - the git Mid-work row now covers real systems, with one ladder for both;
+  - the map lists the two new files.
+
+  It stays inside its 33,000-byte budget: five rows were reworded shorter, and no routing row was
+  removed. To keep description + `when_to_use` under the 1,536-character listing cap, four quoted
+  triggers that repeated words already in the description were dropped ("build chatbot",
+  "landing page", "Electron", "PySide6"); the description still names each.
+- **Cross-links:** `git.md` §1 → `infra.md`; the incident branch → rollback limits and infra tiers
+  under pressure; Branch A's ship step → the release floor; `requirement-drift.md` → live-database
+  migrations; `capacity.md` → restore drills; `scaling-guide.md` → the platform ladder.
+
 ## [1.31.0] — 2026-10 — Data and async, from the people who ran them: caching, messaging, capacity
 A coverage audit measured what shipright knew against two scaling write-ups (a file-storage service
 grown in six steps; AWS's "first 10 million users" ladder). Logging, tracing and resilience were deep.

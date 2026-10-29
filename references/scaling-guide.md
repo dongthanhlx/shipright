@@ -247,7 +247,7 @@ k6 run --vus 100 --duration 30s tests/load/feed-load.js
 ### What NOT to do in Stage 2
 ```
 ✗ Extract anything before Stage 2 signals appear
-✗ Add Kubernetes "because we'll need it"
+✗ Add Kubernetes "because we'll need it" (where to run it, by phase: infra.md §4)
 ✗ Split database before schemas are stable
 ✓ Strengthen isolation, add versioning, make modules independently testable
 ```

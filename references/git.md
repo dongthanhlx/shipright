@@ -74,6 +74,10 @@ TIER 4 — shared history / production   merge into the default or a protected b
      protected branch unless the user names it. Merging is the user's decision; shipright prepares it.
 ```
 
+Beyond the repository (a deploy run by hand, Terraform, `kubectl`, a cloud CLI, a shared database,
+secrets, DNS, IAM) the same tiers continue in `references/infra.md` §1, with production taking the
+place of shared history.
+
 **Standing rules at every tier** (the harness and the repo's safety nets exist for a reason):
 - Never `--no-verify`, never skip signing, never edit git config (`user.name`, `user.email`, hooks).
 - A hook failed → the commit did **not** happen. Fix the cause and make a **new** commit; `--amend` there

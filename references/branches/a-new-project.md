@@ -310,7 +310,8 @@ PRs — ask each time, or go ahead on my own branches? (Merging into main I'll a
 
    a) OUTPUT check — "are we done building?"
       "Can a real user complete [the one journey] right now?"
-      YES → deploy, put in front of real users (push / PR / merge / deploy per the Git policy — git.md). Don't gold-plate first — the last 20% costs the most
+      YES → deploy, put in front of real users (push / PR / merge / deploy per the Git policy — git.md;
+            the release floor first: deploy.md §0). Don't gold-plate first — the last 20% costs the most
             and no user has asked for it. Cut remaining scope to nice-to-have; the quality floor stays.
       NO  → not done. Cut SCOPE to reach the journey, never cut the quality floor. Then ship + learn.
 

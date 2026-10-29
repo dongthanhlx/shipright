@@ -1,23 +1,25 @@
 ---
 name: shipright
-version: 1.31.0
+version: 1.32.0
 description: >
   Ship your MVP fast, grow it right — the Project Brain OS for AI coding. Sets up the project
   constitution (CLAUDE.md, ARCHITECTURE.md), enforces 5 architecture boundaries and a quality gate,
   judges what to build now vs defer and whether to build it at all, hardens for fault tolerance,
-  tracks state across sessions, and dispatches community skills at the right moment. Use when
+  tracks state across sessions, and dispatches community skills when they fit. Use when
   starting any project, adding a feature (2+ files), fixing an unclear bug, refactoring, resuming
   after a break, a production incident, integrating an API or LLM, adding observability, resilience
   or scaling, building AI/RAG/agent/chatbot/MCP projects, deciding what to build next or whether what
   shipped worked, designing or redesigning any user-facing surface (page, landing, dashboard, admin,
-  form, mobile/responsive), desktop apps (Electron, PySide6), and git (commit, push, PR, merge).
+  form, mobile/responsive), desktop apps (Electron, PySide6), git (commit, push, PR, merge), deploys
+  and infrastructure.
 when_to_use: >
   Triggers: "build", "start project", "add feature", "bug", "refactor", "production down",
-  "back on this", "integrate API", "add tracing", "make it resilient", "build chatbot",
-  "should I build", "is this worth building", "what should I build next", "did it work",
-  "nobody uses it", "prioritize", "design a page/screen/UI", "landing page", "dashboard",
-  "admin panel", "frontend", "redesign", "make it look better", "improve the UI/UX", "responsive",
-  "accessibility", "desktop app", "Windows app", "Electron", "PySide6", "multi-account".
+  "back on this", "integrate API", "add tracing", "make it resilient", "should I build",
+  "is this worth building", "what should I build next", "did it work", "nobody uses it",
+  "prioritize", "design a page/screen/UI", "dashboard", "admin panel", "frontend", "redesign",
+  "make it look better", "improve the UI/UX", "responsive", "accessibility", "desktop app",
+  "Windows app", "multi-account", "deploy", "rollback", "migration", "terraform", "kubernetes",
+  "backup".
   Skip for: single-line fixes, knowledge questions, mid-implementation steps. Manual: /shipright.
 allowed-tools: Read, Write, Bash, Glob, Grep
 ---
@@ -41,7 +43,7 @@ Tests:         !`if [ -f package.json ] && grep -q '"test":' package.json; then 
 
 ---
 
-# Shipright v1.31 — Project Brain OS
+# Shipright v1.32 — Project Brain OS
 
 An executive layer over two hemispheres. The executive decides how much of each hemisphere to
 apply, by stage × risk × reversibility (construction is ON from day one — the irreversible quadrant;
@@ -311,6 +313,7 @@ Never add L4 work proactively. Only when production gives a measurable signal.
 | "Hot reads hammer the DB" · stale data or a stampede after caching | Cache-aside, TTL+jitter, stampede guard | `references/caching.md` |
 | "Events lost or duplicated" · queue backlog / DLQ growing | Outbox + idempotent consumers + age SLO | `references/messaging.md` |
 | "One box / one DB can't keep up" · adding instances | Measure the limit → climb one rung | `references/capacity.md` |
+| "Deploys break prod" · afraid to deploy · a migration locked a table | Small batches, expand/contract, canary + auto-rollback | `references/deploy.md` |
 | "p95 latency / DB CPU over target" | Profile → fix query/N+1 → cache → replica | `references/performance.md` (React/Next front end → also `vercel-react-best-practices`; deployed on Vercel and it's the BILL → `vercel-optimize`) |
 | "Need SLOs / error budget" | Golden signals + SLO + alerting | `references/observability.md` |
 | "API changed silently" | Schema validation + contract tests | `references/third-party-apis.md` |
@@ -322,27 +325,26 @@ Never add L4 work proactively. Only when production gives a measurable signal.
 
 ## Mid-work signals — load the moment you realize it, not just at routing
 
-Routing (intake) and the L4 table (operation) cover session-start and production. But some needs
-surface *mid-construction* — a **realization**, not a route. These have no other firing path, so catch
-them here: when the thought below crosses your mind while building, load the ref immediately.
+Some needs surface *mid-construction* — a **realization**, not a route — and have no other firing
+path. When the thought below crosses your mind while building, load the ref immediately.
 
 | You realize, while building… | Load |
 |---|---|
-| "I'm writing code in this project's language for the first time this session" | `references/stacks/<language>.md` — ONCE, before the first implementation. Not just a Branch A concern: the stack file carries compile-time boundary enforcement, timeout/context idioms, the error taxonomy and the language's security footguns, and existing projects (Branch B/C/D) need them just as much. |
+| "I'm writing code in this project's language for the first time this session" | `references/stacks/<language>.md` — ONCE, before the first implementation, in ANY branch: it carries compile-time boundary enforcement, timeout idioms, the error taxonomy and the language's security footguns. |
 | "What's the right shape for this domain concept — entity, value object, aggregate? Where does this invariant live?" | `references/domain-thinking.md` (Evans tactical: aggregate roots, invariants, domain events, "DDD or not?") |
 | "I'm writing the failure path — what should this return / throw / retry / roll back?" | `references/error-handling.md` (taxonomy, Result type, saga, race conditions, idempotency) — decide it while writing, not after an incident |
-| "I'm touching auth, a session, a permission check, money, PII, file paths, or anything a user controls" — **in ANY branch, not just a new feature** | `references/security.md` (Saltzer & Schroeder, OWASP → layer map). Then EXECUTE the review: `/security-review` (bundled, free) and `security-and-hardening` if installed. Refactoring auth or fixing a payment bug is exactly when this gets skipped — and exactly when it costs most. |
-| "Should this feature exist at all?" · "nobody has said why they want this" · an outcome check came back NO / DON'T KNOW · we've shipped a lot and nothing changed for anyone | `references/product-judgment.md` — the OTHER half of the executive question. Cagan's four risks (building proves feasibility for free and value never), the riskiest assumption + the cheapest test that could kill it, cost-of-NOT and opportunity cost, Rumelt's diagnosis. **Skip it for a bug fix, a config change, or a request the user already reasoned about** — asking there is friction, not judgment. |
-| "This decision is irreversible, security-sensitive, or I'm confident in unfamiliar code" | `references/judgment.md` (one-way door) — and if `doubt-driven-development` is installed, that IS the adversarial second opinion the one-way door deserves |
+| "I'm touching auth, a session, a permission check, money, PII, file paths, or anything a user controls" — **in ANY branch, not just a new feature** | `references/security.md` (Saltzer & Schroeder, OWASP → layer map). Then EXECUTE the review: `/security-review` (bundled, free) and `security-and-hardening` if installed. Auth refactors and payment fixes are exactly where it gets skipped, and costs most. |
+| "Should this feature exist at all?" · "nobody has said why they want this" · an outcome check came back NO / DON'T KNOW · we've shipped a lot and nothing changed for anyone | `references/product-judgment.md` — the OTHER half of the executive question. Cagan's four risks, the riskiest assumption + the cheapest test that could kill it, cost-of-NOT, Rumelt's diagnosis. **Skip it for a bug fix, a config change, or a request the user already reasoned about** — asking there is friction, not judgment. |
+| "This decision is irreversible, security-sensitive, or I'm confident in unfamiliar code" | `references/judgment.md` (one-way door) + `doubt-driven-development` if installed: the adversarial second opinion |
 | "A settled decision / the domain model is wrong — it must change" | `references/evolutionary-architecture.md` (evolve under guard, recovery path). A fitness function only guards you if it RUNS on every commit → `ci-cd-and-automation` |
 | "The requirements changed under us mid-build" | `references/requirement-drift.md` (expand → migrate → contract). Removing the old path / moving users off it is the contract phase → `deprecation-and-migration` |
-| "I just decided a ONE-WAY door (public interface, data identity, money, persisted state)" | Record it before it becomes folklore — shipright decides *what* is irreversible, `documentation-and-adrs` records it properly (ARCHITECTURE.md / ADR). An unrecorded one-way door gets re-litigated by the next session. |
+| "I just decided a ONE-WAY door (public interface, data identity, money, persisted state)" | Record it in ARCHITECTURE.md / an ADR (`documentation-and-adrs` if installed): an unrecorded one-way door gets re-litigated by the next session. |
 | "We're exposing tools/data to an AI host (MCP server/client)" | `references/stacks/mcp.md` (lethal-trifecta boundary) |
 | "This runs as a desktop app on the user's PC" — a window, an .exe, an installer, or many accounts/browser sessions on one machine | `references/desktop.md` — Electron+TS by default, Python via PySide6 or a sidecar; the shape is chosen at L0 (a rewrite to change). Mechanics: `stacks/electron.md` / `stacks/python-desktop.md`. Many accounts on a third-party platform → official API first; UI automation is a viability question (`product-judgment.md` §1); evasion (anti-detect, captcha bypass) is out of scope. |
-| "I'm about to commit, push, open/merge a PR, tag a release, discard changes, rewrite history, or resolve a conflict" | `references/git.md` — the **consent ladder**: read-only = just do it · local + recoverable = per the project's Git policy · destroys uncommitted work = ALWAYS ask, with what would be lost · outward (push/PR/tag) = ask unless the policy grants it · shared history (merge to main, force-push) = ALWAYS explicit confirmation. A "yes" covers that action on that branch, not the next one. No policy recorded → offer to write `## Git policy` into CLAUDE.md once. |
+| "I'm about to commit, push, open/merge a PR, tag a release, discard changes, rewrite history, or resolve a conflict" · **or change a real system: deploy by hand, migrate a shared DB, terraform/kubectl/helm/cloud CLI, secrets, DNS, IAM, backups** | `references/git.md`; real systems → `references/infra.md` (release path: `deploy.md`). One **consent ladder**: read-only = just do it · local + recoverable = per the project's policy · destroys work or data = ALWAYS ask, with what would be lost · outward / shared non-prod = ask unless the policy grants it · shared history or prod = ALWAYS explicit confirmation. A "yes" covers that action on that target, not the next. No policy → offer to write `## Git policy` / `## Infra policy` in CLAUDE.md once. |
 | "This module got too big for one person to hold in their head" | `references/team-scale.md` (cognitive load → split) |
 | "I keep threading the same 3 fields / a string stands in for a domain concept" | `references/code-quality.md` (smells → extract) |
-| "I'm about to write / touch a user-facing surface — a page, screen, form, table, dashboard" | `references/ui-design.md` — the EXPERIENCE floor is not optional and not an afterthought: a11y + responsive/mobile + IA + the state-floor (loading / empty / error / success are *designed*). Then dispatch execution (taste-skill / vercel-labs / dataviz). |
+| "I'm about to write / touch a user-facing surface — a page, screen, form, table, dashboard" | `references/ui-design.md` — the EXPERIENCE floor, never an afterthought: a11y + responsive/mobile + IA + the state-floor (loading / empty / error / success are *designed*). Then dispatch execution (taste-skill / vercel-labs / dataviz). |
 | "This screen only has a happy path / this table is unusable at 360px / these are emoji icons" | `references/ui-design.md` (state-floor · §Mobile & responsive · §Icons — SVG, never emoji) |
 | "I'm adding a cache or Redis, a queue, an event published after a DB write, or state in process memory" | `references/caching.md` · `references/messaging.md` (the outbox is decided with the first event) · `references/capacity.md` Rung 0 |
 | "I'm about to call / integrate a NEW 3rd-party API (YouTube, Stripe, **or an LLM API**, …)" | `references/third-party-apis.md` §Layer-1 — MANDATORY before the Adapter: call the real API/sandbox → save real responses as `tests/fixtures/` → THEN write the Adapter + unit tests (fixtures) + a contract test. Never code an Adapter from docs alone. **LLM APIs count** — also capture token-usage / cost / streaming / error shapes (`references/stacks/ai-projects.md`). An ONGOING cost or obligation (per-call billing, PII, support burden) also raises **viability**, which nothing else triggers: the bill at 100 users, not 3 · who answers its mail · may we hold this data → `references/product-judgment.md` §1. |
@@ -368,7 +370,7 @@ it isn't there, say so and fall back.
 
 | Bundled | Use it when |
 |---|---|
-| `/security-review` | Security review of the branch's pending changes — the EXECUTION arm of `security.md`. Run it whenever auth / payments / untrusted input was touched, before the merge gate. This is not "manual OWASP"; it is a real review and it is free. |
+| `/security-review` | The EXECUTION arm of `security.md`: run it whenever auth / payments / untrusted input was touched, before the merge gate. A real review, and free. |
 | `/code-review` | The quality gate on Tier M+. **User-invoke-only** — shipright cannot run it, so ASK the user to run it rather than claiming the gate is done. |
 | `/run` | See the system actually work — the counterpart to `browser-testing-with-devtools` for anything that isn't a browser UI (CLI, server, job). Verifying by running beats asserting from the diff. |
 | `/debug` | Branch C, alongside shipright's own flow |
@@ -378,7 +380,7 @@ it isn't there, say so and fall back.
 only when the idea is genuinely vague + installed); frontend-ui-engineering → taste-skill; performance-
 optimization → L4 signal-driven; code-simplification → code-quality.md + code-health.md (and `/simplify`);
 planning-and-task-breakdown → Branch B tiers + spec-driven. For AI/RAG: addyosmani covers infra code, shipright AI files cover
-AI-specific code (eval loop, LLM boundaries) — use both, no overlap.
+AI-specific code (eval loop, LLM boundaries).
 
 ---
 
@@ -414,6 +416,7 @@ as real code) · `enforcement.md` (the blocking hook) · `l0-templates.md` · `l
 
 **Operation** — `resilience.md` (Nygard, Boundary 5) · `observability.md` (Correlation ID, SLO) ·
 `caching.md` (Redis) · `messaging.md` (outbox, idempotency) · `capacity.md` (load ladder) ·
+`deploy.md` (pipeline, migrations, flags) · `infra.md` (consent, IaC, backups) ·
 `performance.md` (measure-first ladder) · `scaling-guide.md` (Stage 1→2→3, Strangler Fig) ·
 `debug-intermittent.md` · `security.md` (Saltzer & Schroeder, OWASP → layer map, threat modeling).
 

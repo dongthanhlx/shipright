@@ -137,6 +137,7 @@ Phase 3 — CONTRACT (remove the optional)
 ```
 
 Never jump straight to Phase 3. The expand step is what makes the migration survivable.
+The database side (live schema changes, locks, batched backfills) is `references/deploy.md` §3.
 
 ---
 
