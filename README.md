@@ -1,4 +1,4 @@
-# shipright v1.30.0
+# shipright v1.31.0
 
 > **Ship your MVP fast. Grow it right.**
 
@@ -254,6 +254,9 @@ shipright/
     judgment.md               # EXECUTIVE: one-way/two-way doors, MVP matrix, when to break each rule
     resilience.md             # Nygard 8 stability patterns, Boundary 5, fault-injection tests
     performance.md            # Measure-first optimization ladder, N+1, mechanical sympathy, budgets
+    caching.md                # staleness budget, delete-on-write, stampede/hot key/cold cache, Redis in production, rate limits, locks
+    messaging.md              # delivery semantics, transactional outbox, idempotent consumers, DLQ, ordering, backlogs, contracts
+    capacity.md               # the load ladder: stateless → LB + health checks → replicas (lag) → queues → autoscaling → sharding
     code-quality.md           # Evans + Uncle Bob + Fowler: full quality system
     code-health.md            # SOLID tactical + Ousterhout (deep modules, define errors out of existence)
     testing.md                # testing STRATEGY: pyramid, test-through-public-interface, mock-only-at-seams, Test Desiderata
@@ -308,7 +311,8 @@ In one screen:
   Cagan's four risks, the riskiest assumption, the outcome loop that asks "did it work?" next session.
 - **Construction:** 5 boundaries, a quality gate, testing strategy, domain modelling, error handling,
   security, the git consent ladder.
-- **Operation, on signal:** resilience (Nygard), observability and SLOs, performance, scaling.
+- **Operation, on signal:** resilience (Nygard), observability and SLOs, performance, caching (Redis),
+  messaging (outbox, idempotent consumers, backlogs), and the capacity ladder from one box to sharding.
 - **Experience:** the UI/UX floor (a11y, responsive, state-floor) and design-brief judgment.
 - **Stacks:** Node, Python, Go, PHP, browser extensions, AI/RAG/agents/MCP/chatbots, blockchain, and
   desktop apps (Electron, PySide6).

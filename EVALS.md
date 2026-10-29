@@ -268,6 +268,17 @@ A seventh failure mode, after DARK, WEAK, BROKEN-TARGET, NOT-ACQUIRED, BUNDLED-I
 PLATFORM-PATH: **STALE-SOURCE**. A trigger fires into accurate, well-written knowledge about a
 protocol that has since changed. No grep sees it. Only checking the source again does.
 
+### Coverage audit (v1.31) — load-bearing topics with a one-line answer
+
+| # | Situation | Before | Verdict → fix |
+|---|---|---|---|
+| 81 | "add Redis in front of this query" / a stampede after a deploy | `performance.md` step 4: one line on layer order and "decide invalidation first" | **SHALLOW → fixed v1.31** (`caching.md`; L4 + Mid-work rows) |
+| 82 | "publish an event when the order is saved" | no trigger, and no outbox anywhere: the dual-write bug would ship by default | **DARK → fixed v1.31** (`messaging.md` §2; a Mid-work row fires on "event after a DB write") |
+| 83 | "we need to add more servers" / "add a read replica" | `scaling-guide.md` covers team and module scaling; load scaling was one line in performance.md | **DARK → fixed v1.31** (`capacity.md`; L4 row) |
+
+SHALLOW is a new verdict. The trigger fires, but what it reaches is a one-line answer to a question
+that has several well-known failure modes.
+
 ### Finding (v1.20) — the trigger can be perfect and still dead-end
 
 v1.17's lesson was *retrieval + timing*. v1.20 adds: **the target must exist**. shipright's UI dispatch

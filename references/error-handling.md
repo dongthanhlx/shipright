@@ -214,7 +214,8 @@ async createOrder(dto: CreateOrderDTO, idempotencyKey: string): Promise<Order> {
 - Payment processing (charge twice = very bad)
 - Cron jobs (may run twice if crash mid-run)
 - Webhook handlers (may be retried by caller)
-- Message queue consumers (at-least-once delivery)
+- Message queue consumers (at-least-once delivery): dedup table, version checks, DLQ rules in
+  `references/messaging.md` §3–4
 
 **For news crawler specifically**: FeedItem uses `sha256(url)` as primary key.
 `INSERT ... ON CONFLICT DO NOTHING` = naturally idempotent. Good design.

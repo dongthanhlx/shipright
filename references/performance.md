@@ -75,10 +75,14 @@ Work top to bottom. Do not jump to caching/replicas before fixing the query.
                     Decide invalidation FIRST (the hard part). TTL is the simplest correct
                     strategy; event-based invalidation only when staleness is unacceptable.
                     Layer order: in-process → Redis → CDN. Each adds a consistency cost.
+                    Before the first SET: references/caching.md (staleness budget, delete-on-write,
+                    stampede, cold cache, Redis in production).
 
 5. Scale the resource  Connection pooling → read replica → partition/shard.
                     Last resort, highest operational cost. A read replica fixes read-heavy
                     DB CPU; it does nothing for a missing index (fix that first).
+                    The full rung-by-rung ladder (stateless → LB + health checks → replicas and
+                    their lag anomalies → queues → autoscaling → sharding): references/capacity.md.
 ```
 
 | Signal | First thing to try (not last) |
